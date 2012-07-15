@@ -155,29 +155,6 @@ public:
     }
 };
 
-
-class performance_guard_t
-{
-public:
-    performance_guard_t(const char * info_ = ""):
-    m_info(info_)
-    {
-        gettimeofday(&m_tv, 0);
-    }
-    virtual ~performance_guard_t()
-    {
-        struct timeval   tv2;
-        gettimeofday(&tv2, 0);
-        printf("%s:%ld us.\n",m_info.c_str(), (tv2.tv_sec - m_tv.tv_sec) * 1000000 + (tv2.tv_usec - m_tv.tv_usec));
-    }
-
-private:
-    struct timeval   m_tv;
-    std::string m_info;
-};
-
-
-
 }
 
 }

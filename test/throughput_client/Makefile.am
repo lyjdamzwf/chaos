@@ -6,6 +6,7 @@ INCLUDES= \
 		  -I$(top_srcdir)/chaos/task_service \
 		  -I$(top_srcdir)/chaos/network \
 		  -I$(top_srcdir)/chaos/heart_beat \
+		  -I$(top_srcdir)/chaos/statistic \
 		  -I$(top_srcdir)/chaos/test
 
 
@@ -16,6 +17,7 @@ bin_PROGRAMS = chaos_tpclient
 chaos_tpclient_SOURCES = chaos.cpp
 					
 chaos_tpclient_LDADD = -lpthread	\
+			  $(top_srcdir)/chaos/statistic/libchaos_statistic.a \
 			  $(top_srcdir)/chaos/network/libchaos_network.a \
 			  $(top_srcdir)/chaos/task_service/libchaos_task_service.a \
 			  $(top_srcdir)/chaos/thread/libchaos_thread.a \

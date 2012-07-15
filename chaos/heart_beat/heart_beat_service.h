@@ -86,13 +86,17 @@ heart_beat_service_t<element_type, element_hash>::heart_beat_service_t()
         m_started(false),
         m_service_ptr(NULL)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::heart_beat_service_t ..."));
 }
 
 template<typename element_type, typename element_hash>
 heart_beat_service_t<element_type, element_hash>::~heart_beat_service_t()
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::~heart_beat_service_t begin ..."));
+
     stop();
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::~heart_beat_service_t end ok."));
 }
 
 template<typename element_type, typename element_hash>
@@ -114,6 +118,8 @@ int heart_beat_service_t<element_type, element_hash>::initialize(task_service_t*
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::set_callback_function(callback_function_type callback_function)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_callback_function begin ..."));
+
     if (m_started)
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_callback_function "
@@ -130,12 +136,15 @@ int heart_beat_service_t<element_type, element_hash>::set_callback_function(call
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_callback_function end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::set_timeout(bool timeout_flag, unsigned int timedout)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_timedout begin ..."));
+
     if (m_started)
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_timeout "
@@ -152,12 +161,15 @@ int heart_beat_service_t<element_type, element_hash>::set_timeout(bool timeout_f
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_timeout end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::set_max_limit(bool max_limit_flag, unsigned long max_limit)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_max_limit begin ..."));
+
     if (m_started)
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_max_limit "
@@ -174,12 +186,15 @@ int heart_beat_service_t<element_type, element_hash>::set_max_limit(bool max_lim
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::set_max_limit end ok ..."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::start()
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::start begin ..."));
+
     if (m_started)
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::start "
@@ -203,12 +218,15 @@ int heart_beat_service_t<element_type, element_hash>::start()
 
     m_started = true;
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::start end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::stop()
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::stop begin ..."));
+
     if (!m_started)
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::stop "
@@ -219,48 +237,66 @@ int heart_beat_service_t<element_type, element_hash>::stop()
 
     m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t::stop_service));
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::stop end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::stop_service()
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::stop_service begin ..."));
+
     m_element_manager.clear_element();
     m_started = false;
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::stop_service end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 void heart_beat_service_t<element_type, element_hash>::async_add_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_add_element begin..."));
+
     if (NULL != m_service_ptr)
     {
         m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::add_element, element));
     }
+
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_add_element end ok."));
 }
 
 template<typename element_type, typename element_hash>
 void heart_beat_service_t<element_type, element_hash>::async_update_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_update_element begin..."));
+
     if (NULL != m_service_ptr)
     {
         m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::update_element, element));
     }
+
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_update_element end ok."));
 }
 
 template<typename element_type, typename element_hash>
 void heart_beat_service_t<element_type, element_hash>::async_del_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_del_element begin..."));
+
     if (NULL != m_service_ptr)
     {
         m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::del_element, element));
     }
+
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_del_element end ok."));
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::handle_timeout()
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::handle_timeout() begin..."));
+
     if (m_started)
     {
         m_service_ptr->register_timer(HEART_BEAT_MOUDLE_TICKS,
@@ -280,12 +316,15 @@ int heart_beat_service_t<element_type, element_hash>::handle_timeout()
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::handle_timeout() end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::add_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::add_element begin ..."));
+
     if (m_element_manager.add_element(element))
     {
         LOGERROR((HEART_BEAT_MOUDLE, "heart_beat_service_t::add_element "
@@ -294,12 +333,15 @@ int heart_beat_service_t<element_type, element_hash>::add_element(element_type& 
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::add_element end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::update_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::update_element begin ..."));
+
     if (m_element_manager.update_element(element))
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::update_element "
@@ -308,12 +350,15 @@ int heart_beat_service_t<element_type, element_hash>::update_element(element_typ
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::update_element end ok."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_service_t<element_type, element_hash>::del_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::del_element begin ..."));
+
     if (m_element_manager.del_element(element))
     {
         LOGWARN((HEART_BEAT_MOUDLE, "heart_beat_service_t::del_element "
@@ -322,6 +367,7 @@ int heart_beat_service_t<element_type, element_hash>::del_element(element_type& 
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::del_element end ok."));
     return 0;
 }
 

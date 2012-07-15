@@ -1,6 +1,29 @@
 #ifndef _CHAOS_MISC_DEF_H_
 #define _CHAOS_MISC_DEF_H_
 
+#ifdef HAVE_CONFIG_H
+#include "conf.h"
+#endif
+
+#include "utility_inc.h"
+#include "async_method_inc.h"
+#include "thread_inc.h"
+#include "log_inc.h"
+#include "task_service_inc.h"
+#include "statistic_inc.h"
+#include "heart_beat_inc.h"
+#include "network_inc.h"
+
+using namespace chaos::utility;
+using namespace chaos::async_method;
+using namespace chaos::thread;
+using namespace chaos::log;
+using namespace chaos::task_service;
+using namespace chaos::statistic;
+using namespace chaos::heart_beat;
+using namespace chaos::network;
+
+
 //! yunjie: 日志模块定义
 #ifndef LOG_MODULE
 #define TEST_MODULE                 "TEST_MODULE"
@@ -10,27 +33,31 @@
 
 //! yunjie: 所有service对象, 注: service类不要使用单例, 因为static变量析构顺序的不确定性和依赖性, 会导致关闭进程时crash
 
-task_service_t*              task_service_1104;
-work_service_t*              work_service_1104;
-work_service_group_t*        work_service_group_1104;
-task_service_t*              log_service_1104;
+task_service_t*             task_service_1104;
+work_service_t*             work_service_1104;
+work_service_group_t*       work_service_group_1104;
+task_service_t*             log_service_1104;
+statistic_service_t*        stat_service_1104;
 
 #define NEW_SERVICE() \
     task_service_1104 = new task_service_t("global task service"); \
     work_service_1104 = new work_service_t("global work service"); \
     work_service_group_1104 = new work_service_group_t(); \
-    log_service_1104 = new task_service_t("log service");
+    log_service_1104 = new task_service_t("log service"); \
+    stat_service_1104 = new statistic_service_t(); \
 
 #define DEL_SERVICE() \
     SAFE_DELETE(task_service_1104); \
     SAFE_DELETE(work_service_1104); \
     SAFE_DELETE(work_service_group_1104); \
-    SAFE_DELETE(log_service_1104);
+    SAFE_DELETE(log_service_1104); \
+    SAFE_DELETE(stat_service_1104); \
         
 #define TS()    (*task_service_1104)
 #define WS()    (*work_service_1104)
 #define LOGS()  (*log_service_1104)
 #define WSG()   (*work_service_group_1104)
+#define SS()    (*stat_service_1104)
 
 
 //! yunjie: 日志模块封装
@@ -67,6 +94,8 @@ public:
         modules.push_back(ACCEPTOR_SERVICE_MODULE);
         modules.push_back(CONNECTION_MODULE);
         modules.push_back(HEART_BEAT_MOUDLE);
+        modules.push_back(STATISTIC_MOUDLE);
+        modules.push_back(CONNECTOR_SERVICE);
 
         init_log(log_path,
                 log_name,

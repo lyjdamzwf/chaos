@@ -40,8 +40,11 @@ work_service_t::~work_service_t()
 
 void work_service_t::conn_timedout_callback(conn_id_t& conn_id_)
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::conn_timedout_callback begin"));
+
     connection_t::async_close(conn_id_, false, EV_TIMEOUT_CLOSED);
 
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::conn_timedout_callback end"));
 }
 
 int work_service_t::start_heart_beat_service(const conn_heart_beat_param_t& param_)
@@ -64,6 +67,8 @@ int work_service_t::start(int32_t thread_num_)
 
 int work_service_t::stop()
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::stop begin"));
+
     this->post(async_method_t::bind_memfunc(this, &work_service_t::sync_close_all_conn_i));
 
     if (m_enable_conn_heart_beat)
@@ -75,6 +80,7 @@ int work_service_t::stop()
     //! yunjie: 发送线程停止信号并pthread_join
     task_service_t::stop();
 
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::stop end"));
     return 0;
 }
 
@@ -89,7 +95,6 @@ int work_service_t::async_add_connection(conn_ptr_t conn_ptr_)
 
 int work_service_t::async_del_connection(const conn_id_t& conn_id_)
 {
-    //! yunjie: 因为这里有可能被connection_t对象内部调用, 所以不需要当前上下文直接执行, 强制post到任务队列中等待下一轮执行
     this->post(async_method_t::bind_memfunc(this, &work_service_t::sync_del_connection_i, conn_id_));
 
     return 0;
@@ -113,6 +118,8 @@ void work_service_t::async_del_hb_element(conn_id_t& conn_id_)
 
 conn_ptr_t work_service_t::get_conn(const conn_id_t& conn_id_)
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::get_conn  begin"));
+
     fd_t peer_socket = conn_id_.socket;
     if (peer_socket >= m_conn_vct.size())
     {
@@ -136,12 +143,16 @@ conn_ptr_t work_service_t::get_conn(const conn_id_t& conn_id_)
         }
     }
 
+
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::get_conn  end"));
     return conn_ptr;
 }
 
 
 int work_service_t::sync_close_all_conn_i()
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_close_all_conn_i begin"));
+
     for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
         conn_ptr_t conn_ptr = *it;
@@ -152,11 +163,14 @@ int work_service_t::sync_close_all_conn_i()
         }
     }
 
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_close_all_conn_i end"));
     return 0;
 }
 
 int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_add_connection_i arg-[fd:%d] begin", conn_ptr_->native_socket()));
+
     if (is_recv_stop_signal())
     {
         //! yunjie: 如果收到停止信号, 那么不再接受新连接
@@ -203,11 +217,14 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
                                     (void*)conn_ptr_
                                 );
 
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_add_connection_i arg-[fd:%d] end", conn_ptr_->native_socket()));
     return 0;
 }
 
 int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_del_connection_i arg-[fd:%d] begin", conn_id_.socket));
+
     fd_t peer_socket = conn_id_.socket;
     if (peer_socket >= m_conn_vct.size())
     {
@@ -237,6 +254,7 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
     //! yunjie: 将conn_ptr置为NULL
     SAFE_DELETE(conn_ptr);
     
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_del_connection_i arg-[fd:%d] end", conn_id_.socket));
     return 0;
 }
 

@@ -98,41 +98,51 @@ private:
 template<typename element_type>
 element_data_t<element_type>::element_data_t() : element(), time(time(NULL))
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "element_data_t<element_type>::element_data_t"));
 }
 
 template<typename element_type>
 element_data_t<element_type>::element_data_t(const element_type& in_element)
   : element(in_element), time(::time(NULL))
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "element_data_t<element_type>::element_data_t"));
 }
 
 template<typename element_type, typename element_hash>
 heart_beat_element_mgr_t<element_type, element_hash>::heart_beat_element_mgr_t()
   : m_element_count(0), m_timeout_flag(false), m_timeout(0), m_max_limit_flag(false), m_max_limit(0)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::heart_beat_element_mgr_t"));
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::set_callback_function(callback_function_type callback_function)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::set_callback_function begin..."));
+
     m_callback_function = callback_function;
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::set_callback_function end ok..."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::set_timeout(bool timeout_flag, unsigned int timeout)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::set_timedout begin..."));
     m_timeout_flag = timeout_flag;
     m_timeout = timeout;
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::set_timedout end ok..."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::set_max_limit(bool max_limit_flag, unsigned long max_limit)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::set_max_limit begin..."));
     m_max_limit_flag = max_limit_flag;
     m_max_limit = max_limit;
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::set_max_limit end ok..."));
     return 0;
 }
 
@@ -185,6 +195,8 @@ int heart_beat_element_mgr_t<element_type, element_hash>::handle_timeout()
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::add_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::add_element begin..."));
+
     element_map_iterator it = m_elements.find(element);
     if (it != m_elements.end()) //! yunjie: 已经存在, 返回
     {
@@ -230,12 +242,15 @@ int heart_beat_element_mgr_t<element_type, element_hash>::add_element(element_ty
         ++m_element_count;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::add_element end ok..."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::update_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::update_element begin..."));
+
     element_map_iterator it = m_elements.find(element);
     if (it == m_elements.end())
     {
@@ -256,12 +271,15 @@ int heart_beat_element_mgr_t<element_type, element_hash>::update_element(element
     node->data.time = ::time(NULL);
     m_busy_list.push_front(node);
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::update_element end ok..."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::del_element(element_type& element)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::del_element begin..."));
+
     element_map_iterator it = m_elements.find(element);
     if (it != m_elements.end())
     {
@@ -286,12 +304,14 @@ int heart_beat_element_mgr_t<element_type, element_hash>::del_element(element_ty
         return -1;
     }
 
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::del_element end ok..."));
     return 0;
 }
 
 template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::clear_element()
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::clear_element begin..."));
     list_node_type* node = NULL;
     while (NULL != (node = m_busy_list.pop_front()))
     {
@@ -299,6 +319,7 @@ int heart_beat_element_mgr_t<element_type, element_hash>::clear_element()
     }
 
     m_elements.clear();
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::clear_element end ok..."));
     return 0;
 }
 
@@ -306,6 +327,7 @@ template<typename element_type, typename element_hash>
 int heart_beat_element_mgr_t<element_type, element_hash>::get_all_element_and_clear(
                                             vector<element_type>* element_vt)
 {
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::get_all_element_and_clear begin..."));
     list_node_type* node = NULL;
     while (NULL != (node = m_busy_list.pop_front()))
     {
@@ -314,6 +336,7 @@ int heart_beat_element_mgr_t<element_type, element_hash>::get_all_element_and_cl
     }
 
     m_elements.clear();
+    LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_element_mgr_t::get_all_element_and_clear end ok..."));
     return 0;
 }
 

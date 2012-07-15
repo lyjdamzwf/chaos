@@ -39,6 +39,8 @@ io_multiplex_handler_t::~io_multiplex_handler_t()
 
 int io_multiplex_handler_t::initialize(bool lock_)
 {
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize arg-[lock:%d] begin.", lock_));
+
     if (m_inited)
     {
         LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize io multiplex handler has inited, return."));
@@ -71,11 +73,14 @@ int io_multiplex_handler_t::initialize(bool lock_)
 
     m_inited = true;
 
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize arg-[lock:%d] end.", lock_));
     return 0;
 }
 
 int io_multiplex_handler_t::wait_io_notification()
 {
+    //! LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification begin."));
+
     CHECK_LOCK(m_is_lock, m_mutex);
 
     if (0 == m_fd_set.size())   //! yunjie: 避免没有监听的fd也要system call陷入内核
@@ -143,6 +148,8 @@ int io_multiplex_handler_t::wait_io_notification()
                 //! yunjie: 注意, 此时的io_event有可能已经被callback clear, 所以要来判断fd是否不为0
                 if (io_event.listen_fd && !io_event.read_persist)
                 {
+                    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification read event is not persist, remove it from epoll."));
+
                     //! yunjie: 如果有注册写事件, 那么不能直接删除epoll和socket的关联, 需要修改epoll信息, 否则就直接从epoll中删除socket的关联
                     if (NULL != io_event.write_cb)
                     {
@@ -181,6 +188,8 @@ int io_multiplex_handler_t::wait_io_notification()
                 //! yunjie: 注意, 此时的io_event有可能已经被callback clear, 所以要来判断fd是否不为0
                 if (io_event.listen_fd && !io_event.write_persist)
                 {
+                    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification write event is not persist, remove it from epoll."));
+
                     //! yunjie: 如果有注册读事件, 那么不能直接删除epoll和socket的关联, 需要修改epoll信息, 否则就直接从epoll中删除socket的关联
                     if (NULL != io_event.read_cb)
                     {
@@ -219,31 +228,40 @@ int io_multiplex_handler_t::wait_io_notification()
         LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_io_notification m_epoll_events resize to %lu.", new_size));
     }
 
+    //! LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification end"));
     return res;
 }
 
 int io_multiplex_handler_t::register_io_event(fd_t fd_, int event_type_flag_, callback_on_event_t event_cb_, void* cb_arg_, bool is_persist_)
 {
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event arg-[fd:%lu] begin", fd_));
+
     CHECK_LOCK(m_is_lock, m_mutex);
 
     int ret = register_io_event_i(fd_, event_type_flag_, event_cb_, cb_arg_, is_persist_);
 
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event end"));
     return ret;
 }
 
 
 int io_multiplex_handler_t::remove_fd_from_epoll(fd_t fd_)
 {
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::remove_fd_from_epoll begin"));
+
     CHECK_LOCK(m_is_lock, m_mutex);
 
     int ret = remove_fd_from_epoll_i(fd_);
 
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::remove_fd_from_epoll end"));
     return ret;
 }
 
 
 int io_multiplex_handler_t::register_io_event_i(fd_t fd_, int event_type_flag_, callback_on_event_t event_cb_, void* cb_arg_, bool is_persist_)
 {
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event_i args-[fd:%lu, event_flag:%lu] begin", fd_, event_type_flag_));
+
     if (NULL == event_cb_)
     {
         LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event_i event_cb_ equals NULL"));
@@ -357,6 +375,7 @@ int io_multiplex_handler_t::register_io_event_i(fd_t fd_, int event_type_flag_, 
     //! yunjie: 添加已成功监听fd到m_fd_set
     m_fd_set.insert(fd_);
 
+    LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event_i end."));
     return 0;
 }
 

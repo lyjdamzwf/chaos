@@ -103,11 +103,14 @@ public:
         {
             if (NULL != thd_)
             {
+                LOGTRACE(("task_service_t", "send_cond_signal_t::exec() begin"));
+
                 if (ALL_THREAD_MASK == pid || thd_->get_thread_id() == pid)
                 {
                     thd_->cond_signal();
                 }
 
+                LOGTRACE(("task_service_t", "send_cond_signal_t::exec() end"));
             }
         }
 
@@ -146,6 +149,12 @@ public:
     bool is_recv_stop_signal() const
     {
         return m_stop_signal;
+    }
+
+    //! yunjie: 非线程安全
+    timeval get_cached_time()
+    {
+        return m_timer_manager.get_cached_time();
     }
 
 protected:

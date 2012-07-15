@@ -78,7 +78,7 @@ void test_task_service_performance()
     */
 
 #else
-    performance_guard_t guard("task_service");
+    performance_guard_t guard(SS(), "task_service");
 
     int index = 0;
     while (1)

@@ -2,30 +2,27 @@
 #include <iostream>
 using namespace std;
 
-#include "utility_inc.h"
-#include "thread_inc.h"
-#include "task_service_inc.h"
-#include "async_method_inc.h"
-#include "log_inc.h"
-#include "network_inc.h"
-using namespace chaos::utility;
-using namespace chaos::async_method;
-using namespace chaos::thread;
-using namespace chaos::task_service;
-using namespace chaos::log;
-using namespace chaos::network;
-
 #include "../misc_def.h"
 #include "test_tcp_server.h"
 
 arg_option_t       arg_options[] =
 {
+    //! yunjie: 信息输出
     arg_option_t("args", "show all args", false, NULL),
+    arg_option_t("pt", "progress type", false, NULL),
+
+    //! yunjie: 进程相关选项配置
     arg_option_t("d", "daemon progress", false, NULL),
     arg_option_t("ct", "connection timeout", true, NULL),
     arg_option_t("wt", "number of work thread", true, NULL),
-    arg_option_t("pt", "progress type", false, NULL),
     arg_option_t("ll", "log level", true, NULL),
+
+    //! yunjie: 网络选项配置
+    arg_option_t("tss", "tcp sndbuf size", true, NULL),
+    arg_option_t("trs", "tcp rcvbuf size", true, NULL),
+    arg_option_t("msbs", "max send buffer size", true, NULL),
+    arg_option_t("mrbs", "max read buffer size", true, NULL),
+    arg_option_t("tn", "enable tcp nodelay option", false, NULL),
 };
 
 int main(int argc_, char* argv_[])
@@ -42,6 +39,8 @@ int main(int argc_, char* argv_[])
     int tcp_server_thread = 1;
     int log_level = 4;
 
+    network_config_t network_config;
+
     //! yunjie: arg parse begin
     int parse_ret = singleton_t<arg_helper_t>::instance().parse_arg
         (
@@ -56,6 +55,7 @@ int main(int argc_, char* argv_[])
     if (-1 == parse_ret)
     {
         printf("arg parse error.\n");
+        exit(0);
     }
 
     for (int i = 0; i < pair_count; ++i)
@@ -71,33 +71,69 @@ int main(int argc_, char* argv_[])
                 exit(0);
             }
             break;
+
             case 1:
-            {
-                singleton_t<processor_helper_t>::instance().daemonize();
-            }
-            break;
-            case 2:
-            {
-                hb_param.timeout_flag = true;
-                hb_param.timeout = atoi(pair_arr[i].arg_val);
-            }
-            break;
-            case 3:
-            {
-                tcp_server_thread = atoi(pair_arr[i].arg_val);
-            }
-            break;
-            case 4:
             {
                 printf("echo server\n");
                 exit(0);
             }
             break;
+
+            case 2:
+            {
+                singleton_t<processor_helper_t>::instance().daemonize();
+            }
+            break;
+
+            case 3:
+            {
+                hb_param.timeout_flag = true;
+                hb_param.timeout = atoi(pair_arr[i].arg_val);
+            }
+            break;
+
+            case 4:
+            {
+                tcp_server_thread = atoi(pair_arr[i].arg_val);
+            }
+            break;
+
             case 5:
             {
                 log_level = atoi(pair_arr[i].arg_val);
             }
             break;
+
+            case 6:
+            {
+                network_config.tcp_sndbuf_size = atoi(pair_arr[i].arg_val);
+            }
+            break;
+
+            case 7:
+            {
+                network_config.tcp_rcvbuf_size = atoi(pair_arr[i].arg_val);
+            }
+            break;
+
+            case 8:
+            {
+                network_config.max_send_buffer_size = atoi(pair_arr[i].arg_val);
+            }
+            break;
+
+            case 9:
+            {
+                network_config.max_read_buffer_size = atoi(pair_arr[i].arg_val);
+            }
+            break;
+
+            case 10:
+            {
+                network_config.is_enable_tcp_nodelay = true;
+            }
+            break;
+
             default:
             {
             }
@@ -106,9 +142,15 @@ int main(int argc_, char* argv_[])
     }
     //! yunjie: arg parse end
 
+
     //! yunjie: 对于先创建的所有线程阻塞所有信号
     application_tool_t::block_all_signal();
     log_tool_t::start_log_service("echoserver.log", log_level, 1, 1);
+
+    //! yunjie: 启动statistic service
+    //! SS().set_timeout(10);
+    //! SS().start(&LOGS());
+
     tcp_service_t<test_server_echo_conn_t>* tcp_service_ptr = new tcp_service_t<test_server_echo_conn_t>();
     if (NULL == tcp_service_ptr)
     {
@@ -117,7 +159,7 @@ int main(int argc_, char* argv_[])
     }
 
     //! yunjie: 初始化并启动网络
-    tcp_service_ptr->initialize(LOCALHOST, 8880, tcp_conn_event);
+    tcp_service_ptr->initialize(LOCALHOST, 8880, tcp_conn_event, network_config);
     if (hb_param.timeout_flag)
     {
         tcp_service_ptr->enable_conn_heart_beat(hb_param);

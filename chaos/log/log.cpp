@@ -402,8 +402,6 @@ const char* log_t::get_color_head_by_level(int log_level_)
             return YELLOW_COLOR_HEAD;
         case LF_INFO:
             return GREEN_COLOR_HEAD;
-        case LF_DEBUG:
-            return GREEN_COLOR_HEAD;
         default:
             return NONE_COLOR_HEAD;
     }

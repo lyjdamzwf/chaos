@@ -25,6 +25,7 @@
 #include "task_service_inc.h"
 #include "network_tool.h"
 #include "work_service_group.h"
+#include "network_config.h"
 #include "connection.h"
 
 namespace chaos
@@ -52,10 +53,17 @@ public:
                     const string& host,
                     uint32_t port_,
                     work_service_group_t* work_service_group_,
-                    connection_t::on_conn_event_t event_func_
+                    connection_t::on_conn_event_t event_func_,
+                    network_config_t config_ = network_config_t()
                     );
     int start(int thread_num_ = DEFAULT_ACCEPTOR_SERVICE_THREAD_NUM);
     int stop();
+
+    void set_network_config(network_config_t config_ = network_config_t())
+    {
+        m_network_config = config_;
+    }
+
 
 private:
     static void on_listen_callback(fd_t, int, void*);
@@ -72,6 +80,7 @@ private:
     work_service_group_t*                       m_work_service_group_ptr;
     fd_t                                        m_listen_socket;
     connection_t::on_conn_event_t               m_event_func;
+    network_config_t                            m_network_config;
 };
 
 template<typename CONN_TYPE>
@@ -90,8 +99,10 @@ acceptor_service_t<CONN_TYPE>::acceptor_service_t()
 }
 
 template<typename CONN_TYPE>
-int acceptor_service_t<CONN_TYPE>::initialize(const string& host_, uint32_t port_, work_service_group_t* work_service_group_, connection_t::on_conn_event_t event_func_)
+int acceptor_service_t<CONN_TYPE>::initialize(const string& host_, uint32_t port_, work_service_group_t* work_service_group_, connection_t::on_conn_event_t event_func_, network_config_t config_)
 {
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize arg-[host:%s, port:%d] begin", host_.c_str(), port_));
+
     if (m_inited)
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize service has inited, return."));
@@ -108,8 +119,10 @@ int acceptor_service_t<CONN_TYPE>::initialize(const string& host_, uint32_t port
     m_listen_port = port_;
     m_work_service_group_ptr = work_service_group_;
     m_event_func = event_func_;
+    m_network_config = config_;
     m_inited = true;
 
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize arg-[host:%s, port:%d] end", host_.c_str(), port_));
     return 0;
 }
 
@@ -122,6 +135,8 @@ acceptor_service_t<CONN_TYPE>::~acceptor_service_t()
 template<typename CONN_TYPE>
 int acceptor_service_t<CONN_TYPE>::start(int thread_num_)
 {
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start arg-[thread_num:%d] begin", thread_num_));
+
     if (!m_inited)
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start service has not inited, return."));
@@ -148,12 +163,15 @@ int acceptor_service_t<CONN_TYPE>::start(int thread_num_)
 
     m_started = true;
 
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start arg-[thread_num:%d] end", thread_num_));
     return 0;
 }
 
 template<typename CONN_TYPE>
 int acceptor_service_t<CONN_TYPE>::stop()
 {
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::stop begin"));
+
     if (!m_started)
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::stop service has stopped, return."));
@@ -170,12 +188,15 @@ int acceptor_service_t<CONN_TYPE>::stop()
 
     m_started = false;
 
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::stop end"));
     return 0;
 }
 
 template<typename CONN_TYPE>
 int acceptor_service_t<CONN_TYPE>::start_listen_i()
 {
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i begin"));
+
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
     if(sockfd < 0)
     {
@@ -193,19 +214,20 @@ int acceptor_service_t<CONN_TYPE>::start_listen_i()
         return -1;
     }
 
-
     //! yunjie: 窗口大小设置
-    int bufSize = 64 * 1024;
-    if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &bufSize, sizeof(bufSize)))
+    int sndbuf_size = m_network_config.tcp_sndbuf_size;
+    if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &sndbuf_size, sizeof(sndbuf_size)))
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i set socket option size of rcvbuf failed."));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i set socket option size of sndbuf failed."));
         TEMP_FAILURE_RETRY(::close(sockfd));
 
         return -1;
     }
-    if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &bufSize, sizeof(bufSize)))
+
+    int rcvbuf_size = m_network_config.tcp_rcvbuf_size;
+    if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &rcvbuf_size, sizeof(rcvbuf_size)))
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i set socket option size of sndbuf failed."));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i set socket option size of rcvbuf failed."));
         TEMP_FAILURE_RETRY(::close(sockfd));
 
         return -1;
@@ -250,24 +272,30 @@ int acceptor_service_t<CONN_TYPE>::start_listen_i()
                                             true                                       //! yunjie: 该事件是否持续, 由于是监听读事件, 所以一直需要持续
                                         );
 
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i end"));
     return 0;
 }
 
 template<typename CONN_TYPE>
 int acceptor_service_t<CONN_TYPE>::stop_listen_i()
 {
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::stop_listen_i begin"));
+
     //! yunjie: 关闭监听socket
     //! yunjie: 注 - SHUT_RD保证接受缓冲区的数据全被丢弃
     //！        再close将不会发送RST报文
     ::shutdown(m_listen_socket, SHUT_RD);
     TEMP_FAILURE_RETRY(::close(m_listen_socket));
 
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::stop_listen_i end"));
     return 0;
 }
 
 template<typename CONN_TYPE>
 void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_, void* arg_)
 {
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] begin", fd_, event_type_));
+
     if (NULL == arg_)
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback arg_ is NULL, args-[fd:%d, event_type:%d], return", fd_, event_type_));
@@ -296,12 +324,6 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
         return;
     }
 
-    //! yunjie: 设置描述符为nonblock
-    if (-1 == network_tool_t::make_socket_nonblocking(accepted_fd))
-    {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback make_socket_nonblocking failed"));
-    }
-
     //! yunjie: 为connection_t绑定work_service, 根据accepted_fd模到相应的work_service_group中对应的work_service(linux进程空间中fd从1递增)
     work_service_t* work_ptr = (work_service_t*)((*work_group_ptr)[accepted_fd % work_group_ptr->size()]);
     if (NULL == work_ptr)
@@ -319,9 +341,9 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
         return;
     }
 
-    conn_ptr->initialize(accepted_fd, now, work_ptr, T_PASSIVE, as_ptr->m_event_func, work_ptr->is_enable_hb());
+    conn_ptr->initialize(accepted_fd, now, work_ptr, T_PASSIVE, as_ptr->m_event_func, &as_ptr->m_network_config, work_ptr->is_enable_hb());
 
-    work_ptr->async_add_connection(conn_ptr);
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] end", fd_, event_type_));
 }
 
 }

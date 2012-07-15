@@ -26,25 +26,60 @@ int test_press_client(int conn_num_);
 
 void tcp_press_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, conn_id_t conn_id_)
 {
-    LOGINFO((TEST_MODULE, "tcp_press_conn_event args-[conn_event:%d, conn_status:%d, socket fd:%d] begin", conn_event_, conn_status_, conn_id_.socket));
-
     switch (conn_event_)
     {
+        case EV_INIT_COMPLETE:
+        {
+            LOGINFO((TEST_MODULE, "tcp_conn_event init complete sockfd:[%d]", conn_id_.socket));
+        }
+        break;
+
+        case EV_DECONSTRUCT:
+        {
+            LOGINFO((TEST_MODULE, "tcp_conn_event deconstruct sockfd:[%d]", conn_id_.socket));
+        }
+        break;
+
         case EV_ACCEPTED_COMPLETE:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event accepted complete"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event accepted complete sockfd:[%d]", conn_id_.socket));
         }
         break;
 
         case EV_CONNECT_SUCCESS:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event connect success"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event connect success sockfd:[%d]", conn_id_.socket));
+
+            uint32_t packet_size = rand_gen_t::get_rand(MIN_PACKET_SIZE, g_max_packet_size + 1);
+            uint32_t body_size = packet_size - sizeof(packet_header_t);
+
+            packet_header_t header;
+            header.cmd = 1121;
+            header.ext = 1104;
+            header.data_len = body_size;
+
+            char data[g_max_packet_size];
+
+            packet_wrapper_t packet;
+            packet.append((char*)&header, sizeof(header));
+            if (0 != body_size)
+            {
+                packet.append(data, body_size);
+            }
+
+            connection_t::async_send(conn_id_, packet);
+        }
+        break;
+
+        case EV_CONNECT_FAILED:
+        {
+            LOGINFO((TEST_MODULE, "tcp_conn_event connect failed sockfd:[%d]", conn_id_.socket));
         }
         break;
 
         case EV_ACTIVE_CLOSED:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event conn active closed"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event conn active closed sockfd:[%d]", conn_id_.socket));
             //! yunjie: 关闭后再发起一个连接
             test_press_client(1);
         }
@@ -52,7 +87,7 @@ void tcp_press_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, 
 
         case EV_PASSIVE_CLOSED:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event conn passive closed"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event conn passive closed sockfd:[%d]", conn_id_.socket));
             //! yunjie: 关闭后再发起一个连接
             test_press_client(1);
         }
@@ -60,7 +95,7 @@ void tcp_press_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, 
 
         case EV_TIMEOUT_CLOSED:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event conn timeout closed"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event conn timeout closed sockfd:[%d]", conn_id_.socket));
             //! yunjie: 关闭后再发起一个连接
             test_press_client(1);
         }
@@ -68,20 +103,17 @@ void tcp_press_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, 
 
         case EV_ERROR_OCCURRED:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event error occurred"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event error occurred sockfd:[%d]", conn_id_.socket));
             connection_t::async_close(conn_id_);
         }
         break;
 
         default:
         {
-            LOGINFO((TEST_MODULE, "tcp_press_conn_event unknown event"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event unknown event sockfd:[%d]", conn_id_.socket));
         }
     }
-
-    LOGINFO((TEST_MODULE, "tcp_server_conn_event args-[conn_event:%d, conn_status:%d, socket fd:%d] end", conn_event_, conn_status_, conn_id_.socket));
 }
-
 
 class test_press_conn_strategy_t : public default_conn_strategy_t
 {
@@ -212,42 +244,23 @@ private:
 };
 
 
+connector_service_t<test_press_conn_strategy_t>* connector_service_ptr = NULL;
+
 int test_press_client(int conn_num_)
 {
     for (int i = 0; i < conn_num_; ++i)
     {
-        conn_id_t conn_id;
-        int ret = active_connection_t::sync_connect<test_press_conn_strategy_t>(conn_id, tcp_press_conn_event, LOCALHOST, 8880, &WS(), true);
-        if (-1 == ret)
-        {
-            LOGINFO((TEST_MODULE, "sync_connect failed."));
-            return -1;
-        }
-
-        LOGINFO((TEST_MODULE, "connect success fd:[%u]", conn_id.socket));
-
-        uint32_t packet_size = rand_gen_t::get_rand(MIN_PACKET_SIZE, g_max_packet_size + 1);
-        uint32_t body_size = packet_size - sizeof(packet_header_t);
-
-        packet_header_t header;
-        header.cmd = 1121;
-        header.ext = 1104;
-        header.data_len = body_size;
-
-        char data[g_max_packet_size];
-
-        packet_wrapper_t packet;
-        packet.append((char*)&header, sizeof(header));
-        if (0 != body_size)
-        {
-            packet.append(data, body_size);
-        }
-
-        connection_t::async_send(conn_id, packet);
+        connector_service_ptr->async_connect(
+                                                LOCALHOST,
+                                                8880,
+                                                tcp_press_conn_event,
+                                                true
+                                            );
     }
 
     return 0;
 }
+
 
 //! yunjie: test press end
 

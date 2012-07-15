@@ -35,6 +35,7 @@
 #include "task_service_inc.h"
 #include "log_inc.h"
 #include "buffer_list.h"
+#include "network_config.h"
 #include "network_tool.h"
 
 namespace chaos
@@ -107,13 +108,19 @@ enum conn_type_e
 
 enum conn_event_e
 {
-    EV_ACCEPTED_COMPLETE = 0,
+    EV_INIT_COMPLETE = 0,
+    EV_DECONSTRUCT,
+
+    EV_ACCEPTED_COMPLETE,
     EV_CONNECT_SUCCESS,
+    EV_CONNECT_FAILED,
+
     EV_PASSIVE_CLOSED,
     EV_ACTIVE_CLOSED,
     EV_TIMEOUT_CLOSED,
+
     EV_ERROR_OCCURRED,
-    EV_DECONSTRUCT,
+
     EV_UNKNOWN
 };
 
@@ -134,7 +141,6 @@ public:
 
     static int async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_);
     static int async_send(const struct conn_id_t& conn_id_, const char* msg_, uint32_t size_);
-
 
 
 protected:
@@ -161,7 +167,7 @@ public:
     connection_t();
     virtual ~connection_t();
 
-    virtual void initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, bool enable_hb_ = false);
+    virtual int initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, network_config_t* config_ = NULL, bool enable_hb_ = false);
 
     conn_status_e get_status() const
     {
@@ -229,6 +235,11 @@ protected:
     buffer_list_t                                   m_send_buffer;
     bool                                            m_sending_flag;
     bool                                            m_enable_hb;
+
+    //! yunjie: 配置信息
+    //!         使用config_holder_t让多个connection_t共享一份
+    //！        config信息
+    config_holder_t                                 m_config_holder;
 };
 
 typedef connection_t::inner_conn_ptr_t              conn_ptr_t;

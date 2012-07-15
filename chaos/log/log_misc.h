@@ -23,19 +23,21 @@
 #include <string>
 #include <vector>
 
-#include "singleton.h"
-#include "log.h"
-
 #ifdef HAVE_CONFIG_H
 #include "conf.h"
 #endif
 
-//#define ENABLE_LOG_FATAL
-//#define ENABLE_LOG_ERROR
-//#define ENABLE_LOG_WARN
-//#define ENABLE_LOG_INFO
-//#define ENABLE_LOG_TRACE
-//#define ENABLE_LOG_DEBUG
+#include "singleton.h"
+#include "log.h"
+
+/**
+#define ENABLE_LOG_FATAL
+#define ENABLE_LOG_ERROR
+#define ENABLE_LOG_WARN
+#define ENABLE_LOG_INFO
+#define ENABLE_LOG_TRACE
+#define ENABLE_LOG_DEBUG
+*/
 
 //! yunjie: log modules begin
 #ifndef THREAD_MODULE
@@ -72,6 +74,14 @@
 
 #ifndef HEART_BEAT_MOUDLE
 #define HEART_BEAT_MOUDLE           "HEART_BEAT_MOUDLE"
+#endif
+
+#ifndef STATISTIC_MOUDLE
+#define STATISTIC_MOUDLE            "STATISTIC_MOUDLE"
+#endif
+
+#ifndef CONNECTOR_SERVICE
+#define CONNECTOR_SERVICE           "CONNECTOR_SERVICE"
 #endif
 
 //! yunjie: log modules end

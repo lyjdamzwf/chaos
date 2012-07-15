@@ -34,12 +34,30 @@ class active_connection_t : public connection_t
 
 public:
     template<typename CONN_TYPE>
-    static int sync_connect(struct conn_id_t& out_, on_conn_event_t event_func_, const string& host_, uint32_t port_, work_service_t* service_ptr_, bool is_add_to_hb_ = true);
+    static int sync_connect(
+                                const string& host_,
+                                uint32_t port_,
+                                work_service_t* service_ptr_,
+                                struct conn_id_t& out_,
+                                on_conn_event_t event_func_ = NULL,
+                                network_config_t* config_ = NULL,
+                                bool is_add_to_hb_ = true
+                            );
 };
 
 template<typename CONN_TYPE>
-int active_connection_t::sync_connect(struct conn_id_t& out_, on_conn_event_t event_func_, const string& host_, uint32_t port_, work_service_t* service_ptr_, bool is_add_to_hb_)
+int active_connection_t::sync_connect(
+                                        const string& host_,
+                                        uint32_t port_,
+                                        work_service_t* service_ptr_,
+                                        struct conn_id_t& out_,
+                                        on_conn_event_t event_func_,
+                                        network_config_t* config_ptr_,
+                                        bool is_add_to_hb_
+                                    )
 {
+    LOGTRACE((CONNECTION_MODULE, "active_connection_t::sync_connect begin"));
+
     if (NULL == service_ptr_)
     {
         LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect constructor or service_ptr is NULL, return."));
@@ -73,14 +91,13 @@ int active_connection_t::sync_connect(struct conn_id_t& out_, on_conn_event_t ev
         return -1;
     }
 
-    conn_ptr->initialize(sockfd, now, service_ptr_, T_ACTIVE, event_func_, is_add_to_hb_);
-
-    service_ptr_->async_add_connection(conn_ptr);
+    conn_ptr->initialize(sockfd, now, service_ptr_, T_ACTIVE, event_func_, config_ptr_, is_add_to_hb_);
 
     out_.socket = sockfd;
     out_.timestamp = now;
     out_.service_ptr = service_ptr_;
 
+    LOGTRACE((CONNECTION_MODULE, "active_connection_t::sync_connect end"));
     return 0;
 }
 

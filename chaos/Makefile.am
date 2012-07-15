@@ -1,1 +1,1 @@
-SUBDIRS= thread utility task_service log network
+SUBDIRS= thread utility task_service log network statistic

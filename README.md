@@ -9,5 +9,5 @@ chaos是一个采用c++开发, reactor模式的网络事件库, 是我个人对l
 更多chaos库的资料请关注以下:
 github      - https://github.com/lyjdamzwf/chaos
 新浪weibo   - http://weibo.com/crazyprogramerlyj
-博客        - http://blog.chinaunix.net/space.php?uid=14617649
+博客        - http://www.cppthinker.com
 

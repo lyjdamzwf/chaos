@@ -6,6 +6,8 @@
  * license that can be found in the License file.
  */
 
+#include <netinet/tcp.h>
+
 #include "connection.h"
 #include "work_service.h"
 
@@ -30,6 +32,8 @@ namespace network
 
 void connection_t::on_peer_event(fd_t fd_, int event_type_, void* arg_)
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_peer_event args-[fd:%d, event_type:%d] begin", fd_, event_type_));
+
     conn_ptr_t conn = (conn_ptr_t)arg_;
     if (NULL == conn)
     {
@@ -67,10 +71,13 @@ void connection_t::on_peer_event(fd_t fd_, int event_type_, void* arg_)
         }
     }
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_peer_event args-[fd:%d, event_type:%d] end", fd_, event_type_));
 }
 
 int connection_t::async_close(const struct conn_id_t& conn_id_, bool is_del_from_hb_, conn_event_e close_type_)
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::async_close args-[fd:%d] begin", conn_id_.socket));
+
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
     {
@@ -81,11 +88,14 @@ int connection_t::async_close(const struct conn_id_t& conn_id_, bool is_del_from
     //! yunjie: sync_close_i操作必须放到队列中执行, 因为其中会delete connection_t对象, 所以最后一个参数为false
     service_ptr->post(async_method_t::bind_func(&connection_t::sync_close_i, conn_id_, is_del_from_hb_, close_type_), NULL, TASK_PRIOR_NORMAL, false);
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::async_close args-[fd:%d] end", conn_id_.socket));
     return 0;
 }
 
 int connection_t::async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_)
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::async_send begin"));
+
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
     {
@@ -95,11 +105,14 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const packet_wrap
 
     service_ptr->post(async_method_t::bind_func(&connection_t::sync_send_packet_wrapper_i, conn_id_, msg_));
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
     return 0;
 }
 
 int connection_t::async_send(const struct conn_id_t& conn_id_, const char* msg_, uint32_t size_)
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::async_send begin"));
+
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
     {
@@ -119,11 +132,14 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const char* msg_,
         service_ptr->post(async_method_t::bind_func(&connection_t::sync_send_packet_wrapper_i, conn_id_, msg_wrapper));
     }
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
     return 0;
 }
 
 int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_from_hb_, conn_event_e close_type_)
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_close_i args-[fd:%d] begin", conn_id_.socket));
+
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
     {
@@ -140,6 +156,7 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
 
     if (ST_CLOSED == conn_ptr->get_status())
     {
+        LOGTRACE((CONNECTION_MODULE, "connection_t::sync_close_i connection has closed, return. args-[fd:%d]", conn_id_.socket));
         return 0;
     }
 
@@ -175,6 +192,7 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
         event_callback(close_type_, conn_status, conn_id_);
     }
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_close_i args-[fd:%d] end", conn_id_.socket));
     return 0;
 }
 
@@ -183,6 +201,8 @@ int connection_t::sync_send_packet_wrapper_i(
                                 const packet_wrapper_t& msg_ 
                              )
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] begin", conn_id_.socket));
+
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
     {
@@ -206,6 +226,7 @@ int connection_t::sync_send_packet_wrapper_i(
     conn_ptr->m_send_buffer.append(msg_.data(), msg_.size());
     conn_ptr->start_drive_send_i();
         
+    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] end", conn_id_.socket));
     return 0;
 }
 
@@ -264,14 +285,25 @@ connection_t::connection_t()
 
 connection_t::~connection_t()
 {
+    m_conn_event_callback(EV_DECONSTRUCT, m_conn_status, m_conn_id);
+
     //! yunjie: 释放I/O缓冲区内存
     m_read_buffer.clear();
     m_send_buffer.clear();
 }
 
 
-void connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, bool enable_hb_)
+int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, network_config_t* config_, bool enable_hb_)
 {
+    int ret = 0;
+
+    //! yunjie: 设置描述符为nonblock
+    if (-1 == network_tool_t::make_socket_nonblocking(socket_))
+    {
+        LOGWARN((CONNECTION_MODULE, "connection_t::initialize make_socket_nonblocking failed"));
+        ret = -1;
+    }
+
     //! yunjie: 初始化成员
     m_socket = socket_;
     m_timestamp.tv_sec = timestamp_.tv_sec;
@@ -289,9 +321,58 @@ void connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_serv
 
     m_conn_event_callback = event_func_;
 
+    m_config_holder.set_config(config_);
+
     m_enable_hb = enable_hb_;
 
+    //! yunjie: 设置I/O缓冲区的最大字节数
+    m_send_buffer.set_buffer_max_limit((*m_config_holder).max_send_buffer_size);
+    m_read_buffer.set_buffer_max_limit((*m_config_holder).max_read_buffer_size);
 
+    //! yunjie: 初始化套接字选项
+    if (T_ACTIVE == conn_type_)
+    {
+        //! yunjie: 窗口大小设置
+        int sndbuf_size = (*m_config_holder).tcp_sndbuf_size;
+        if(-1 == ::setsockopt(m_socket, SOL_SOCKET, SO_SNDBUF, &sndbuf_size, sizeof(sndbuf_size)))
+        {
+            LOGWARN((CONNECTION_MODULE, "connection_t::initialize set socket option size of sndbuf failed."));
+            TEMP_FAILURE_RETRY(::close(m_socket));
+            ret = -1;
+        }
+
+        int rcvbuf_size = (*m_config_holder).tcp_rcvbuf_size;
+        if(-1 == ::setsockopt(m_socket, SOL_SOCKET, SO_RCVBUF, &rcvbuf_size, sizeof(rcvbuf_size)))
+        {
+            LOGWARN((CONNECTION_MODULE, "connection_t::initialize set socket option size of rcvbuf failed."));
+            TEMP_FAILURE_RETRY(::close(m_socket));
+            ret = -1;
+        }
+    }
+
+    //! yunjie: 屏蔽nagling算法,防止数据量小的指令被打包发送
+    if ((*m_config_holder).is_enable_tcp_nodelay)
+    {
+        int nodelay = 1;
+        if(::setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void*)&nodelay, sizeof(nodelay)))
+        {   
+            LOGWARN((CONNECTION_MODULE, "connection_t::initialize set nodelay failed socket:[%u]", m_socket));
+            ret = -1;
+        }
+    }
+
+    //! yunjie: connection初始化完毕, 回调通知上层
+    m_conn_event_callback(EV_INIT_COMPLETE, m_conn_status, m_conn_id);
+
+    //! yunjie: 注册到event loop中
+    work_service_->async_add_connection(this);
+
+    if (m_enable_hb)
+    {
+        m_service_ptr->async_add_hb_element(m_conn_id);
+    }
+
+    //! yunjie: connection已加入到event loop中, 回调通知上层
     if (NULL != m_conn_event_callback)
     {
         conn_event_e conn_ev;
@@ -308,22 +389,16 @@ void connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_serv
             conn_ev = EV_UNKNOWN;
         }
 
-        //! yunjie: 调用用户注册的回调
         m_conn_event_callback(conn_ev, m_conn_status, m_conn_id);
     }
 
-    if (m_enable_hb)
-    {
-        m_service_ptr->async_add_hb_element(m_conn_id);
-    }
-
-    //! yunjie: 设置I/O缓冲区的最大字节数
-    m_send_buffer.set_buffer_max_limit(16384);
-    m_read_buffer.set_buffer_max_limit(16384);
+    return ret;
 }
 
 int connection_t::on_recv_data()
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_recv_data begin"));
+
     if (m_enable_hb)
     {
         m_service_ptr->async_update_hb_element(m_conn_id);
@@ -373,11 +448,14 @@ int connection_t::on_recv_data()
         on_read_complete(m_read_buffer);
     }
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_recv_data end"));
     return 0;
 }
 
 int connection_t::on_send_data()
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_send_data begin"));
+
     if (m_enable_hb)
     {
         m_service_ptr->async_update_hb_element(m_conn_id);
@@ -452,17 +530,21 @@ int connection_t::on_send_data()
         m_sending_flag = false;
     }
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_send_data end"));
     return 0;
 }
 
 int connection_t::on_error_occur()
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_error_occur begin"));
+
     if (NULL != m_conn_event_callback)
     {
         //! yunjie: 调用用户注册的回调
         m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id);
     }
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::on_error_occur end"));
     return 0;
 }
 
@@ -489,6 +571,8 @@ int connection_t::start_drive_send_i()
 
 int connection_t::close_i()
 {
+    LOGTRACE((CONNECTION_MODULE, "connection_t::close_i begin"));
+
     //! yunjie: 从epoll中删除对fd的管理
     m_service_ptr->remove_fd_from_epoll(m_socket);
 
@@ -498,6 +582,7 @@ int connection_t::close_i()
     m_read_buffer.clear();
     m_send_buffer.clear();
 
+    LOGTRACE((CONNECTION_MODULE, "connection_t::close_i end"));
     return 0;
 }
 

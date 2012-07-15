@@ -16,8 +16,9 @@
 #include "work_service.h"
 #include "work_service_group.h"
 #include "connection.h"
-#include "active_connection.h"
 #include "default_conn_strategy.h"
 #include "tcp_service.h"
+#include "active_connection.h"
+#include "connector_service.h"
 
 #endif //! _CHAOS_NETWORK_INC_H_

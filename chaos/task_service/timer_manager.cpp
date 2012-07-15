@@ -55,6 +55,8 @@ timer_manager_t::~timer_manager_t()
 
 int timer_manager_t::initialize(bool lock_)
 {
+    LOGTRACE((TIMER_MANAGER_MODULE, "timer_manager_t::initialize arg-[lock:%d] begin", lock_));
+
     if (m_inited)
     {
         LOGWARN((TIMER_MANAGER_MODULE, "timer_manager_t::initialize timer manager has inited, return."));
@@ -69,6 +71,7 @@ int timer_manager_t::initialize(bool lock_)
 
     m_inited = true;
 
+    LOGTRACE((TIMER_MANAGER_MODULE, "timer_manager_t::initialize end"));
     return 0;
 }
 
@@ -78,6 +81,8 @@ void timer_manager_t::register_timer(uint32_t                       interval_,
                                      time_t                         start_time_
                                     )
 {
+    LOGTRACE((TIMER_MANAGER_MODULE, "timer_manager_t::register_timer args-[interval:%u, persist:%d, start_time:%lu] begin", interval_, persist_, start_time_));
+
     CHECK_LOCK(m_is_lock, m_mutex);
 
     time_t local_start_time = start_time_;
@@ -103,6 +108,8 @@ void timer_manager_t::register_timer(uint32_t                       interval_,
 
     //! yunjie: 这里不需要加锁, m_time_heap被初始化为线程安全的
     register_timer_i(time_event);
+
+    LOGTRACE((TIMER_MANAGER_MODULE, "timer_manager_t::register_timer end"));
 }
 
 void timer_manager_t::exec()

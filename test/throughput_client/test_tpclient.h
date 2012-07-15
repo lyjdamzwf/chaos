@@ -1,6 +1,8 @@
 #ifndef _CHAOS_TEST_TCP_SERVER_H_
 #define _CHAOS_TEST_TCP_SERVER_H_
 
+#include <netinet/tcp.h>
+
 //! yunjie: test throughput begin
 
 #define SEND_COUNT          10000
@@ -9,10 +11,12 @@
 
 #define CHECK_SUM 0
 
+//! yunjie: 可配选项
 uint32_t                        g_send_count = SEND_COUNT;
 uint32_t                        g_send_packet_size = SEND_PACKET_SIZE;
 uint32_t                        g_active_conn_count = ACTIVE_CONN_COUNT;
 
+//! yunjie: 统计数据
 atomic_val_t<uint64_t>          g_finished_conn;
 struct timeval                  g_timeval;
 atomic_val_t<int>               g_connected_num;
@@ -21,19 +25,31 @@ string                          g_send_data;
 
 void tcp_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, conn_id_t conn_id_)
 {
-    LOGINFO((TEST_MODULE, "tcp_conn_event args-[conn_event:%d, conn_status:%d, socket fd:%d] begin", conn_event_, conn_status_, conn_id_.socket));
-
     switch (conn_event_)
     {
+        case EV_INIT_COMPLETE:
+        {
+            LOGINFO((TEST_MODULE, "tcp_conn_event init complete sockfd:[%d]", conn_id_.socket));
+        }
+        break;
+
+        case EV_DECONSTRUCT:
+        {
+            LOGINFO((TEST_MODULE, "tcp_conn_event deconstruct sockfd:[%d]", conn_id_.socket));
+        }
+        break;
+
         case EV_ACCEPTED_COMPLETE:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event accepted complete"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event accepted complete sockfd:[%d]", conn_id_.socket));
         }
         break;
 
         case EV_CONNECT_SUCCESS:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event connect success"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event connect success sockfd:[%d]", conn_id_.socket));
+
+            connection_t::async_send(conn_id_, g_send_data);
 
             uint32_t connected_num = ++g_connected_num;
             if (connected_num == g_active_conn_count)
@@ -72,38 +88,42 @@ void tcp_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, conn_i
         }
         break;
 
-        case EV_ACTIVE_CLOSED:
+        case EV_CONNECT_FAILED:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event conn active closed"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event connect failed sockfd:[%d]", conn_id_.socket));
         }
         break;
 
         case EV_PASSIVE_CLOSED:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event conn passive closed"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event conn passive closed sockfd:[%d]", conn_id_.socket));
+        }
+        break;
+
+        case EV_ACTIVE_CLOSED:
+        {
+            LOGINFO((TEST_MODULE, "tcp_conn_event conn active closed sockfd:[%d]", conn_id_.socket));
         }
         break;
 
         case EV_TIMEOUT_CLOSED:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event conn timeout closed"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event conn timeout closed sockfd:[%d]", conn_id_.socket));
         }
         break;
 
         case EV_ERROR_OCCURRED:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event error occurred"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event error occurred sockfd:[%d]", conn_id_.socket));
             connection_t::async_close(conn_id_);
         }
         break;
 
         default:
         {
-            LOGINFO((TEST_MODULE, "tcp_conn_event unknown event"));
+            LOGINFO((TEST_MODULE, "tcp_conn_event unknown event sockfd:[%d]", conn_id_.socket));
         }
     }
-
-    LOGINFO((TEST_MODULE, "tcp_conn_event args-[conn_event:%d, conn_status:%d, socket fd:%d] end", conn_event_, conn_status_, conn_id_.socket));
 }
 
 
@@ -180,19 +200,6 @@ protected:
         //! yunjie: check sum end
 #endif
 
-        /**
-        string send_data;
-        send_data.reserve(HEADER_SIZE + data_size_);
-
-        packet_header_t header;
-        header.cmd = 1121;
-        header.ext = 1104;
-        header.data_len = data_size_;
-
-        send_data.append((char*)&header, HEADER_SIZE);
-        send_data.append((char*)data_ptr_, data_size_);
-        */
-
         STAT_TP("client")
         else
         {
@@ -203,43 +210,6 @@ protected:
 private:
     uint64_t                                            m_transferred_bytes;
 };
-
-//! yunjie: 运行在work service上
-void start_one_conn(work_service_t* ws_ptr_)
-{
-    conn_id_t conn_id;
-    int ret = active_connection_t::sync_connect<test_tp_conn_strategt_t>(conn_id, tcp_conn_event, LOCALHOST, 8880, ws_ptr_, true);
-    if (-1 == ret)
-    {
-        LOGINFO((TEST_MODULE, "sync_connect failed."));
-        return;
-    }
-
-    connection_t::async_send(conn_id, g_send_data);
-}
-
-void test_tp_press_client()
-{
-    packet_header_t header;
-    header.cmd = 1121;
-    header.ext = 1104;
-    header.data_len = g_send_packet_size;
-    g_send_data.append((char*)&header, HEADER_SIZE);
-    g_send_data.append(g_send_packet_size, 'a');
-
-    gettimeofday(&g_timeval, NULL);
-    uint64_t total_bytes = 2 * g_active_conn_count * g_send_count * (g_send_packet_size + sizeof(packet_header_t));
-    LOGINFO((TEST_MODULE, "test_tp_press_client total need transfer data size:[%lu] bytes, [%lu] MB",
-                            total_bytes,
-                            total_bytes / 1000 / 1000
-            ));
-
-    for (uint32_t i = 0; i < g_active_conn_count; ++i)
-    {
-        work_service_t* ws_ptr = ((work_service_t*)(WSG()[i % WSG().size()]));
-        ws_ptr->post(async_method_t::bind_func(start_one_conn, ws_ptr));
-    }
-}
 
 //! yunjie: test throughput end
 

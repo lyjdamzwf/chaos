@@ -43,6 +43,8 @@ task_service_t::~task_service_t()
 
 int task_service_t::start(int32_t thread_num_)
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::start service(%s) begin", m_service_name.c_str()));
+
     if (m_started)
     {
         LOGWARN((TASK_SERVICE_MODULE, "task_service_t::start service(%s) has started, return.", m_service_name.c_str()));
@@ -77,11 +79,14 @@ int task_service_t::start(int32_t thread_num_)
 
     m_started = true;
 
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::start service(%s) end", m_service_name.c_str()));
     return 0;
 }
 
 int task_service_t::stop()
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::stop service(%s) begin", m_service_name.c_str()));
+
     if (!m_started)
     {
         LOGWARN((TASK_SERVICE_MODULE, "task_service_t::stop service(%s) has stopped, return.", m_service_name.c_str()));
@@ -96,18 +101,20 @@ int task_service_t::stop()
     m_thread_group.join_all();
     m_thread_num = 0;
     m_fetch_num_per_loop = 0xffffffff;
-
-    assert(0 == m_timer_manager.size());
-    assert(0 == m_task_queue.size());
-
+    
     m_started = false;
 
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::stop service(%s) end", m_service_name.c_str()));
     return 0;
 }
 
 int task_service_t::post_async_stop_signal()
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::post_async_stop_signal service(%s) begin", m_service_name.c_str()));
+
     this->post(async_method_t::bind_memfunc(this, &task_service_t::set_stop_signal, true));
+
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::post_async_stop_signal service(%s) end", m_service_name.c_str()));
 
     return 0;
 }
@@ -119,6 +126,8 @@ bool task_service_t::is_run_on_service()
 
 void task_service_t::exec_task(thread_t* thd_)
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::exec_task service(%s) begin", m_service_name.c_str()));
+
     deque<async_method_t> tasks;
     uint32_t all_task_num = 0;
     uint32_t thread_num = m_thread_group.size();
@@ -192,14 +201,16 @@ void task_service_t::exec_task(thread_t* thd_)
 
     m_timer_manager.clear();
 
-    assert(0 == m_task_queue.size());
-
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::exec_task service(%s) end", m_service_name.c_str()));
 }
 
 void task_service_t::set_stop_signal(bool signal_)
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::set_stop_signal service(%s) m_stop_signal:[%d] begin", m_service_name.c_str(), m_stop_signal));
+
     m_stop_signal = signal_;
 
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::set_stop_signal service(%s) end", m_service_name.c_str()));
 }
 
 int task_service_t::post(const async_method_t& async_method_, void* ext_data_, task_prior_e prior_, bool exec_local_)

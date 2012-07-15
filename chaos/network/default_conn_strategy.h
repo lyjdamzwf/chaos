@@ -70,15 +70,19 @@ public:
 protected:
     virtual void on_read_complete(buffer_list_t& buffer_)
     {
+        LOGTRACE((CONNECTION_MODULE, "default_conn_strategy_t::on_read_complete arg-[readable_size:%d]", buffer_.size()));
         parse_packet(buffer_);
     }
 
     virtual void on_write_complete(uint32_t transferred_size_)
     {
+        LOGTRACE((CONNECTION_MODULE, "default_conn_strategy_t::on_write_complete arg-[transferred_size:%d]", transferred_size_));
     }
 
     int parse_packet(buffer_list_t& buffer_)
     {
+        LOGTRACE((CONNECTION_MODULE, "default_conn_strategy_t::parse_packet arg-[readable_size:%d] begin", buffer_.size()));
+
         while (buffer_.size())
         {
             uint32_t header_remain_bytes = HEADER_SIZE - m_header_readed_bytes;
@@ -128,6 +132,7 @@ protected:
                             m_packet_body_buffer = new char[data_len];
                             if (NULL == m_packet_body_buffer)
                             {
+                                LOGTRACE((CONNECTION_MODULE, "default_conn_strategy_t::parse_packet new body buffer failed"));
                                 return -1;
                             }
 
@@ -161,6 +166,7 @@ protected:
             }
         }
 
+        LOGTRACE((CONNECTION_MODULE, "default_conn_strategy_t::parse_packet arg-[readable_size:%d] end", buffer_.size()));
         return 0;
     }
 

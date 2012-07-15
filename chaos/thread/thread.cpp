@@ -32,6 +32,8 @@ namespace thread
 
 void thread_t::join()
 {
+    LOGTRACE((THREAD_MODULE, "thread_t::join begin"));
+
 	if(0 != m_thread && m_joinable)
 	{
 		::pthread_join(m_thread, NULL);
@@ -42,10 +44,14 @@ void thread_t::join()
 		while(m_alive) m_cond.wait(m_lock);
 		m_lock.unlock();
 	}
+
+    LOGTRACE((THREAD_MODULE, "thread_t::join end"));
 }
 
 void * thread_t::thread_func(void *arg)
 {
+    LOGTRACE((THREAD_MODULE, "thread_func begin"));
+
 	thread_t* thread = (thread_t*)arg;
 
 	thread->m_lock.lock();
@@ -74,11 +80,15 @@ void * thread_t::thread_func(void *arg)
 		SAFE_DELETE(thread);
 	}
 
+
+    LOGTRACE((THREAD_MODULE, "thread_func end"));
 	pthread_exit(NULL);
 }
 
 bool thread_t::start(async_method_t method_)
 {
+    LOGTRACE((THREAD_MODULE, "thread_t::start begin"));
+
 	if(m_alive)
 	{
         LOGWARN((THREAD_MODULE, "thread_t::start thread-[%] has started, return.", get_thread_name().c_str()));
@@ -101,27 +111,36 @@ bool thread_t::start(async_method_t method_)
 
 	pthread_attr_destroy(&attr);
 
+    LOGTRACE((THREAD_MODULE, "thread_t::start end"));
 	return true;
 }
 
 void thread_t::cond_wait()
 {
+    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() begin"));
+
     m_lock.lock();
     if (m_alive) 
     {
         m_cond.wait(m_lock);
     }
     m_lock.unlock();
+
+    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() end"));
 }
 
 void thread_t::cond_wait(struct timeval& now_, uint64_t timeout_second_, uint64_t timeout_microsecond_)
 {
+    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() args-[timeout_sec:%lu, timeout_usec:%lu] begin", timeout_second_, timeout_microsecond_));
+
     m_lock.lock();
     if (m_alive) 
     {
         m_cond.wait(m_lock, now_, timeout_second_, timeout_microsecond_);
     }
     m_lock.unlock();
+
+    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() end"));
 }
 
 void thread_t::cond_signal()

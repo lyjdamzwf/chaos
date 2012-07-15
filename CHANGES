@@ -1,3 +1,20 @@
 
-Chaos beta 0.223                        2012.7.3
-    *)  第一个beta版发布
+Chaos 0.223-beta                                                2012.6.21
+    *)  首发
+
+
+
+Chaos 0.24-beta                                                 2012.7.15
+    *)  增加统计组件 - statistic
+
+    *)  增加connector_service
+
+    *)  修复task_service_group_t::stop时由于内部
+        service数据互相投递导致的崩溃问题
+
+    *)  增加各模块的trace日志
+
+    *)  增加network_config对socket选项的配置
+
+    *)  修复各模块静态库打印不了warn级别以下日志
+        的问题

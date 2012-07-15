@@ -44,6 +44,8 @@ task_service_t* task_service_group_t::new_service()
 
 int task_service_group_t::start(int task_service_num_, int thread_num_per_service_)
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_group_t::start args-[task_service_num:%d, thread_num_per_service:%d] begin", task_service_num_, thread_num_per_service_));
+
     if (m_started)
     {
             LOGWARN((TASK_SERVICE_MODULE, "task_service_group_t::start task service has started, return."));
@@ -82,11 +84,14 @@ int task_service_group_t::start(int task_service_num_, int thread_num_per_servic
 
     m_started = true;
 
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_group_t::start args-[task_service_num:%d, thread_num_per_service:%d] end", task_service_num_, thread_num_per_service_));
     return 0;
 }
 
 int task_service_group_t::stop()
 {
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_group_t::stop begin"));
+
     if (!m_started)
     {
         LOGWARN((TASK_SERVICE_MODULE, "task_service_group_t::stop task service has stopped, return."));
@@ -106,13 +111,21 @@ int task_service_group_t::stop()
         {
             LOGWARN((TASK_SERVICE_MODULE, "task_service_group_t::stop task_service stop failed."));
         }
+    }
 
+    //! yunjie: delete必须在所有service都停止之后才能进行
+    //!         否则可能发生service2向已经delete的service1
+    //!         进行消息投递, 导致崩溃
+    for (uint32_t i = 0; i < m_task_service_group.size(); ++i)
+    {
+        task_service_t*& task_service_ptr = m_task_service_group[i];
         SAFE_DELETE(task_service_ptr);
     }
 
     m_task_service_group.clear();
     m_started = false;
 
+    LOGTRACE((TASK_SERVICE_MODULE, "task_service_group_t::stop end"));
     return 0;
 }
 

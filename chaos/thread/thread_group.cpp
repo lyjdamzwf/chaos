@@ -38,10 +38,13 @@ thread_group_t::~thread_group_t()
 
 void thread_group_t::add(thread_t* thread_)
 {
+    LOGTRACE((THREAD_MODULE, "thread_grout_t::add thread-[%] begin.", thread_->get_thread_name().c_str()));
+
 	container_t::iterator it = std::find(m_thd_vt.begin(), m_thd_vt.end(), thread_);
 	if (it == m_thd_vt.end())
 		m_thd_vt.push_back(thread_);
 
+    LOGTRACE((THREAD_MODULE, "thread_grout_t::add thread-[%] end.", thread_->get_thread_name().c_str()));
 }
 
 thread_t* thread_group_t::get_by_index(size_type_t idx_)
@@ -62,6 +65,8 @@ thread_t* thread_group_t::operator[](size_type_t idx_)
 
 void thread_group_t::join_all()
 {
+    LOGTRACE((THREAD_MODULE, "thread_group_t::join_all() begin"));
+
 	while (!m_thd_vt.empty())
 	{
 		thread_t* thread = m_thd_vt.back();
@@ -73,6 +78,8 @@ void thread_group_t::join_all()
 		}
 		m_thd_vt.pop_back();
 	}
+
+    LOGTRACE((THREAD_MODULE, "thread_group_t::join_all() end"));
 }
 
 bool thread_group_t::check_is_self(pthread_t pid_)
