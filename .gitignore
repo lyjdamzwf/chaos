@@ -10,3 +10,27 @@
 *.lai
 *.la
 *.a
+
+# yunjie add
+*.swp
+*.in
+*.m4
+Makefile
+conf.h
+*.guess
+*.log
+*.status
+*.sub
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+missing
+stamp-h1
+.deps
+*.cache
+*.files
+*.out
+tags
+vigen.sh
