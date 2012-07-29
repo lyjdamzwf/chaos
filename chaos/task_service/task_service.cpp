@@ -6,6 +6,7 @@
  * license that can be found in the License file.
  */
 
+#include <stdlib.h>
 #include <assert.h>
 
 #include "task_service.h"
@@ -146,56 +147,74 @@ void task_service_t::exec_task(thread_t* thd_)
 
     while (!m_stop_signal || !m_task_queue.empty())
     {
-        struct timeval cached_now;
-        //! yunjie: prepare the task buffer
-        tasks.clear();
-
-        while (1)
+        try
         {
-            //! yunjie: 处理定时事件
-            m_timer_manager.flush_time();
-            cached_now = m_timer_manager.get_cached_time();
+            struct timeval cached_now;
+            //! yunjie: prepare the task buffer
+            tasks.clear();
 
-            //! yunjie: 如果有timer时间超时, 将会在函数内部执行callback
-            m_timer_manager.exec();
-
-            //! yunjie; 进行网络IO检测, 并会调用相应 读/写 回调
-            int wake_num = m_io_handler.wait_io_notification();
-
-            //! yunjie: 本来是采用动态调整m_fetch_num_per_loop来平衡每个线程的任务抓取量, 发现并没有太大意义, 改为一次性全部获取所有任务
-            m_task_queue.fetch_task(tasks, all_task_num, m_fetch_num_per_loop);
-            if (wake_num || tasks.size() || m_stop_signal)      //! yunjie: 需要判断m_stop_signal, 否则外部投递stop信号号会发生join永远阻塞
+            while (1)
             {
-                break;
-            }
+                //! yunjie: 处理定时事件
+                m_timer_manager.flush_time();
+                cached_now = m_timer_manager.get_cached_time();
+
+                //! yunjie: 如果有timer时间超时, 将会在函数内部执行callback
+                m_timer_manager.exec();
+
+                //! yunjie; 进行网络IO检测, 并会调用相应 读/写 回调
+                int wake_num = m_io_handler.wait_io_notification();
+
+                //! yunjie: 本来是采用动态调整m_fetch_num_per_loop来平衡每个线程的任务抓取量, 发现并没有太大意义, 改为一次性全部获取所有任务
+                m_task_queue.fetch_task(tasks, all_task_num, m_fetch_num_per_loop);
+                if (wake_num || tasks.size() || m_stop_signal)      //! yunjie: 需要判断m_stop_signal, 否则外部投递stop信号号会发生join永远阻塞
+                {
+                    break;
+                }
 
 #if USE_COND_VAR
-            thd_->cond_wait(cached_now, 0, TIMEDOUT_US);
+                thd_->cond_wait(cached_now, 0, TIMEDOUT_US);
 #else
-            thread_t::usleep(TIMEDOUT_US);
+                thread_t::usleep(TIMEDOUT_US);
 #endif
-        }
-
-        //! yunjie: calc the fetch_num_per_loop
-        if (thread_num != 1)
-        {
-            m_fetch_num_per_loop = all_task_num / thread_num;
-            if (!m_fetch_num_per_loop)
-            {
-                m_fetch_num_per_loop = MIN_TASK_FETCH_NUM;
             }
 
-            if (m_fetch_num_per_loop > MAX_TASK_FETCH_NUM)
+            //! yunjie: calc the fetch_num_per_loop
+            if (thread_num != 1)
             {
-                m_fetch_num_per_loop = MAX_TASK_FETCH_NUM;
+                m_fetch_num_per_loop = all_task_num / thread_num;
+                if (!m_fetch_num_per_loop)
+                {
+                    m_fetch_num_per_loop = MIN_TASK_FETCH_NUM;
+                }
+
+                if (m_fetch_num_per_loop > MAX_TASK_FETCH_NUM)
+                {
+                    m_fetch_num_per_loop = MAX_TASK_FETCH_NUM;
+                }
+            }
+
+            //! yunjie: 处理异步请求
+            for (deque<async_method_t>::iterator it = tasks.begin(); it != tasks.end(); ++it)
+            {
+                (*it)();
+                it->release();
             }
         }
-
-        //! yunjie: 处理异步请求
-        for (deque<async_method_t>::iterator it = tasks.begin(); it != tasks.end(); ++it)
+        catch (const std::exception& ex) 
         {
-            (*it)();
-            it->release();
+            LOGERROR((TASK_SERVICE_MODULE, "task_service_t::exec_task service(%s) exception caught info:[%s]",
+                        m_service_name.c_str(),
+                        ex.what()
+                     ));
+            //! abort();
+        }
+        catch (...)
+        {
+            LOGERROR((TASK_SERVICE_MODULE, "task_service_t::exec_task service(%s) unknown exception caught info",
+                        m_service_name.c_str()
+                     ));
+            //! abort();
         }
     }
 

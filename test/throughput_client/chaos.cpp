@@ -10,6 +10,7 @@ arg_option_t       arg_options[] =
     //! yunjie: 信息输出
     arg_option_t("args", "show all args", false, NULL),
     arg_option_t("pt", "progress type", false, NULL),
+    arg_option_t("v", "version", false, NULL),
 
     //! yunjie: 进程相关选项配置
     arg_option_t("d", "daemon progress", false, NULL),
@@ -90,72 +91,80 @@ int main(int argc_, char* argv_[])
 
             case 2:
             {
-                singleton_t<processor_helper_t>::instance().daemonize();
+                printf("%s-%s\n", PACKAGE_NAME, VERSION);
+                exit(0);
             }
             break;
 
             case 3:
+            {
+                singleton_t<processor_helper_t>::instance().daemonize();
+            }
+            break;
+
+
+            case 4:
             {
                 hb_param.timeout_flag = true;
                 hb_param.timeout = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 4:
+            case 5:
             {
                 work_thread_num = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 5:
+            case 6:
             {
                 log_level = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 6:
+            case 7:
             {
                 network_config.tcp_sndbuf_size = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 7:
+            case 8:
             {
                 network_config.tcp_rcvbuf_size = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 8:
+            case 9:
             {
                 network_config.max_send_buffer_size = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 9:
+            case 10:
             {
                 network_config.max_read_buffer_size = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 10:
+            case 11:
             {
                 network_config.is_enable_tcp_nodelay = true;
             }
             break;
 
-            case 11:
+            case 12:
             {
                 g_send_count = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 12:
+            case 13:
             {
                 g_send_packet_size = atoi(pair_arr[i].arg_val);
             }
             break;
 
-            case 13:
+            case 14:
             {
                 g_active_conn_count = atoi(pair_arr[i].arg_val);
             }

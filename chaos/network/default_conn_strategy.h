@@ -56,7 +56,6 @@ public:
         :
             m_header_readed_bytes(0),
             m_is_split(false),
-            m_packet_body_buffer(NULL),
             m_body_readed_bytes(0)
     {
         memset(m_packet_header_buffer, 0, sizeof(m_packet_header_buffer));
@@ -128,13 +127,19 @@ protected:
                         else if (buffer_.is_full())
                         {
                             //! yunjie: buffer没有可用空间了, 并且数据包仍不完整
-                            //          开辟内存空间在这一层组包
-                            m_packet_body_buffer = new char[data_len];
-                            if (NULL == m_packet_body_buffer)
+                            if (m_packet_body_buffer.capacity() < data_len)
+                            {
+                                m_packet_body_buffer.reserve(data_len);
+                            }
+
+                            /**
+                             * 不需要检查是否reserve成功, 失败会抛出length_error exception
+                            if (m_packet_body_buffer.capacity() < data_len)
                             {
                                 LOGTRACE((CONNECTION_MODULE, "default_conn_strategy_t::parse_packet new body buffer failed"));
                                 return -1;
                             }
+                            */
 
                             uint32_t body_copy_bytes = buffer_.size();
                             memcpy(&m_packet_body_buffer[m_body_readed_bytes], buffer_.data(), body_copy_bytes);
@@ -157,7 +162,7 @@ protected:
 
                         if (data_len == m_body_readed_bytes)
                         {
-                            handle_packet(header, m_packet_body_buffer, data_len);
+                            handle_packet(header, &m_packet_body_buffer[0], data_len);
                             clear();
                             continue;
                         }
@@ -179,7 +184,10 @@ protected:
         memset(m_packet_header_buffer, 0, sizeof(m_packet_header_buffer));
         m_header_readed_bytes = 0;
         m_is_split = false;
-        SAFE_DELETE_ARR(m_packet_body_buffer);
+        if (m_packet_body_buffer.capacity() > (16 * 1024))
+        {
+            m_packet_body_buffer.resize(16 * 1024, 0);
+        }
         m_body_readed_bytes = 0;
     }
 
@@ -189,7 +197,7 @@ protected:
 
     //! yunjie: 数据包是否被分割在两个buffer中
     bool                            m_is_split;
-    char*                           m_packet_body_buffer;
+    vector<char>                    m_packet_body_buffer;
     uint32_t                        m_body_readed_bytes;
 };
 
