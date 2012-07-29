@@ -159,11 +159,11 @@ void task_service_t::exec_task(thread_t* thd_)
                 m_timer_manager.flush_time();
                 cached_now = m_timer_manager.get_cached_time();
 
-                //! yunjie: 如果有timer时间超时, 将会在函数内部执行callback
-                m_timer_manager.exec();
-
                 //! yunjie; 进行网络IO检测, 并会调用相应 读/写 回调
                 int wake_num = m_io_handler.wait_io_notification();
+
+                //! yunjie: 如果有timer时间超时, 将会在函数内部执行callback
+                m_timer_manager.exec();
 
                 //! yunjie: 本来是采用动态调整m_fetch_num_per_loop来平衡每个线程的任务抓取量, 发现并没有太大意义, 改为一次性全部获取所有任务
                 m_task_queue.fetch_task(tasks, all_task_num, m_fetch_num_per_loop);
