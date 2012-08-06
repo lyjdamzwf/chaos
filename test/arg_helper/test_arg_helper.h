@@ -1,17 +1,17 @@
 #ifndef _CHAOS_TEST_ARG_HELER_H_
 #define _CHAOS_TEST_ARG_HELER_H_
 
-void arg1_handler(int index, char* arg_name_, char* arg_val_)
+void arg1_handler(int index, const char* arg_name_, const char* arg_val_)
 {
     printf("arg_handler1 val:[%d %s %s]\n", index, arg_name_, arg_val_);
 }
 
-void arg2_handler(int index, char* arg_name_, char* arg_val_)
+void arg2_handler(int index, const char* arg_name_, const char* arg_val_)
 {
     printf("arg_handler2 val:[%d %s %s]\n", index, arg_name_, arg_val_);
 }
 
-void arg3_handler(int index, char* arg_name_, char* arg_val_)
+void arg3_handler(int index, const char* arg_name_, const char* arg_val_)
 {
     printf("arg_handler3 val:[%d %s %s]\n", index, arg_name_, arg_val_);
 }

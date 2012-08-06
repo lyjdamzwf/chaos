@@ -6,6 +6,9 @@
  * license that can be found in the License file.
  */
 
+#include <string.h>
+#include <stdio.h>
+
 #include "arg_helper.h"
 
 /*! 

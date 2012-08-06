@@ -6,6 +6,9 @@
  * license that can be found in the License file.
  */
 
+#include <algorithm>
+using namespace std;
+
 #include "utility_inc.h"
 #include "mutex.h"
 #include "thread_group.h"

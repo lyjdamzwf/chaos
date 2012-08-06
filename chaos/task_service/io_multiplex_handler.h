@@ -132,7 +132,13 @@ public:
     int initialize(bool lock_ = false);
     int wait_io_notification();
 
-    int register_io_event(fd_t fd_, int event_type_flag_, callback_on_event_t event_cb_, void* cb_arg_ = NULL, bool is_persist_ = false);
+    int register_io_event(
+                            fd_t                    fd_,
+                            int                     event_type_flag_,
+                            callback_on_event_t     event_cb_,
+                            void*                   cb_arg_             = NULL,
+                            bool                    is_persist_         = false
+                         );
 
     int remove_fd_from_epoll(fd_t fd_);
 
@@ -147,7 +153,13 @@ public:
 private:
     /** yunjie: 私有方法都不会涉及到锁竞争 */
 
-    int register_io_event_i(fd_t fd_, int event_type_flag_, callback_on_event_t event_cb_, void* cb_arg_ = NULL, bool is_persist_ = false);
+    int register_io_event_i(
+                            fd_t                    fd_,
+                            int                     event_type_flag_,
+                            callback_on_event_t     event_cb_,
+                            void*                   cb_arg_             = NULL,
+                            bool                    is_persist_         = false
+                           );
     int remove_fd_from_epoll_i(fd_t fd_);
 
 private:

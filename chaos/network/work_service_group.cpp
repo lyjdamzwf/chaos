@@ -41,7 +41,10 @@ void work_service_group_t::enable_conn_heart_beat(const conn_heart_beat_param_t&
     m_conn_heart_beat_param = param_;
 }
 
-int work_service_group_t::start(int task_service_num_, int thread_num_per_service_)
+int work_service_group_t::start(
+                                int task_service_num_,
+                                int thread_num_per_service_
+                               )
 {
     int ret = 0;
     if ((ret = task_service_group_t::start(task_service_num_, thread_num_per_service_)))

@@ -94,7 +94,13 @@ struct time_event_t
     bool                                persist;                    //! yunjie: true - 执行callback后不会从minheap中删除timeevent, false - 执行callback后会删除timeevent, 需要重新注册.
 };
 
-class timer_container_t : public base_container_t<time_event_t*, std::priority_queue>
+//! yunjie: 为了适配高版本g++对嵌套模板参数的类型检查更为严格
+template<typename T>
+class __heap_t__ : public std::priority_queue<T>
+{
+};
+
+class timer_container_t : public base_container_t<time_event_t*, __heap_t__>
 {
 public:
     timer_container_t()
@@ -113,11 +119,12 @@ public:
         return ret;
     }
 
-    int fetch_task(priority_queue<time_event_t*>&   out_task_,
-                   uint32_t&                        out_all_task_num_,
-                   uint32_t                         fetch_count_,
-                   cond_checker_t*                  checker_,
-                   task_prior_e                     prior_ = TASK_PRIOR_NORMAL
+    int fetch_task(
+                    container_t&                     out_task_,
+                    uint32_t&                        out_all_task_num_,
+                    uint32_t                         fetch_count_,
+                    cond_checker_t*                  checker_,
+                    task_prior_e                     prior_ = TASK_PRIOR_NORMAL
                   )
     {
         CHECK_LOCK(m_is_lock, m_mutex);

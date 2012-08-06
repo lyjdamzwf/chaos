@@ -37,7 +37,10 @@ public:
     //! yunjie: enable_conn_heart_beat要在start之前调用才会生效
     void enable_conn_heart_beat(const conn_heart_beat_param_t& param_);
 
-    int start(int task_service_num_, int thread_num_per_service_ = DEFAULT_THREAD_NUM_PER_SERVICE);
+    int start(
+                int task_service_num_,
+                int thread_num_per_service_ = DEFAULT_THREAD_NUM_PER_SERVICE
+             );
 
 protected:
     //! yunjie: 父类的virtual方法

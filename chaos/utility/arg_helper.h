@@ -29,7 +29,7 @@ namespace chaos
 namespace utility
 {
 
-typedef                     void (*arg_handler_t) (int, char*, char*);
+typedef                     void (*arg_handler_t) (int, const char*, const char*);
 
 struct arg_option_t
 {
@@ -42,7 +42,7 @@ struct arg_option_t
     {
     }
 
-    arg_option_t(char* name_, char* des_, bool has_val_, arg_handler_t handler_)
+    arg_option_t(const char* name_, const char* des_, bool has_val_, arg_handler_t handler_)
         :
             name(name_),
             description(des_),
@@ -51,10 +51,10 @@ struct arg_option_t
     {
     }
 
-    char*           name;
-    char*           description;
-    bool            has_val;
-    arg_handler_t   handler;
+    const char*             name;
+    const char*             description;
+    bool                    has_val;
+    arg_handler_t           handler;
 };
 
 struct arg_pair_t

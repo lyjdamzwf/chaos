@@ -21,6 +21,7 @@
  */
 
 
+#include <string.h>
 #include <string>
 
 namespace chaos

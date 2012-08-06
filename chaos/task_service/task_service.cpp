@@ -129,7 +129,7 @@ void task_service_t::exec_task(thread_t* thd_)
 {
     LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::exec_task service(%s) begin", m_service_name.c_str()));
 
-    deque<async_method_t> tasks;
+    task_queue_t::container_t tasks;
     uint32_t all_task_num = 0;
     uint32_t thread_num = m_thread_group.size();
 
@@ -232,7 +232,12 @@ void task_service_t::set_stop_signal(bool signal_)
     LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::set_stop_signal service(%s) end", m_service_name.c_str()));
 }
 
-int task_service_t::post(const async_method_t& async_method_, void* ext_data_, task_prior_e prior_, bool exec_local_)
+int task_service_t::post(
+                            const async_method_t&   async_method_,
+                            void*                   ext_data_,
+                            task_prior_e            prior_,
+                            bool                    exec_local_
+                        )
 {
     //! yunjie: 如果投递消息的是本线程组中的线程, 那么就直接执行, 不进行多余的入队列操作.
     if (exec_local_ && is_run_on_service())
@@ -261,7 +266,8 @@ int task_service_t::clear_all_task()
     return 0;
 }
 
-void task_service_t::register_timer(uint32_t                        interval_,
+void task_service_t::register_timer(
+                                    uint32_t                        interval_,
                                     const time_event_callback_t&    callback_,
                                     bool                            persist_,
                                     time_t                          start_time_

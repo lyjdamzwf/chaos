@@ -36,7 +36,13 @@ namespace task_service
 using namespace std;
 using namespace chaos::thread;
 
-class task_queue_t : public base_container_t<async_method_t, std::deque>
+//! yunjie: 为了适配高版本g++对嵌套模板参数的类型检查更为严格
+template<typename T>
+class __deque_t__ : public std::deque<T>
+{
+};
+
+class task_queue_t : public base_container_t<async_method_t, __deque_t__>
 {
 public:
     void push(const async_method_t& task_, task_prior_e prior_ = TASK_PRIOR_NORMAL)
@@ -46,7 +52,13 @@ public:
         m_container_arr[prior_].push_back(task_);
     }
 
-    int fetch_task(deque<async_method_t>& out_task_, uint32_t& all_task_num_, uint32_t task_num_, cond_checker_t* checker = NULL, task_prior_e prior_ = TASK_PRIOR_NORMAL)
+    int fetch_task(
+                    container_t&                out_task_,
+                    uint32_t&                   all_task_num_,
+                    uint32_t                    task_num_,
+                    cond_checker_t*             checker         = NULL,
+                    task_prior_e                prior_          = TASK_PRIOR_NORMAL
+                  )
     {
         CHECK_LOCK(m_is_lock, m_mutex);
 
@@ -62,7 +74,11 @@ public:
 
         if (task_num_ > task_queue.size())
         {
-            for (deque<async_method_t>::iterator it = task_queue.begin(); it < task_queue.end(); ++it)
+            for (
+                    deque<async_method_t>::iterator it = task_queue.begin();
+                    it < task_queue.end();
+                    ++it
+                )
             {
                 out_task_.push_back(*it);
             }
@@ -71,7 +87,11 @@ public:
         }
         else
         {
-            for (deque<async_method_t>::iterator it = task_queue.begin(); it < task_queue.begin() + task_num_; ++it)
+            for (
+                    deque<async_method_t>::iterator it = task_queue.begin();
+                    it < task_queue.begin() + task_num_;
+                    ++it
+                )
             {
                 out_task_.push_back(*it);
             }

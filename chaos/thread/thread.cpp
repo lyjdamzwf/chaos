@@ -129,7 +129,11 @@ void thread_t::cond_wait()
     LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() end"));
 }
 
-void thread_t::cond_wait(struct timeval& now_, uint64_t timeout_second_, uint64_t timeout_microsecond_)
+void thread_t::cond_wait(
+                            struct timeval&     now_,
+                            uint64_t            timeout_second_,
+                            uint64_t            timeout_microsecond_
+                        )
 {
     LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() args-[timeout_sec:%lu, timeout_usec:%lu] begin", timeout_second_, timeout_microsecond_));
 

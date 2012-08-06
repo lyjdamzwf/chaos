@@ -43,7 +43,10 @@ public:
     virtual ~task_service_group_t();
 
 
-    virtual int start(int task_service_num_, int thread_num_per_service_ = DEFAULT_THREAD_NUM_PER_SERVICE);
+    virtual int start(
+                        int task_service_num_,
+                        int thread_num_per_service_ = DEFAULT_THREAD_NUM_PER_SERVICE
+                     );
     virtual int stop();
     task_service_t* operator[](uint32_t index_);
     int size() const

@@ -6,6 +6,8 @@
  * license that can be found in the License file.
  */
 
+#include <errno.h>
+
 #include "io_multiplex_handler.h"
 
 /*! 
@@ -232,7 +234,13 @@ int io_multiplex_handler_t::wait_io_notification()
     return res;
 }
 
-int io_multiplex_handler_t::register_io_event(fd_t fd_, int event_type_flag_, callback_on_event_t event_cb_, void* cb_arg_, bool is_persist_)
+int io_multiplex_handler_t::register_io_event(
+                                                fd_t                    fd_,
+                                                int                     event_type_flag_,
+                                                callback_on_event_t     event_cb_,
+                                                void*                   cb_arg_,
+                                                bool                    is_persist_
+                                             )
 {
     LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event arg-[fd:%lu] begin", fd_));
 
@@ -258,7 +266,13 @@ int io_multiplex_handler_t::remove_fd_from_epoll(fd_t fd_)
 }
 
 
-int io_multiplex_handler_t::register_io_event_i(fd_t fd_, int event_type_flag_, callback_on_event_t event_cb_, void* cb_arg_, bool is_persist_)
+int io_multiplex_handler_t::register_io_event_i(
+                                                fd_t                    fd_,
+                                                int                     event_type_flag_,
+                                                callback_on_event_t     event_cb_,
+                                                void*                   cb_arg_,
+                                                bool                    is_persist_
+                                               )
 {
     LOGTRACE((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event_i args-[fd:%lu, event_flag:%lu] begin", fd_, event_type_flag_));
 

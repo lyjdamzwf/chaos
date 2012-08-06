@@ -42,7 +42,10 @@ task_service_t* task_service_group_t::new_service()
     return new task_service_t(m_service_name);
 }
 
-int task_service_group_t::start(int task_service_num_, int thread_num_per_service_)
+int task_service_group_t::start(
+                                int task_service_num_,
+                                int thread_num_per_service_
+                               )
 {
     LOGTRACE((TASK_SERVICE_MODULE, "task_service_group_t::start args-[task_service_num:%d, thread_num_per_service:%d] begin", task_service_num_, thread_num_per_service_));
 

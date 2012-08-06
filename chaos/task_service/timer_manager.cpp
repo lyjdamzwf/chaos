@@ -75,7 +75,8 @@ int timer_manager_t::initialize(bool lock_)
     return 0;
 }
 
-void timer_manager_t::register_timer(uint32_t                       interval_,
+void timer_manager_t::register_timer(
+                                     uint32_t                       interval_,
                                      const time_event_callback_t&   callback_,
                                      bool                           persist_,
                                      time_t                         start_time_

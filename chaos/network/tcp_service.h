@@ -44,10 +44,10 @@ public:
     virtual ~tcp_service_t();
 
     int initialize( 
-                    const string& host_,
-                    uint32_t port_,
-                    connection_t::on_conn_event_t event_func_ = NULL,
-                    network_config_t config_ = network_config_t()
+                    const string&                   host_,
+                    uint32_t                        port_,
+                    connection_t::on_conn_event_t   event_func_ = NULL,
+                    network_config_t                config_     = network_config_t()
                     );
     int start(uint16_t work_thread_num_ = DEFAULT_WORK_THREAD_NUM);
     int stop();
@@ -76,10 +76,10 @@ tcp_service_t<CONN_TYPE>::~tcp_service_t()
 
 template<typename CONN_TYPE>
 int tcp_service_t<CONN_TYPE>::initialize(
-                                            const string& host_,
-                                            uint32_t port_,
-                                            connection_t::on_conn_event_t event_func_,
-                                            network_config_t config_
+                                            const string&                   host_,
+                                            uint32_t                        port_,
+                                            connection_t::on_conn_event_t   event_func_,
+                                            network_config_t                config_
                                         )
 {
     return m_acceptor_service.initialize(

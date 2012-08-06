@@ -52,7 +52,8 @@ public:
 public:
     int initialize(bool lock_ = false);
 
-    void register_timer(uint32_t                        interval_,
+    void register_timer(
+                        uint32_t                        interval_,
                         const time_event_callback_t&    callback_,
                         bool                            persist_ = false,
                         time_t                          start_time_ = 0

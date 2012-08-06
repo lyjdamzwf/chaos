@@ -99,8 +99,8 @@ public:
     virtual int fetch_task(CONTAINER<ELEMENT>&          out_task_,
                            uint32_t&                    out_all_task_num_,
                            uint32_t                     fetch_count_,
-                           cond_checker_t*              checker_ = NULL,
-                           task_prior_e                 prior_ = TASK_PRIOR_NORMAL
+                           cond_checker_t*              checker_            = NULL,
+                           task_prior_e                 prior_              = TASK_PRIOR_NORMAL
                           ) = 0;
 
     virtual void clear(task_prior_e prior_ = TASK_PRIOR_NORMAL) = 0;

@@ -21,6 +21,7 @@
  */
 
 #include <signal.h>
+#include <stddef.h>
 
 #include <map>
 using namespace std;

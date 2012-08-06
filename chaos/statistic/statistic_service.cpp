@@ -231,7 +231,11 @@ int statistic_service_t::timeout_func_i()
     return 0;
 }
 
-void statistic_service_t::async_perf_stat_cost(const string& op_, uint64_t cost_, bool is_persist_)
+void statistic_service_t::async_perf_stat_cost(
+                                                const string&       op_,
+                                                uint64_t            cost_,
+                                                bool                is_persist_
+                                              )
 {
     if (NULL != m_service_ptr)
     {
@@ -247,7 +251,11 @@ void statistic_service_t::async_perf_stat_cost(const string& op_, uint64_t cost_
     }
 }
 
-void statistic_service_t::async_action_increment(const string& action_, size_t inc_, bool is_persist_)
+void statistic_service_t::async_action_increment(
+                                                    const string&       action_,
+                                                    size_t              inc_,
+                                                    bool                is_persist_
+                                                )
 {
     if (NULL != m_service_ptr)
     {
@@ -263,7 +271,11 @@ void statistic_service_t::async_action_increment(const string& action_, size_t i
     }
 }
 
-void statistic_service_t::async_stat_throughput(const string& action_, uint64_t value_, bool is_persist_)
+void statistic_service_t::async_stat_throughput(
+                                                const string&   action_,
+                                                uint64_t        value_,
+                                                bool            is_persist_
+                                               )
 {
     if (NULL != m_service_ptr)
     {
@@ -311,7 +323,11 @@ statistic_service_t::throughput_info_t& statistic_service_t::find_tp_info_i(cons
     return ret;
 }
 
-int statistic_service_t::sync_perf_stat_cost_i(const string& op_, uint64_t cost_, bool is_persist_)
+int statistic_service_t::sync_perf_stat_cost_i(
+                                                const string&   op_,
+                                                uint64_t        cost_,
+                                                bool            is_persist_
+                                              )
 {
     LOGTRACE((STATISTIC_MOUDLE, "statistic_service_t::sync_perf_stat_cost_i begin"));
 
@@ -338,7 +354,11 @@ int statistic_service_t::sync_perf_stat_cost_i(const string& op_, uint64_t cost_
     return 0;
 }
 
-int statistic_service_t::sync_action_increment_i(const string& action_, size_t inc_, bool is_persist_)
+int statistic_service_t::sync_action_increment_i(
+                                                    const string&       action_,
+                                                    size_t              inc_,
+                                                    bool                is_persist_
+                                                )
 {
     LOGTRACE((STATISTIC_MOUDLE, "statistic_service_t::sync_action_increment_i begin"));
 
@@ -351,7 +371,11 @@ int statistic_service_t::sync_action_increment_i(const string& action_, size_t i
     return 0;
 }
 
-int statistic_service_t::sync_stat_throughput_i(const string& action_, uint64_t value_, bool is_persist_)
+int statistic_service_t::sync_stat_throughput_i(
+                                                const string&   action_,
+                                                uint64_t        value_,
+                                                bool            is_persist_
+                                               )
 {
     LOGTRACE((STATISTIC_MOUDLE, "statistic_service_t::sync_stat_throughput_i begin"));
 

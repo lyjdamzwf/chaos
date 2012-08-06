@@ -76,21 +76,45 @@ public:
     int stop();
     int set_timeout(int seconds_);
 
-    void async_perf_stat_cost(const string& op_, uint64_t cost_, bool is_persist_ = false);
+    void async_perf_stat_cost(
+                                const string&       op_,
+                                uint64_t            cost_,
+                                bool                is_persist_ = false
+                             );
 
-    void async_action_increment(const string& action_, size_t inc_ = 1, bool is_persist_ = false);
+    void async_action_increment(
+                                const string&       action_,
+                                size_t              inc_        = 1,
+                                bool                is_persist_ = false
+                               );
 
-    void async_stat_throughput(const string& action_, uint64_t value_, bool is_persist_ = false);
+    void async_stat_throughput(
+                                const string&   action_,
+                                uint64_t        value_,
+                                bool            is_persist_ = false
+                              );
 
 private:
     //! yunjie: 私有方法都跑在m_service_ptr上
     int timeout_func_i();
 
-    int sync_perf_stat_cost_i(const string& op_, uint64_t cost_, bool is_persist_);
+    int sync_perf_stat_cost_i(
+                                const string&   op_,
+                                uint64_t        cost_,
+                                bool            is_persist_
+                             );
 
-    int sync_action_increment_i(const string& action_, size_t inc_, bool is_persist_);
+    int sync_action_increment_i(
+                                const string&       action_,
+                                size_t              inc_,
+                                bool                is_persist_
+                               );
 
-    int sync_stat_throughput_i(const string& action_, uint64_t value_, bool is_persist_);
+    int sync_stat_throughput_i(
+                                const string&   action_,
+                                uint64_t        value_,
+                                bool            is_persist_
+                              );
 
     performance_info_t& find_perf_info_i(const string& op_name_);
     throughput_info_t& find_tp_info_i(const string& op_name_);
@@ -109,10 +133,15 @@ private:
 class performance_guard_t
 {
 public:
-    performance_guard_t(statistic_service_t& service_, const char * info_ = "", bool is_persist_ = false):
-        m_service(service_), 
-        m_info(info_),
-        m_is_persist(is_persist_)
+    performance_guard_t(
+                        statistic_service_t&    service_,
+                        const char *            info_       = "",
+                        bool                    is_persist_ = false
+                       )
+        :
+            m_service(service_), 
+            m_info(info_),
+            m_is_persist(is_persist_)
     {
         gettimeofday(&m_begin_tv, NULL);
     }

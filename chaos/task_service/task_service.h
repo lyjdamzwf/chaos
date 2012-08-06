@@ -126,13 +126,19 @@ public:
     //! yunjie: 
     //! ext_data_ -使用者可以借助ext_data来改变投递规则
     //! is_allow_exec_local_ - 如果当前线程属于task_service的线程组, 就立即执行
-    virtual int post(const async_method_t& async_method_, void* ext_data_ = NULL, task_prior_e prior_ = TASK_PRIOR_NORMAL, bool is_allow_exec_local_ = true);
+    virtual int post(
+                        const async_method_t&   async_method_,
+                        void*                   ext_data_               = NULL,
+                        task_prior_e            prior_                  = TASK_PRIOR_NORMAL,
+                        bool                    is_allow_exec_local_    = true
+                    );
 
-    void register_timer(uint32_t                        interval_,
+    void register_timer(
+                        uint32_t                        interval_,
                         const time_event_callback_t&    callback_,
-                        bool                            persist_ = false,
+                        bool                            persist_    = false,
                         time_t                          start_time_ = 0
-                        );
+                       );
 
     void register_io_event(
                             fd_t                    fd_,

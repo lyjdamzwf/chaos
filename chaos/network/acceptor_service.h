@@ -99,7 +99,13 @@ acceptor_service_t<CONN_TYPE>::acceptor_service_t()
 }
 
 template<typename CONN_TYPE>
-int acceptor_service_t<CONN_TYPE>::initialize(const string& host_, uint32_t port_, work_service_group_t* work_service_group_, connection_t::on_conn_event_t event_func_, network_config_t config_)
+int acceptor_service_t<CONN_TYPE>::initialize(
+                                                const string&                   host_,
+                                                uint32_t                        port_,
+                                                work_service_group_t*           work_service_group_,
+                                                connection_t::on_conn_event_t   event_func_,
+                                                network_config_t                config_
+                                             )
 {
     LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize arg-[host:%s, port:%d] begin", host_.c_str(), port_));
 

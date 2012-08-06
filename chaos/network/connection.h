@@ -167,7 +167,15 @@ public:
     connection_t();
     virtual ~connection_t();
 
-    virtual int initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, network_config_t* config_ = NULL, bool enable_hb_ = false);
+    virtual int initialize(
+                            fd_t                socket_,
+                            struct timeval      timestamp_,
+                            work_service_t*     work_service_,
+                            conn_type_e         conn_type_,
+                            on_conn_event_t     event_func_,
+                            network_config_t*   config_ = NULL,
+                            bool                enable_hb_ = false
+                          );
 
     conn_status_e get_status() const
     {
