@@ -26,6 +26,13 @@ Chaos 0.24-8-gba14387-beta                                      2012.7.29
     *)  task_service主循环中增加异常捕获
 
 
-Chaos 0.2.25-beta                                               2012.8.6
+Chaos 0.3.25-beta                                               2012.8.6
     *)  解决了对高版本gcc/g++的兼容性问题
 
+
+Chaos 0.4.25-beta                                               2012.8.16
+    *)  增加pipe,socketpair,eventfd三种线程通信
+        方式(编译期使用宏指定)，默认使用pipe
+
+    *)  完善chaos::task_service_t与boost::io_service
+        测试用例

@@ -20,6 +20,9 @@
  *
  */
 
+#include <sys/types.h>
+#include <sys/socket.h>
+
 #include "utility_inc.h"
 #include "async_method_inc.h"
 #include "thread_inc.h"
@@ -28,6 +31,18 @@
 #include "timer_manager.h"
 #include "task_queue.h"
 #include "io_multiplex_handler.h"
+
+#define PTHREAD_COND_VAR    1
+#define SLEEP               2
+#define PIPE                3
+#define SOCKET_PAIR         4
+#define EVENTFD             5
+
+#define COMMUNICATION_MODE  3
+
+#if COMMUNICATION_MODE == EVENTFD
+#include <sys/eventfd.h>
+#endif
 
 namespace chaos
 {
@@ -63,9 +78,6 @@ using namespace chaos::log;
 #ifndef DEFAULT_SERVICE_NAME
 #define DEFAULT_SERVICE_NAME                "default_service_name"
 #endif
-
-#define USE_COND_VAR    1
-
 
 class task_service_t : private noncopyable_t
 {
@@ -177,6 +189,12 @@ protected:
     atomic_val_t<uint32_t>                  m_fetch_num_per_loop;
     timer_manager_t                         m_timer_manager;
     io_multiplex_handler_t                  m_io_handler;
+
+#if COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
+    //! yunjie: 用于IPC通信的fd
+    int                                     m_comm_fds[2];
+#endif
+
 };
 
 }

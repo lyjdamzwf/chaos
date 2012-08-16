@@ -53,7 +53,7 @@ int io_multiplex_handler_t::initialize(bool lock_)
 
     //! yunjie: 32000参数对linux 2.6 内核之后的版本已经无效.
     if ((int)(m_epoll_fd = ::epoll_create(32000)) == -1) 
-    {                                                                                                                                                                                                
+    {
         LOGERROR((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize epoll_create failed, errno:[%m] return.", errno));
 
         return -1;
@@ -90,8 +90,12 @@ int io_multiplex_handler_t::wait_io_notification()
         return 0;
     }
 
-    int timeout = 50;        //! yunjie: timeout暂时为50, 以后会进行优化
-    int res = ::epoll_wait(m_epoll_fd, &m_epoll_events[0], m_epoll_events.size(), timeout);
+    int res = ::epoll_wait(
+                            m_epoll_fd,
+                            &m_epoll_events[0],
+                            m_epoll_events.size(),
+                            EPOLL_TIMEOUT
+                          );
 
     //! yunjie: epoll_wait 非正常返回值处理.
     if (res == -1)
@@ -279,7 +283,7 @@ int io_multiplex_handler_t::register_io_event_i(
     if (NULL == event_cb_)
     {
         LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::register_io_event_i event_cb_ equals NULL"));
-        return -1;
+        //! return -1;
     }
 
     //! yunjie: 判断是否要扩张m_io_event容器

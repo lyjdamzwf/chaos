@@ -48,6 +48,8 @@ using namespace chaos::thread;
 #define ERROR_EVENT_FLAG            0x04
 #define ALL_EVENT_FLAG              0x07
 
+#define EPOLL_TIMEOUT               100
+
 typedef     uint32_t                             fd_t;
 typedef     void (*callback_on_event_t) (fd_t, int, void*);
 

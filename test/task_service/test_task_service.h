@@ -1,15 +1,24 @@
 #ifndef _CHAOS_TEST_TASK_SERVICE_H_
 #define _CHAOS_TEST_TASK_SERVICE_H_
 
-/**
+#define USE_BOOST 0
+#define TASK_SERVICE_PERFORMANCE_COUNT 10000000
+
+#if USE_BOOST
 #include "boost/function.hpp"
 #include "boost/thread.hpp"
 #include "boost/asio.hpp"
 #include "boost/shared_ptr.hpp"
-*/
 
-#define USE_BOOST 0
-#define TASK_SERVICE_PERFORMANCE_COUNT 100000
+typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
+typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
+work_ptr gwp;
+
+#endif
+
+struct timeval begin_tv;
+struct timeval post_end_tv;
+struct timeval fin_tv;
 
 void task_service_productor(string str_, int index_)
 {
@@ -22,6 +31,9 @@ void task_service_productor(string str_, int index_)
     if (TASK_SERVICE_PERFORMANCE_COUNT - 1 == index_)
     {
         LOGDEBUG((TEST_MODULE, "%s done", str_.c_str()));
+        gettimeofday(&fin_tv, NULL);
+        uint64_t cost_us = (fin_tv.tv_sec - begin_tv.tv_sec) * 1000 * 1000 + (fin_tv.tv_usec - begin_tv.tv_usec);
+        printf("task exec cost:[%lu us]\n", cost_us);
     }
 }
 
@@ -40,62 +52,39 @@ void test_task_service_press()
     }
 }
 
-/**
-typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
-typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
-*/
-
-
 void test_task_service_performance()
 {
     LOGDEBUG((TEST_MODULE, "test_task_service_performance begin"));
 
+    int index = 0;
+    gettimeofday(&begin_tv, NULL);
+
 #if USE_BOOST 
-    /**
     io_service_ptr isptr = io_service_ptr(new boost::asio::io_service());
-    work_ptr wp = work_ptr(new boost::asio::io_service::work(*isptr));
+    gwp = work_ptr(new boost::asio::io_service::work(*isptr));
     boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_service::run, isptr)));
 
-    performance_guard_t guard("boost io_service");
-
-    int index = 0;
-    while (1)
+    while (index <= TASK_SERVICE_PERFORMANCE_COUNT)
     {
-        if (TASK_SERVICE_PERFORMANCE_COUNT == index)
-        {
-            break;
-        }
-
-        isptr->post(boost::bind(&task_service_productor, string("bsio_service"), index));
-        ++index ;
+        isptr->post(boost::bind(&task_service_productor, string("asio_service"), index++));
     }
     LOGDEBUG((TEST_MODULE, "boost post end"));
-    wp.reset();
+    gwp.reset();
 
     LOGDEBUG((TEST_MODULE, "boost thread join start"));
     thread->join();
     LOGDEBUG((TEST_MODULE, "boost thread join end"));
-    */
-
 #else
-    performance_guard_t guard(SS(), "task_service");
-
-    int index = 0;
-    while (1)
+    while (index <= TASK_SERVICE_PERFORMANCE_COUNT)
     {
-        if (TASK_SERVICE_PERFORMANCE_COUNT == index)
-        {
-            break;
-        }
-
-        TS().post(async_method_t::bind_func(&task_service_productor, string("task_service"), index));
-        ++index ;
+        TS().post(async_method_t::bind_func(&task_service_productor, string("task_service"), index++));
     }
     LOGDEBUG((TEST_MODULE, "chaos post end"));
-
-    LOGDEBUG((TEST_MODULE, "chaos thread join start"));
-    LOGDEBUG((TEST_MODULE, "chaos thread join end"));
 #endif
+
+    gettimeofday(&post_end_tv, NULL);
+    uint64_t cost_us = (post_end_tv.tv_sec - begin_tv.tv_sec) * 1000 * 1000 + (post_end_tv.tv_usec - begin_tv.tv_usec);
+    printf("post cost:[%lu us]\n", cost_us);
 
     LOGDEBUG((TEST_MODULE, "test_task_service_performance end"));
 }

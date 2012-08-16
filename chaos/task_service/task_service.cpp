@@ -5,6 +5,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the License file.
  */
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <stdlib.h>
 #include <assert.h>
@@ -35,11 +37,26 @@ task_service_t::task_service_t(const string& service_name_)
         m_thread_num(0),
         m_fetch_num_per_loop(0xffffffff)
 {
+#if COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
+    memset(&m_comm_fds, 0 , sizeof(m_comm_fds));
+#endif
 }
 
 task_service_t::~task_service_t()
 {
     stop();
+}
+
+void read_byte_from_fd(fd_t fd_, int event_, void* arg_)
+{
+    char byte;
+    int ret; 
+    if ((ret = ::read(fd_, &byte, sizeof(char))) != sizeof(char))
+    {
+        LOGWARN((TASK_SERVICE_MODULE, "read_byte_from_fd read failed ret:[%d]",
+                    ret
+               ));
+    }
 }
 
 int task_service_t::start(int32_t thread_num_)
@@ -75,6 +92,33 @@ int task_service_t::start(int32_t thread_num_)
     m_timer_manager.initialize(lock_flag); 
     m_io_handler.initialize(lock_flag); 
 
+    //! yunjie: 初始化IPC
+#if COMMUNICATION_MODE == PIPE
+    if (::pipe(m_comm_fds) < 0) 
+    {
+        LOGERROR((TASK_SERVICE_MODULE, "task_service_t::start service(%s) create pipe failed, exit", m_service_name.c_str()));
+        exit(EXIT_FAILURE);
+    } 
+
+    //! yunjie: 禁止pipe读时进行touch_atime操作
+    fcntl(m_comm_fds[0], F_SETFL, O_NOATIME);
+    register_io_event(m_comm_fds[0], READ_EVENT_FLAG, read_byte_from_fd, NULL, true);
+#elif COMMUNICATION_MODE == SOCKET_PAIR
+    if (::socketpair(AF_UNIX, SOCK_STREAM, 0, m_comm_fds) < 0)
+    {
+        LOGERROR((TASK_SERVICE_MODULE, "task_service_t::start service(%s) create socketpair failed, exit", m_service_name.c_str()));
+        exit(EXIT_FAILURE);
+    }
+    register_io_event(m_comm_fds[0], READ_EVENT_FLAG, read_byte_from_fd, NULL, true);
+#elif COMMUNICATION_MODE == EVENTFD
+    if ((m_comm_fds[1] = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) < 0)
+    {
+        LOGERROR((TASK_SERVICE_MODULE, "task_service_t::start service(%s) create eventfd failed, exit", m_service_name.c_str()));
+        exit(EXIT_FAILURE);
+    }
+    register_io_event(m_comm_fds[1], READ_EVENT_FLAG, read_byte_from_fd, NULL, true);
+#endif
+
     start_thread_t start_thread(*this);
     m_thread_group.exec_all(start_thread);
 
@@ -100,6 +144,14 @@ int task_service_t::stop()
 
     //! yunjie: thread* 将会在join_all()中被delete
     m_thread_group.join_all();
+
+#if COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR
+    ::close(m_comm_fds[0]);
+    ::close(m_comm_fds[1]);
+#elif COMMUNICATION_MODE == EVENTFD
+    ::close(m_comm_fds[1]);
+#endif
+
     m_thread_num = 0;
     m_fetch_num_per_loop = 0xffffffff;
     
@@ -159,7 +211,7 @@ void task_service_t::exec_task(thread_t* thd_)
                 m_timer_manager.flush_time();
                 cached_now = m_timer_manager.get_cached_time();
 
-                //! yunjie; 进行网络IO检测, 并会调用相应 读/写 回调
+                //! yunjie: 进行网络IO检测, 并会调用相应 读/写 回调
                 int wake_num = m_io_handler.wait_io_notification();
 
                 //! yunjie: 如果有timer时间超时, 将会在函数内部执行callback
@@ -172,9 +224,9 @@ void task_service_t::exec_task(thread_t* thd_)
                     break;
                 }
 
-#if USE_COND_VAR
+#if COMMUNICATION_MODE == PTHREAD_COND_VAR
                 thd_->cond_wait(cached_now, 0, TIMEDOUT_US);
-#else
+#elif COMMUNICATION_MODE == SLEEP
                 thread_t::usleep(TIMEDOUT_US);
 #endif
             }
@@ -251,9 +303,24 @@ int task_service_t::post(
 
     m_task_queue.push(async_method_);
     
-#if USE_COND_VAR
+#if COMMUNICATION_MODE == PTHREAD_COND_VAR
     send_cond_signal_t send_cond_signal;
     m_thread_group.exec_all(send_cond_signal);
+#elif COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
+    char byte;
+    int ret = 0;
+    if ((ret = ::write(m_comm_fds[1], &byte, sizeof(char))) != sizeof(char))
+    {
+        /**
+        LOGWARN((TASK_SERVICE_MODULE, "task_service_t::post write pipe failed ret:[%d]",
+                    ret
+               ));
+               */
+    }
+    else
+    {
+        //LOGINFO((TASK_SERVICE_MODULE, "write ret:%d", ret));
+    }
 #endif
 
     return 0;
