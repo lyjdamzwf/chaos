@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(0.001)
-AC_INIT(chaos, 0.4.25, lyjdamzwf@gmail.com)
+AC_INIT(chaos, 0.4.26, lyjdamzwf@gmail.com)
 AM_INIT_AUTOMAKE([foreign])
 
 # Checks for programs.

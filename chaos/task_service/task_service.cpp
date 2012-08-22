@@ -311,15 +311,7 @@ int task_service_t::post(
     int ret = 0;
     if ((ret = ::write(m_comm_fds[1], &byte, sizeof(char))) != sizeof(char))
     {
-        /**
-        LOGWARN((TASK_SERVICE_MODULE, "task_service_t::post write pipe failed ret:[%d]",
-                    ret
-               ));
-               */
-    }
-    else
-    {
-        //LOGINFO((TASK_SERVICE_MODULE, "write ret:%d", ret));
+        //! yunjie: post函数内不能进行LOGXXXX,会引起递归溢出(因为LOGXXXX内也会post到日志线程)
     }
 #endif
 

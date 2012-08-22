@@ -36,3 +36,7 @@ Chaos 0.4.25-beta                                               2012.8.16
 
     *)  完善chaos::task_service_t与boost::io_service
         测试用例
+
+Chaos 0.4.26-beta                                               2012.8.22
+    *)  修复post时日志造成递归溢出的错误，并加上提示注释
+    *)  增加op_lvl脚本批量更改g++编译优化选项
