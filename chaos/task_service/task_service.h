@@ -40,6 +40,17 @@
 
 #define COMMUNICATION_MODE  3
 
+//! yunjie: 根据内核版本选择最优化IPC方式
+#ifdef HAVE_CONFIG_H
+#include "conf.h"
+#undef COMMUNICATION_MODE
+#if (KER_V1 > 2) || (KER_V1 == 2 && KER_V2 > 6) || (KER_V1 == 2  && KER_V2 == 6 && KER_V3 >= 27)
+#define COMMUNICATION_MODE  5
+#else
+#define COMMUNICATION_MODE  3
+#endif
+#endif
+
 #if COMMUNICATION_MODE == EVENTFD
 #include <sys/eventfd.h>
 #endif

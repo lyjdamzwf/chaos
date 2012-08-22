@@ -56,4 +56,8 @@ AC_CONFIG_FILES([Makefile
 		test/timer/Makefile
 		test/msg_buffer/Makefile
                 ])
+
+AC_DEFINE([KER_V1],[2],[the first kernel version])
+AC_DEFINE([KER_V2],[6],[the second kernel version])
+AC_DEFINE([KER_V3],[32],[the third kernel version])
 AC_OUTPUT

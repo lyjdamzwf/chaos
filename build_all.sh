@@ -1,3 +1,4 @@
+sh get_ker_ver.sh
 sh autogen.sh
 ./configure
 make

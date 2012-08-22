@@ -122,10 +122,10 @@ public:
     }
 
 private:
-    static bool             is_started;
+    volatile static bool             is_started;
 };
 
-bool log_tool_t::is_started = false;
+volatile bool log_tool_t::is_started = false;
 
 class application_tool_t
 {
