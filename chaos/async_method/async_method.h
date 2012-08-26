@@ -41,7 +41,7 @@ using namespace std;
 
 #define BIND_FUNC_ENTRY(num) \
 template <typename F BIND_NAME_LIST_##num(typename A)> \
-static async_method_t bind_func(F f_ BIND_ARG_LIST_##num) \
+async_method_t bind_func(F f_ BIND_ARG_LIST_##num) \
 { \
     async_method_base_t* async_method_ptr = \
     new async_method_bind_func_##num##_t<F BIND_NAME_LIST_##num(A)>( \
@@ -53,7 +53,7 @@ static async_method_t bind_func(F f_ BIND_ARG_LIST_##num) \
 
 #define BIND_OBJ_ENTRY(num) \
 template <typename F, typename CLS_TYPE BIND_NAME_LIST_##num(typename A)> \
-static async_method_t bind_memfunc(CLS_TYPE obj_, F f_ BIND_ARG_LIST_##num) \
+async_method_t bind_memfunc(CLS_TYPE obj_, F f_ BIND_ARG_LIST_##num) \
 { \
     async_method_base_t* async_method_ptr = \
     new async_method_bind_obj_##num##_t<CLS_TYPE, F BIND_NAME_LIST_##num(A)>( \
@@ -63,40 +63,8 @@ static async_method_t bind_memfunc(CLS_TYPE obj_, F f_ BIND_ARG_LIST_##num) \
     return async_method; \
 }
 
-//! yunjie: bind接口的参数不能使用const T&类型, 如果传入的是函数指针将编译错误
 class async_method_t
 {
-public:
-    //! ---------------------- yunjie: bind static function begin ---------------------- 
-    BIND_FUNC_ENTRY(0)
-    BIND_FUNC_ENTRY(1)
-    BIND_FUNC_ENTRY(2)
-    BIND_FUNC_ENTRY(3)
-    BIND_FUNC_ENTRY(4)
-    BIND_FUNC_ENTRY(5)
-    BIND_FUNC_ENTRY(6)
-    BIND_FUNC_ENTRY(7)
-    BIND_FUNC_ENTRY(8)
-    BIND_FUNC_ENTRY(9)
-    //! ---------------------- yunjie: bind static function end ---------------------- 
-
-
-
-
-    //! ---------------------- yunjie: bind object function begin ---------------------- 
-    BIND_OBJ_ENTRY(0)
-    BIND_OBJ_ENTRY(1)
-    BIND_OBJ_ENTRY(2)
-    BIND_OBJ_ENTRY(3)
-    BIND_OBJ_ENTRY(4)
-    BIND_OBJ_ENTRY(5)
-    BIND_OBJ_ENTRY(6)
-    BIND_OBJ_ENTRY(7)
-    BIND_OBJ_ENTRY(8)
-    BIND_OBJ_ENTRY(9)
-    //! ---------------------- yunjie: bind object function end ---------------------- 
-
-
 public:
     async_method_t()
         : m_async_method_base_ptr(NULL)
@@ -137,6 +105,28 @@ public:
 private:
     async_method_base_t*    m_async_method_base_ptr;
 };
+
+    BIND_FUNC_ENTRY(0)
+    BIND_FUNC_ENTRY(1)
+    BIND_FUNC_ENTRY(2)
+    BIND_FUNC_ENTRY(3)
+    BIND_FUNC_ENTRY(4)
+    BIND_FUNC_ENTRY(5)
+    BIND_FUNC_ENTRY(6)
+    BIND_FUNC_ENTRY(7)
+    BIND_FUNC_ENTRY(8)
+    BIND_FUNC_ENTRY(9)
+
+    BIND_OBJ_ENTRY(0)
+    BIND_OBJ_ENTRY(1)
+    BIND_OBJ_ENTRY(2)
+    BIND_OBJ_ENTRY(3)
+    BIND_OBJ_ENTRY(4)
+    BIND_OBJ_ENTRY(5)
+    BIND_OBJ_ENTRY(6)
+    BIND_OBJ_ENTRY(7)
+    BIND_OBJ_ENTRY(8)
+    BIND_OBJ_ENTRY(9)
 
 
 }

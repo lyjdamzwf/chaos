@@ -86,7 +86,7 @@ int connection_t::async_close(const struct conn_id_t& conn_id_, bool is_del_from
     }
 
     //! yunjie: sync_close_i操作必须放到队列中执行, 因为其中会delete connection_t对象, 所以最后一个参数为false
-    service_ptr->post(async_method_t::bind_func(&connection_t::sync_close_i, conn_id_, is_del_from_hb_, close_type_), NULL, TASK_PRIOR_NORMAL, false);
+    service_ptr->post(bind_func(&connection_t::sync_close_i, conn_id_, is_del_from_hb_, close_type_), NULL, TASK_PRIOR_NORMAL, false);
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_close args-[fd:%d] end", conn_id_.socket));
     return 0;
@@ -103,7 +103,7 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const packet_wrap
         return -1;
     }
 
-    service_ptr->post(async_method_t::bind_func(&connection_t::sync_send_packet_wrapper_i, conn_id_, msg_));
+    service_ptr->post(bind_func(&connection_t::sync_send_packet_wrapper_i, conn_id_, msg_));
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
     return 0;
@@ -129,7 +129,7 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const char* msg_,
     {
         //! yunjie: 为保证数据跨线程安全性, 包装成packet_wrapper_t, post异步消息
         packet_wrapper_t msg_wrapper(msg_, size_);
-        service_ptr->post(async_method_t::bind_func(&connection_t::sync_send_packet_wrapper_i, conn_id_, msg_wrapper));
+        service_ptr->post(bind_func(&connection_t::sync_send_packet_wrapper_i, conn_id_, msg_wrapper));
     }
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));

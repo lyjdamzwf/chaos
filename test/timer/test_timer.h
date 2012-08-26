@@ -6,14 +6,14 @@ timer_manager_t timer_manager;
 void timer_event()
 {
     printf("timer_event called!!!!!\n");
-    timer_manager.register_timer(1, async_method_t::bind_func(timer_event), false); 
+    timer_manager.register_timer(1, bind_func(timer_event), false); 
 }
 
 void test_time_event()
 {
     timer_manager.initialize(false);
 
-    timer_manager.register_timer(1, async_method_t::bind_func(timer_event), false, time(NULL) + 10);
+    timer_manager.register_timer(1, bind_func(timer_event), false, time(NULL) + 10);
 
     while (1)
     {

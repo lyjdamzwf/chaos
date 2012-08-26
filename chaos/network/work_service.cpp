@@ -69,7 +69,7 @@ int work_service_t::stop()
 {
     LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::stop begin"));
 
-    this->post(async_method_t::bind_memfunc(this, &work_service_t::sync_close_all_conn_i));
+    this->post(bind_memfunc(this, &work_service_t::sync_close_all_conn_i));
 
     if (m_enable_conn_heart_beat)
     {
@@ -87,7 +87,7 @@ int work_service_t::stop()
 
 int work_service_t::async_add_connection(conn_ptr_t conn_ptr_)
 {
-    this->post(async_method_t::bind_memfunc(this, &work_service_t::sync_add_connection_i, conn_ptr_));
+    this->post(bind_memfunc(this, &work_service_t::sync_add_connection_i, conn_ptr_));
 
     return 0;
 }
@@ -95,7 +95,7 @@ int work_service_t::async_add_connection(conn_ptr_t conn_ptr_)
 
 int work_service_t::async_del_connection(const conn_id_t& conn_id_)
 {
-    this->post(async_method_t::bind_memfunc(this, &work_service_t::sync_del_connection_i, conn_id_));
+    this->post(bind_memfunc(this, &work_service_t::sync_del_connection_i, conn_id_));
 
     return 0;
 }

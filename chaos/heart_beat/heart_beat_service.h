@@ -210,7 +210,7 @@ int heart_beat_service_t<element_type, element_hash>::start()
     }
 
     m_service_ptr->register_timer(HEART_BEAT_MOUDLE_TICKS,
-                                  async_method_t::bind_memfunc(
+                                  bind_memfunc(
                                                                 this,
                                                                 &heart_beat_service_t<element_type, element_hash>::handle_timeout
                                                                )
@@ -235,7 +235,7 @@ int heart_beat_service_t<element_type, element_hash>::stop()
         return 0;
     }
 
-    m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t::stop_service));
+    m_service_ptr->post(bind_memfunc(this, &heart_beat_service_t::stop_service));
 
     LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::stop end ok."));
     return 0;
@@ -260,7 +260,7 @@ void heart_beat_service_t<element_type, element_hash>::async_add_element(element
 
     if (NULL != m_service_ptr)
     {
-        m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::add_element, element));
+        m_service_ptr->post(bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::add_element, element));
     }
 
     LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_add_element end ok."));
@@ -273,7 +273,7 @@ void heart_beat_service_t<element_type, element_hash>::async_update_element(elem
 
     if (NULL != m_service_ptr)
     {
-        m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::update_element, element));
+        m_service_ptr->post(bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::update_element, element));
     }
 
     LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_update_element end ok."));
@@ -286,7 +286,7 @@ void heart_beat_service_t<element_type, element_hash>::async_del_element(element
 
     if (NULL != m_service_ptr)
     {
-        m_service_ptr->post(async_method_t::bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::del_element, element));
+        m_service_ptr->post(bind_memfunc(this, &heart_beat_service_t<element_type, element_hash>::del_element, element));
     }
 
     LOGTRACE((HEART_BEAT_MOUDLE, "heart_beat_service_t::async_del_element end ok."));
@@ -300,7 +300,7 @@ int heart_beat_service_t<element_type, element_hash>::handle_timeout()
     if (m_started)
     {
         m_service_ptr->register_timer(HEART_BEAT_MOUDLE_TICKS,
-                async_method_t::bind_memfunc(
+                bind_memfunc(
                     this,
                     &heart_beat_service_t<element_type, element_hash>::handle_timeout
                     )

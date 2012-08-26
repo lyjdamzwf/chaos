@@ -211,31 +211,31 @@ using namespace std;
 #define BIND_ARG_LIST_0
 
 #define BIND_ARG_LIST_1 \
-    , A0 a0_
+    , const A0& a0_
 
 #define BIND_ARG_LIST_2 \
-    , A0 a0_, A1 a1_
+    , const A0& a0_, const A1& a1_
 
 #define BIND_ARG_LIST_3 \
-    , A0 a0_, A1 a1_, A2 a2_
+    , const A0& a0_, const A1& a1_, const A2& a2_
 
 #define BIND_ARG_LIST_4 \
-    , A0 a0_, A1 a1_, A2 a2_, A3 a3_
+    , const A0& a0_, const A1& a1_, const A2& a2_, const A3& a3_
 
 #define BIND_ARG_LIST_5 \
-    , A0 a0_, A1 a1_, A2 a2_, A3 a3_, A4 a4_
+    , const A0& a0_, const A1& a1_, const A2& a2_, const A3& a3_, const A4& a4_
 
 #define BIND_ARG_LIST_6 \
-    , A0 a0_, A1 a1_, A2 a2_, A3 a3_, A4 a4_, A5 a5_
+    , const A0& a0_, const A1& a1_, const A2& a2_, const A3& a3_, const A4& a4_, const A5& a5_
 
 #define BIND_ARG_LIST_7 \
-    , A0 a0_, A1 a1_, A2 a2_, A3 a3_, A4 a4_, A5 a5_, A6 a6_
+    , const A0& a0_, const A1& a1_, const A2& a2_, const A3& a3_, const A4& a4_, const A5& a5_, const A6& a6_
 
 #define BIND_ARG_LIST_8 \
-    , A0 a0_, A1 a1_, A2 a2_, A3 a3_, A4 a4_, A5 a5_, A6 a6_, A7 a7_
+    , const A0& a0_, const A1& a1_, const A2& a2_, const A3& a3_, const A4& a4_, const A5& a5_, const A6& a6_, const A7& a7_
 
 #define BIND_ARG_LIST_9 \
-    , A0 a0_, A1 a1_, A2 a2_, A3 a3_, A4 a4_, A5 a5_, A6 a6_, A7 a7_, A8 a8_
+    , const A0& a0_, const A1& a1_, const A2& a2_, const A3& a3_, const A4& a4_, const A5& a5_, const A6& a6_, const A7& a7_, const A8& a8_
 
 
 

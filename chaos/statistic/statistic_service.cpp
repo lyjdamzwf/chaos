@@ -82,7 +82,7 @@ int statistic_service_t::start(task_service_t* service_ptr_)
 
     m_service_ptr->register_timer(
                                 m_timer_expiration,
-                                async_method_t::bind_memfunc(this, &statistic_service_t::timeout_func_i),
+                                bind_memfunc(this, &statistic_service_t::timeout_func_i),
                                 false
                                 );
     m_started = true;
@@ -222,7 +222,7 @@ int statistic_service_t::timeout_func_i()
 
         m_service_ptr->register_timer(
                                         m_timer_expiration,
-                                        async_method_t::bind_memfunc(this, &statistic_service_t::timeout_func_i),
+                                        bind_memfunc(this, &statistic_service_t::timeout_func_i),
                                         false
                                     );
     }
@@ -240,7 +240,7 @@ void statistic_service_t::async_perf_stat_cost(
     if (NULL != m_service_ptr)
     {
         m_service_ptr->post(
-                async_method_t::bind_memfunc(
+                bind_memfunc(
                                 this,
                                 &statistic_service_t::sync_perf_stat_cost_i,
                                 op_,
@@ -260,7 +260,7 @@ void statistic_service_t::async_action_increment(
     if (NULL != m_service_ptr)
     {
         m_service_ptr->post(
-                async_method_t::bind_memfunc(
+                bind_memfunc(
                                 this,
                                 &statistic_service_t::sync_action_increment_i,
                                 action_,
@@ -280,7 +280,7 @@ void statistic_service_t::async_stat_throughput(
     if (NULL != m_service_ptr)
     {
         m_service_ptr->post(
-                async_method_t::bind_memfunc(
+                bind_memfunc(
                                 this,
                                 &statistic_service_t::sync_stat_throughput_i,
                                 action_,
