@@ -4,7 +4,7 @@ if [ ! -z $1 ]; then
     def_dir=$1
 fi
 
-echo "install dir:"$def_dir
+echo "install directory:"$def_dir
 
 aclocal
 libtoolize
