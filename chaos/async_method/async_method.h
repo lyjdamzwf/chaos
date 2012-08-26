@@ -39,123 +39,61 @@ namespace async_method
 
 using namespace std;
 
+#define BIND_FUNC_ENTRY(num) \
+template <typename F BIND_NAME_LIST_##num(typename A)> \
+static async_method_t bind_func(F f_ BIND_ARG_LIST_##num) \
+{ \
+    async_method_base_t* async_method_ptr = \
+    new async_method_bind_func_##num##_t<F BIND_NAME_LIST_##num(A)>( \
+                                f_ BIND_NEW_CTOR_LIST_##num \
+                                                                   ); \
+    async_method_t async_method(async_method_ptr); \
+    return async_method; \
+}
+
+#define BIND_OBJ_ENTRY(num) \
+template <typename F, typename CLS_TYPE BIND_NAME_LIST_##num(typename A)> \
+static async_method_t bind_memfunc(CLS_TYPE obj_, F f_ BIND_ARG_LIST_##num) \
+{ \
+    async_method_base_t* async_method_ptr = \
+    new async_method_bind_obj_##num##_t<CLS_TYPE, F BIND_NAME_LIST_##num(A)>( \
+                                obj_, f_ BIND_NEW_CTOR_LIST_##num \
+                                                                            ); \
+    async_method_t async_method(async_method_ptr); \
+    return async_method; \
+}
+
 //! yunjie: bind接口的参数不能使用const T&类型, 如果传入的是函数指针将编译错误
 class async_method_t
 {
 public:
     //! ---------------------- yunjie: bind static function begin ---------------------- 
-    template<typename FUNC>
-    static async_method_t bind_func(FUNC func_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_func_0_t<FUNC>(func_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename FUNC, typename ARG0>
-    static async_method_t bind_func(FUNC func_, ARG0 arg0_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_func_1_t<FUNC, ARG0>(func_, arg0_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename FUNC, typename ARG0, typename ARG1>
-    static async_method_t bind_func(FUNC func_, ARG0 arg0_, ARG1 arg1_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_func_2_t<FUNC, ARG0, ARG1>(func_, arg0_, arg1_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename FUNC, typename ARG0, typename ARG1, typename ARG2>
-    static async_method_t bind_func(FUNC func_, ARG0 arg0_, ARG1 arg1_, ARG2 arg2_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_func_3_t<FUNC, ARG0, ARG1, ARG2>(func_, arg0_, arg1_, arg2_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename FUNC, typename ARG0, typename ARG1, typename ARG2, typename ARG3>
-    static async_method_t bind_func(FUNC func_, ARG0 arg0_, ARG1 arg1_, ARG2 arg2_, ARG3 arg3_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_func_4_t<FUNC, ARG0, ARG1, ARG2, ARG3>(func_, arg0_, arg1_, arg2_, arg3_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename FUNC, typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4>
-    static async_method_t bind_func(FUNC func_, ARG0 arg0_, ARG1 arg1_, ARG2 arg2_, ARG3 arg3_, ARG4 arg4_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_func_5_t<FUNC, ARG0, ARG1, ARG2, ARG3, ARG4>(func_, arg0_, arg1_, arg2_, arg3_, arg4_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
+    BIND_FUNC_ENTRY(0)
+    BIND_FUNC_ENTRY(1)
+    BIND_FUNC_ENTRY(2)
+    BIND_FUNC_ENTRY(3)
+    BIND_FUNC_ENTRY(4)
+    BIND_FUNC_ENTRY(5)
+    BIND_FUNC_ENTRY(6)
+    BIND_FUNC_ENTRY(7)
+    BIND_FUNC_ENTRY(8)
+    BIND_FUNC_ENTRY(9)
     //! ---------------------- yunjie: bind static function end ---------------------- 
 
 
 
 
     //! ---------------------- yunjie: bind object function begin ---------------------- 
-    template<typename T, typename FUNC>
-    static async_method_t bind_memfunc(T instance_, FUNC func_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_obj_0_t<T, FUNC>(instance_, func_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename T, typename FUNC, typename ARG0>
-    static async_method_t bind_memfunc(T instance_, FUNC func_, ARG0 arg0_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_obj_1_t<T, FUNC, ARG0>(instance_, func_, arg0_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename T, typename FUNC, typename ARG0, typename ARG1>
-    static async_method_t bind_memfunc(T instance_, FUNC func_, ARG0 arg0_, ARG1 arg1_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_obj_2_t<T, FUNC, ARG0, ARG1>(instance_, func_, arg0_, arg1_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename T, typename FUNC, typename ARG0, typename ARG1, typename ARG2>
-    static async_method_t bind_memfunc(T instance_, FUNC func_, ARG0 arg0_, ARG1 arg1_, ARG2 arg2_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_obj_3_t<T, FUNC, ARG0, ARG1, ARG2>(instance_, func_, arg0_, arg1_, arg2_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename T, typename FUNC, typename ARG0, typename ARG1, typename ARG2, typename ARG3>
-    static async_method_t bind_memfunc(T instance_, FUNC func_, ARG0 arg0_, ARG1 arg1_, ARG2 arg2_, ARG3 arg3_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_obj_4_t<T, FUNC, ARG0, ARG1, ARG2, ARG3>(instance_, func_, arg0_, arg1_, arg2_, arg3_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
-
-    template<typename T, typename FUNC, typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4>
-    static async_method_t bind_memfunc(T instance_, FUNC func_, ARG0 arg0_, ARG1 arg1_, ARG2 arg2_, ARG3 arg3_, ARG4 arg4_)
-    {
-        async_method_base_t* async_method_ptr = new async_method_bind_obj_5_t<T, FUNC, ARG0, ARG1, ARG2, ARG3, ARG4>(instance_, func_, arg0_, arg1_, arg2_, arg3_, arg4_);
-        async_method_t async_method(async_method_ptr);
-
-        return async_method;
-    }
+    BIND_OBJ_ENTRY(0)
+    BIND_OBJ_ENTRY(1)
+    BIND_OBJ_ENTRY(2)
+    BIND_OBJ_ENTRY(3)
+    BIND_OBJ_ENTRY(4)
+    BIND_OBJ_ENTRY(5)
+    BIND_OBJ_ENTRY(6)
+    BIND_OBJ_ENTRY(7)
+    BIND_OBJ_ENTRY(8)
+    BIND_OBJ_ENTRY(9)
     //! ---------------------- yunjie: bind object function end ---------------------- 
 
 

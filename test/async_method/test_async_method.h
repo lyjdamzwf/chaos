@@ -83,7 +83,6 @@ void test_async_method()
         (*it)();
         it->release();
     }
-
 }
 
 
