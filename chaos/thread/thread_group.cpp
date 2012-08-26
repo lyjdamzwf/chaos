@@ -9,9 +9,9 @@
 #include <algorithm>
 using namespace std;
 
-#include "utility_inc.h"
-#include "mutex.h"
-#include "thread_group.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/thread/mutex.h>
+#include <chaos/thread/thread_group.h>
 
 /*! 
  *  @file           thread_group.cpp

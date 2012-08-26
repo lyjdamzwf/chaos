@@ -20,7 +20,7 @@
  *
  */
 
-#include "work_service.h"
+#include <chaos/network/work_service.h>
 
 namespace chaos
 {

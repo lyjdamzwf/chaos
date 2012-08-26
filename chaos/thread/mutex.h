@@ -22,7 +22,7 @@
 
 #include <pthread.h>
 
-#include "noncopyable.h"
+#include <chaos/utility/noncopyable.h>
 
 namespace chaos
 {

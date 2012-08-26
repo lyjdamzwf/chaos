@@ -9,9 +9,9 @@
 #ifndef _CHAOS_HEART_BEAT_INC_H_
 #define _CHAOS_HEART_BEAT_INC_H_
 
-#include "heart_beat_list.h"
-#include "heart_beat_element_mgr.h"
-#include "heart_beat_service.h"
+#include <chaos/heart_beat/heart_beat_list.h>
+#include <chaos/heart_beat/heart_beat_element_mgr.h>
+#include <chaos/heart_beat/heart_beat_service.h>
 
 #endif //! _CHAOS_HEART_BEAT_INC_H_
 

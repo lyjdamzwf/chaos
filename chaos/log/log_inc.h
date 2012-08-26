@@ -9,8 +9,8 @@
 #ifndef _CHAOS_LOG_INC_H_
 #define _CHAOS_LOG_INC_H_
 
-#include "log_misc.h"
-#include "log.h"
+#include <chaos/log/log_misc.h>
+#include <chaos/log/log.h>
 
 
 #endif //! _CHAOS_LOG_INC_H_

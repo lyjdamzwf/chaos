@@ -8,8 +8,8 @@
 
 #include <netinet/tcp.h>
 
-#include "connection.h"
-#include "work_service.h"
+#include <chaos/network/connection.h>
+#include <chaos/network/work_service.h>
 
 /*! 
  *  @file           connection.cpp

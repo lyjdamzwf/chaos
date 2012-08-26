@@ -2,8 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(0.001)
-AC_INIT(chaos, 0.4.26, lyjdamzwf@gmail.com)
+AC_INIT(chaos, 0.5.26, lyjdamzwf@gmail.com)
 AM_INIT_AUTOMAKE([foreign])
+chaos_ver=0.5.26
+AC_SUBST(chaos_ver)
 
 # Checks for programs.
 AC_PROG_RANLIB
@@ -57,7 +59,18 @@ AC_CONFIG_FILES([Makefile
 		test/msg_buffer/Makefile
                 ])
 
-AC_DEFINE([KER_V1],[2],[the first kernel version])
-AC_DEFINE([KER_V2],[6],[the second kernel version])
-AC_DEFINE([KER_V3],[32],[the third kernel version])
+# yunjie: 获取内核信息
+full_kernel_version=$(uname -r)
+echo $full_kernel_version
+fir_v=$(echo $full_kernel_version|awk -F"." '{print $1}')
+sec_v=$(echo $full_kernel_version|awk -F"." '{print $2}')
+suffix=$(echo $full_kernel_version|awk -F"." '{print $3}')
+thi_v=$(echo $suffix|awk -F"-" '{print $1}')
+
+AC_DEFINE_UNQUOTED([KER_V1],[${fir_v}],[the first kernel version])
+AC_DEFINE_UNQUOTED([KER_V2],[${sec_v}],[the second kernel version])
+AC_DEFINE_UNQUOTED([KER_V3],[${thi_v}],[the third kernel version])
 AC_OUTPUT
+
+cp conf.h chaos
+

@@ -9,9 +9,9 @@
 #ifndef _CHAOS_ASYNC_METHOD_INC_H_
 #define _CHAOS_ASYNC_METHOD_INC_H_
 
-#include "async_method_bind_obj.h"
-#include "async_method_bind_func.h"
-#include "async_method.h"
+#include <chaos/async_method/async_method_bind_obj.h>
+#include <chaos/async_method/async_method_bind_func.h>
+#include <chaos/async_method/async_method.h>
 
 
 #endif //! _CHAOS_ASYNC_METHOD_INC_H_

@@ -24,11 +24,11 @@
 #include <vector>
 
 #ifdef HAVE_CONFIG_H
-#include "conf.h"
+#include <chaos/conf.h>
 #endif
 
-#include "singleton.h"
-#include "log.h"
+#include <chaos/utility/singleton.h>
+#include <chaos/log/log.h>
 
 /**
 #define ENABLE_LOG_FATAL

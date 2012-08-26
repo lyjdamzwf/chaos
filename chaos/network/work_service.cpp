@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-#include "work_service.h"
+#include <chaos/network/work_service.h>
 
 /*! 
  *  @file           work_service.cpp

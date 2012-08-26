@@ -25,9 +25,11 @@
 #include <vector>
 #include <set>
 
-#include <utility_inc.h>
-#include <thread_inc.h>
-#include <task_service_define.h>
+#include <chaos/utility/utility_inc.h>
+#include <chaos/thread/thread_inc.h>
+
+#include <chaos/task_service/task_service_define.h>
+
 namespace chaos
 {
 

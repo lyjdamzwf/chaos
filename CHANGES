@@ -37,6 +37,18 @@ Chaos 0.4.25-beta                                               2012.8.16
     *)  完善chaos::task_service_t与boost::io_service
         测试用例
 
+
 Chaos 0.4.26-beta                                               2012.8.22
     *)  修复post时日志造成递归溢出的错误，并加上提示注释
     *)  增加op_lvl脚本批量更改g++编译优化选项
+
+
+Chaos 0.5.26-beta                                               2012.8.26
+    *) 预编译时加入内核版本信息，可自动根据内核版本选择
+       最优IPC方式
+
+    *) 修改include文件方式，从附加目录中或系统目录中按层
+       次include头文件，而不是当前相对路径
+
+    *) 重构automake目录结构，支持make install
+

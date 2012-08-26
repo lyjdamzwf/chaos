@@ -1,11 +1,12 @@
-INCLUDES= -I$(top_srcdir)/chaos/utility \
-		  -I$(top_srcdir)/chaos/log \
-		  -I$(top_srcdir)/chaos/async_method \
-		  -I$(top_srcdir)/chaos/thread
-
 CXXFLAGS = -Wall -g -O2 -fPIC
 
-noinst_LIBRARIES = libchaos_task_service.a
+## 安装根目录
+chaosdir=$(prefix)/chaos-@chaos_ver@
+
+## 安装库目录
+libdir=$(chaosdir)/lib
+
+lib_LIBRARIES = libchaos_task_service.a
 libchaos_task_service_a_LIBFLAGS =
 libchaos_task_service_a_LIBADD =
 

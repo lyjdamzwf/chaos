@@ -24,8 +24,8 @@
 #include <assert.h>
 #include <string>
 
-#include "task_service_inc.h"
-#include "network_tool.h"
+#include <chaos/task_service/task_service_inc.h>
+#include <chaos/network/network_tool.h>
 
 namespace chaos
 {

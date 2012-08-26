@@ -17,7 +17,7 @@
  *
  */
 
-#include "buffer_list.h"
+#include <chaos/network/buffer_list.h>
 
 namespace chaos
 {

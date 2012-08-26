@@ -25,11 +25,11 @@
 
 #include <iostream>
 
-#include "utility_inc.h"
+#include <chaos/utility/utility_inc.h>
 
-#include "async_method_base.h"
-#include "async_method_bind_func.h"
-#include "async_method_bind_obj.h"
+#include <chaos/async_method/async_method_base.h>
+#include <chaos/async_method/async_method_bind_func.h>
+#include <chaos/async_method/async_method_bind_obj.h>
 
 namespace chaos
 {

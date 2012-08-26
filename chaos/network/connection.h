@@ -31,12 +31,13 @@
 
 #include <list>
 
-#include "utility_inc.h"
-#include "task_service_inc.h"
-#include "log_inc.h"
-#include "buffer_list.h"
-#include "network_config.h"
-#include "network_tool.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/task_service/task_service_inc.h>
+#include <chaos/log/log_inc.h>
+
+#include <chaos/network/network_config.h>
+#include <chaos/network/network_tool.h>
+#include <chaos/network/buffer_list.h>
 
 namespace chaos
 {

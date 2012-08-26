@@ -2,17 +2,17 @@
 #define _CHAOS_MISC_DEF_H_
 
 #ifdef HAVE_CONFIG_H
-#include "conf.h"
+#include <chaos/conf.h>
 #endif
 
-#include "utility_inc.h"
-#include "async_method_inc.h"
-#include "thread_inc.h"
-#include "log_inc.h"
-#include "task_service_inc.h"
-#include "statistic_inc.h"
-#include "heart_beat_inc.h"
-#include "network_inc.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/async_method/async_method_inc.h>
+#include <chaos/thread/thread_inc.h>
+#include <chaos/log/log_inc.h>
+#include <chaos/task_service/task_service_inc.h>
+#include <chaos/statistic/statistic_inc.h>
+#include <chaos/heart_beat/heart_beat_inc.h>
+#include <chaos/network/network_inc.h>
 
 using namespace chaos::utility;
 using namespace chaos::async_method;

@@ -22,10 +22,11 @@
 
 #include <deque>
 
-#include "thread_inc.h"
-#include "async_method_inc.h"
-#include "base_container.h"
-#include "task_service_define.h"
+#include <chaos/thread/thread_inc.h>
+#include <chaos/async_method/async_method_inc.h>
+
+#include <chaos/task_service/base_container.h>
+#include <chaos/task_service/task_service_define.h>
 
 namespace chaos
 {

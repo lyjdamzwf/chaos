@@ -20,8 +20,8 @@
  *
  */
 
-#include "task_service_inc.h"
-#include "heart_beat_element_mgr.h"
+#include <chaos/task_service/task_service_inc.h>
+#include <chaos/heart_beat/heart_beat_element_mgr.h>
 
 namespace chaos
 {

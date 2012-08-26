@@ -26,9 +26,9 @@
 #include <map>
 using namespace std;
 
-#include "async_method_inc.h"
-#include "utility_inc.h"
-#include "task_service_inc.h"
+#include <chaos/async_method/async_method_inc.h>
+#include <chaos/utility/utility_inc.h>
+#include <chaos/task_service/task_service_inc.h>
 
 using namespace chaos::async_method;
 using namespace chaos::utility;

@@ -23,7 +23,7 @@
 #include <list>
 using namespace std;
 
-#include "msg_buffer.h"
+#include <chaos/network/msg_buffer.h>
 
 #ifndef BUF_STAT
 #define BUF_STAT 1

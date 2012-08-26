@@ -20,13 +20,14 @@
  *
  */
 
-#include "utility_inc.h"
-#include "log_inc.h"
-#include "task_service_inc.h"
-#include "network_tool.h"
-#include "work_service_group.h"
-#include "network_config.h"
-#include "connection.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/log/log_inc.h>
+#include <chaos/task_service/task_service_inc.h>
+
+#include <chaos/network/network_tool.h>
+#include <chaos/network/work_service_group.h>
+#include <chaos/network/network_config.h>
+#include <chaos/network/connection.h>
 
 namespace chaos
 {

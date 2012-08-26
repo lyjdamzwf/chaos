@@ -20,7 +20,7 @@
  *
  */
 
-#include "connection.h"
+#include <chaos/network/connection.h>
 
 namespace chaos
 {

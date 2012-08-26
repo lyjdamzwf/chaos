@@ -9,16 +9,16 @@
 #ifndef _CHAOS_NETWORK_INC_H_
 #define _CHAOS_NETWORK_INC_H_
 
-#include "msg_buffer.h"
-#include "buffer_list.h"
-#include "network_tool.h"
-#include "acceptor_service.h"
-#include "work_service.h"
-#include "work_service_group.h"
-#include "connection.h"
-#include "default_conn_strategy.h"
-#include "tcp_service.h"
-#include "active_connection.h"
-#include "connector_service.h"
+#include <chaos/network/msg_buffer.h>
+#include <chaos/network/buffer_list.h>
+#include <chaos/network/network_tool.h>
+#include <chaos/network/acceptor_service.h>
+#include <chaos/network/work_service.h>
+#include <chaos/network/work_service_group.h>
+#include <chaos/network/connection.h>
+#include <chaos/network/default_conn_strategy.h>
+#include <chaos/network/tcp_service.h>
+#include <chaos/network/active_connection.h>
+#include <chaos/network/connector_service.h>
 
 #endif //! _CHAOS_NETWORK_INC_H_

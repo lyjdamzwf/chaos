@@ -17,10 +17,10 @@
  *
  */
 
-#include "log_inc.h"
+#include <chaos/log/log_inc.h>
 using namespace chaos::log;
 
-#include "statistic_service.h"
+#include <chaos/statistic/statistic_service.h>
 
 namespace chaos
 {

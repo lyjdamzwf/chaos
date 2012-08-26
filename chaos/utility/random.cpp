@@ -17,7 +17,7 @@
  *
  */
 
-#include "random.h"
+#include <chaos/utility/random.h>
 
 namespace chaos
 {

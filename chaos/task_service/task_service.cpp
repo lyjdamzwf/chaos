@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "task_service.h"
+#include <chaos/task_service/task_service.h>
 
 /*! 
  *  @file           task_service.cpp

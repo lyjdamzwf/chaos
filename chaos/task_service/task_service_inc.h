@@ -9,12 +9,12 @@
 #ifndef _CHAOS_TASK_SERVICE_INC_H_
 #define _CHAOS_TASK_SERVICE_INC_H_
 
-#include "ring_buffer.h"
-#include "timer_manager.h"
-#include "task_queue.h"
-#include "task_service.h"
-#include "task_service_group.h"
-#include "timer_container.h"
-#include "io_multiplex_handler.h"
+#include <chaos/task_service/ring_buffer.h>
+#include <chaos/task_service/timer_manager.h>
+#include <chaos/task_service/task_queue.h>
+#include <chaos/task_service/task_service.h>
+#include <chaos/task_service/task_service_group.h>
+#include <chaos/task_service/timer_container.h>
+#include <chaos/task_service/io_multiplex_handler.h>
 
 #endif //! _CHAOS_TASK_SERVICE_INC_H_

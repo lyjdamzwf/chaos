@@ -20,11 +20,11 @@
  *
  */
 
-#include "log_inc.h"
+#include <chaos/log/log_inc.h>
 
-#include "acceptor_service.h"
-#include "work_service_group.h"
-#include "default_conn_strategy.h"
+#include <chaos/network/acceptor_service.h>
+#include <chaos/network/work_service_group.h>
+#include <chaos/network/default_conn_strategy.h>
 
 namespace chaos
 {

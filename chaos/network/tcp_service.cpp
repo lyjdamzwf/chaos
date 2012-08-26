@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-#include "tcp_service.h"
+#include <chaos/network/tcp_service.h>
 
 /*! 
  *  @file           tcp_service.cpp

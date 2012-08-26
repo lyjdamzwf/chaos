@@ -23,13 +23,13 @@
 #include <string>
 #include <vector>
 
-#include "utility_inc.h"
-#include "async_method_inc.h"
-#include "log_inc.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/async_method/async_method_inc.h>
+#include <chaos/log/log_inc.h>
 
-#include "mutex.h"
-#include "condition.h"
-#include "rwlock.h"
+#include <chaos/thread/mutex.h>
+#include <chaos/thread/condition.h>
+#include <chaos/thread/rwlock.h>
 
 namespace chaos
 {

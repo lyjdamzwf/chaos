@@ -20,8 +20,8 @@
  *
  */
 
-#include "thread_inc.h"
-#include "task_service_define.h"
+#include <chaos/thread/thread_inc.h>
+#include <chaos/task_service/task_service_define.h>
 
 namespace chaos
 {

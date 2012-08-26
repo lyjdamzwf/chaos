@@ -18,7 +18,7 @@
  */
 
 #include <iostream>
-#include "msg_buffer.h"
+#include <chaos/network/msg_buffer.h>
 
 namespace chaos
 {

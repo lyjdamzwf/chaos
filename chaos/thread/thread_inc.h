@@ -9,12 +9,12 @@
 #ifndef _CHAOS_THREAD_INC_H_
 #define _CHAOS_THREAD_INC_H_
 
-#include "condition.h"
-#include "mutex.h"
-#include "rwlock.h"
-#include "spinlock.h"
-#include "thread.h"
-#include "thread_group.h"
+#include <chaos/thread/condition.h>
+#include <chaos/thread/mutex.h>
+#include <chaos/thread/rwlock.h>
+#include <chaos/thread/spinlock.h>
+#include <chaos/thread/thread.h>
+#include <chaos/thread/thread_group.h>
 
 
 #endif //! _CHAOS_THREAD_INC_H_

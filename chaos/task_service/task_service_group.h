@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "task_service.h"
+#include <chaos/task_service/task_service.h>
 
 namespace chaos
 {

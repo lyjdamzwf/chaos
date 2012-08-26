@@ -26,8 +26,8 @@
 #include <string.h>
 #include <pthread.h>
 
-#include "noncopyable.h"
-#include "mutex.h"
+#include <chaos/utility/noncopyable.h>
+#include <chaos/thread/mutex.h>
 
 namespace chaos
 {

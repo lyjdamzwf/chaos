@@ -22,8 +22,8 @@
 
 #include <queue>
 
-#include "task_service_define.h"
-#include "base_container.h"
+#include <chaos/task_service/task_service_define.h>
+#include <chaos/task_service/base_container.h>
 
 namespace chaos
 {

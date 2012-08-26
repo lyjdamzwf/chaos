@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-#include "task_service_group.h"
+#include <chaos/task_service/task_service_group.h>
 
 /*! 
  *  @file           task_service_group.h

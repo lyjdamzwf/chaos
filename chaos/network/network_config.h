@@ -9,7 +9,7 @@
 #ifndef _CHAOS_NETWORK_CONFIG_H_
 #define _CHAOS_NETWORK_CONFIG_H_
 
-#include "utility_inc.h"
+#include <chaos/utility/utility_inc.h>
 
 /*! 
  *  @file           network_config.cpp

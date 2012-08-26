@@ -17,7 +17,7 @@
  *
  */
 
-#include "log_misc.h"
+#include <chaos/log/log_misc.h>
 
 namespace chaos
 {

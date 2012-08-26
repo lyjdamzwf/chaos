@@ -23,12 +23,13 @@
 #include <vector>
 #include <list>
 
-#include "utility_inc.h"
-#include "log_inc.h"
-#include "task_service_inc.h"
-#include "network_tool.h"
-#include "connection.h"
-#include "heart_beat_inc.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/log/log_inc.h>
+#include <chaos/task_service/task_service_inc.h>
+#include <chaos/heart_beat/heart_beat_inc.h>
+
+#include <chaos/network/network_tool.h>
+#include <chaos/network/connection.h>
 
 namespace chaos
 {

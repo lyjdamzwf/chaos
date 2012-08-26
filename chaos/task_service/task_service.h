@@ -23,14 +23,14 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#include "utility_inc.h"
-#include "async_method_inc.h"
-#include "thread_inc.h"
-#include "log_inc.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/async_method/async_method_inc.h>
+#include <chaos/thread/thread_inc.h>
+#include <chaos/log/log_inc.h>
 
-#include "timer_manager.h"
-#include "task_queue.h"
-#include "io_multiplex_handler.h"
+#include <chaos/task_service/timer_manager.h>
+#include <chaos/task_service/task_queue.h>
+#include <chaos/task_service/io_multiplex_handler.h>
 
 #define PTHREAD_COND_VAR    1
 #define SLEEP               2
@@ -42,7 +42,7 @@
 
 //! yunjie: 根据内核版本选择最优化IPC方式
 #ifdef HAVE_CONFIG_H
-#include "conf.h"
+#include <chaos/conf.h>
 #undef COMMUNICATION_MODE
 #if (KER_V1 > 2) || (KER_V1 == 2 && KER_V2 > 6) || (KER_V1 == 2  && KER_V2 == 6 && KER_V3 >= 27)
 #define COMMUNICATION_MODE  5

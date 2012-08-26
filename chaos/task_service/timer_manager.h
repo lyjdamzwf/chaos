@@ -24,10 +24,11 @@
 
 #include <queue>
 
-#include "utility_inc.h"
-#include "thread_inc.h"
-#include "async_method_inc.h"
-#include "timer_container.h"
+#include <chaos/utility/utility_inc.h>
+#include <chaos/thread/thread_inc.h>
+#include <chaos/async_method/async_method_inc.h>
+
+#include <chaos/task_service/timer_container.h>
 
 namespace chaos
 {

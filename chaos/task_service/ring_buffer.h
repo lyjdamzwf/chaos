@@ -20,8 +20,8 @@
  *  @last changed
  */
 
-#include "thread_inc.h"
-#include "utility_inc.h"
+#include <chaos/thread/thread_inc.h>
+#include <chaos/utility/utility_inc.h>
 
 namespace chaos
 {

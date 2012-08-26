@@ -23,9 +23,9 @@
 
 #include <deque>
 
-#include "thread_inc.h"
+#include <chaos/thread/thread_inc.h>
 
-#include "ring_buffer.h"
+#include <chaos/task_service/ring_buffer.h>
 
 namespace chaos
 {

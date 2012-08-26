@@ -30,7 +30,7 @@
 #include <iostream>
 using namespace std;
 
-#include "processor_helper.h"
+#include <chaos/utility/processor_helper.h>
 
 namespace chaos
 {

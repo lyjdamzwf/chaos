@@ -22,7 +22,7 @@
 #include <algorithm>
 using namespace std;
 
-#include "thread.h"
+#include <chaos/thread/thread.h>
 
 namespace chaos
 {
