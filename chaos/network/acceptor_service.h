@@ -108,17 +108,24 @@ int acceptor_service_t<CONN_TYPE>::initialize(
                                                 network_config_t                config_
                                              )
 {
-    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize arg-[host:%s, port:%d] begin", host_.c_str(), port_));
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::initialize arg-[host:%s, port:%d] begin",
+                host_.c_str(), port_
+            ));
 
     if (m_inited)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize service has inited, return."));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::initialize service has inited, return."
+                ));
         return -1;
     }
 
     if (NULL == work_service_group_)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize work_service_group is NULL, return."));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::initialize work_service_group is NULL, return."
+               ));
         return -1;
     }
 
@@ -129,7 +136,10 @@ int acceptor_service_t<CONN_TYPE>::initialize(
     m_network_config = config_;
     m_inited = true;
 
-    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::initialize arg-[host:%s, port:%d] end", host_.c_str(), port_));
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::initialize arg-[host:%s, port:%d] end",
+                host_.c_str(), port_
+            ));
     return 0;
 }
 
@@ -142,11 +152,16 @@ acceptor_service_t<CONN_TYPE>::~acceptor_service_t()
 template<typename CONN_TYPE>
 int acceptor_service_t<CONN_TYPE>::start(int thread_num_)
 {
-    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start arg-[thread_num:%d] begin", thread_num_));
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::start arg-[thread_num:%d] begin",
+                thread_num_
+            ));
 
     if (!m_inited)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start service has not inited, return."));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::start service has not inited, return."
+                ));
         return -1;
     }
 
@@ -301,11 +316,17 @@ int acceptor_service_t<CONN_TYPE>::stop_listen_i()
 template<typename CONN_TYPE>
 void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_, void* arg_)
 {
-    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] begin", fd_, event_type_));
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] begin",
+                fd_, event_type_
+            ));
 
     if (NULL == arg_)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback arg_ is NULL, args-[fd:%d, event_type:%d], return", fd_, event_type_));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::on_listen_callback arg_ is NULL, args-[fd:%d, event_type:%d], return",
+                    fd_, event_type_
+                ));
         return;
     }
 
@@ -316,26 +337,40 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
     work_service_group_t* work_group_ptr = as_ptr->m_work_service_group_ptr;
     if (NULL == work_group_ptr)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback work_group_ptr is NULL, args-[fd:%d, event_type:%d], return", fd_, event_type_));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::on_listen_callback work_group_ptr is NULL, args-[fd:%d, event_type:%d], return",
+                    fd_, event_type_
+                ));
         return;
     }
 
     struct sockaddr peer_addr;
     socklen_t sin_size;
     int accepted_fd = ::accept(fd_, &peer_addr, &sin_size);
-    LOGDEBUG((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback accepted_fd:%d end", accepted_fd));
+    LOGDEBUG((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::on_listen_callback accepted_fd:%d end",
+                accepted_fd
+            ));
 
     if (-1 == accepted_fd)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback accept failed accepted_fd is [%d], errno:[%m] args-[fd:%d, event_type:%d], return", accepted_fd, errno, fd_, event_type_));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::on_listen_callback accept failed"
+                    " accepted_fd is [%d], errno:[%m] args-[fd:%d, event_type:%d], return",
+                    accepted_fd, errno, fd_, event_type_
+               ));
         return;
     }
 
-    //! yunjie: 为connection_t绑定work_service, 根据accepted_fd模到相应的work_service_group中对应的work_service(linux进程空间中fd从1递增)
+    //! yunjie: 为connection_t绑定work_service, 根据accepted_fd
+    //          模到相应的work_service_group中对应的work_service
     work_service_t* work_ptr = (work_service_t*)((*work_group_ptr)[accepted_fd % work_group_ptr->size()]);
     if (NULL == work_ptr)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback work_ptr is NULL, args-[fd:%d, event_type:%d], return", fd_, event_type_));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::on_listen_callback work_ptr is NULL, args-[fd:%d, event_type:%d], return",
+                    fd_, event_type_
+                ));
         return;
     }
 
@@ -344,13 +379,19 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
     conn_ptr_t conn_ptr = new CONN_TYPE;
     if (NULL == conn_ptr)
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback new conn_ptr failed, args-[fd:%d, event_type:%d], return", fd_, event_type_));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::on_listen_callback new conn_ptr failed, args-[fd:%d, event_type:%d], return",
+                    fd_, event_type_
+               ));
         return;
     }
 
     conn_ptr->initialize(accepted_fd, now, work_ptr, T_PASSIVE, as_ptr->m_event_func, &as_ptr->m_network_config, work_ptr->is_enable_hb());
 
-    LOGTRACE((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] end", fd_, event_type_));
+    LOGTRACE((ACCEPTOR_SERVICE_MODULE,
+                "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] end",
+                fd_, event_type_
+            ));
 }
 
 }
