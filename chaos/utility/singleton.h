@@ -9,7 +9,7 @@
 #ifndef SINGLETON_INC
 #define SINGLETON_INC
 
-/** 
+/**
  *  @file           singleton.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

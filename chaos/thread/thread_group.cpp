@@ -13,7 +13,7 @@ using namespace std;
 #include <chaos/thread/mutex.h>
 #include <chaos/thread/thread_group.h>
 
-/*! 
+/*!
  *  @file           thread_group.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

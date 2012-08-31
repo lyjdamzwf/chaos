@@ -9,7 +9,7 @@
 #ifndef _CHAOS_BUFFER_LIST_H_
 #define _CHAOS_BUFFER_LIST_H_
 
-/*! 
+/*!
  *  @file           buffer_list.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -86,9 +86,9 @@ public:
     string format_buffer_list_info();
 
 private:
-    list<msg_buffer_t>                  m_buffer_list; 
+    list<msg_buffer_t>                  m_buffer_list;
     iterator_t                          m_read_it;
-    iterator_t                          m_write_it; 
+    iterator_t                          m_write_it;
     uint32_t                            m_max_move_bytes;
     uint32_t                            m_buffer_max_limit;
 

@@ -12,7 +12,7 @@ int main(int argc_, char* argv_[])
     log_tool_t::start_log_service("testlog.log", 6, 1, 1);
 
     test_log();
-    
+
     application_tool_t::wait_signal();
     log_tool_t::stop_log_service();
 

@@ -10,7 +10,7 @@
 
 #include <chaos/task_service/io_multiplex_handler.h>
 
-/*! 
+/*!
  *  @file           io_multiplex_handler.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -52,7 +52,7 @@ int io_multiplex_handler_t::initialize(bool lock_)
     m_is_lock = lock_;
 
     //! yunjie: 32000参数对linux 2.6 内核之后的版本已经无效.
-    if ((int)(m_epoll_fd = ::epoll_create(32000)) == -1) 
+    if ((int)(m_epoll_fd = ::epoll_create(32000)) == -1)
     {
         LOGERROR((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize epoll_create failed, errno:[%m] return.", errno));
 
@@ -104,7 +104,7 @@ int io_multiplex_handler_t::wait_io_notification()
         return (0);
     }
 
-    for (int i = 0; i < res; i++) 
+    for (int i = 0; i < res; i++)
     {
         int what = m_epoll_events[i].events;                        //! yunjie: 当前循环epoll事件类型
         fd_t fd = m_epoll_events[i].data.fd;                        //! yunjie: 当前循环epoll需要处理的fd
@@ -161,7 +161,7 @@ int io_multiplex_handler_t::wait_io_notification()
                     {
                         epoll_operate = EPOLL_CTL_MOD;
                         epev.events = EPOLLOUT;
-                    
+
                         if (::epoll_ctl(m_epoll_fd, epoll_operate, io_event.listen_fd, &epev) == -1)
                         {
                             LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification system call epoll_ctl failed fd:%d.", io_event.listen_fd));
@@ -184,7 +184,7 @@ int io_multiplex_handler_t::wait_io_notification()
             }
 
             if (what & EPOLLOUT)                                //! yunjie: 写事件
-            {                      
+            {
                 if (NULL != io_event.write_cb)
                 {
                     io_event.write_cb(fd, IO_WRITE_EVENT, io_event.write_cb_arg);     //! yunjie: 调用写回调
@@ -227,7 +227,7 @@ int io_multiplex_handler_t::wait_io_notification()
 
     //! yunjie: 对m_epoll_events进行扩张, 这样的话可以尽可能通过一次epoll_wait我们能获得更多的fd, 减少内核线程的切换, 提高性能.
     int epoll_events_size = m_epoll_events.size();
-    if (res == epoll_events_size && epoll_events_size < EPOLL_EVENT_WAIT_NUM_MAX) 
+    if (res == epoll_events_size && epoll_events_size < EPOLL_EVENT_WAIT_NUM_MAX)
     {
         uint32_t new_size = epoll_events_size << 1;
         m_epoll_events.resize(new_size);      //! yunjie: 成倍扩张, 由于初始值对齐到8(32), 所以最终极限扩张值必定是EPOLL_EVENT_WAIT_NUM_MAX(4096)

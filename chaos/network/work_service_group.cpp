@@ -8,7 +8,7 @@
 
 #include <chaos/network/work_service_group.h>
 
-/*! 
+/*!
  *  @file           work_service_group.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -29,7 +29,7 @@ work_service_group_t::work_service_group_t()
     :
         task_service_group_t("work_service")        //! yunjie: 调用父类构造, 初始化service name
 {
-    
+
 }
 
 work_service_group_t::~work_service_group_t()

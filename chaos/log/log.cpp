@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-/*! 
+/*!
  *  @file           log.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -52,7 +52,7 @@ log_t::log_t()
     m_opened = false;
     memset(m_path, 0, sizeof(m_path));
     memset(m_filename, 0, sizeof(m_filename));
-    m_maxline = 50000;      //! yunjie: 单文件最大50000行 
+    m_maxline = 50000;      //! yunjie: 单文件最大50000行
     m_maxsize = 1024000;    //! yunjie: 单文件最大100M
 
     m_log_level_flags = 0;
@@ -192,7 +192,7 @@ int log_t::open()
 
     int rc = access(m_path, F_OK);
     if (0 != rc)
-    {   
+    {
         // 目录不存在,创建
         rc = mkdir(m_path, 0777);
         if (rc != 0)
@@ -205,7 +205,7 @@ int log_t::open()
     sprintf(file, "%s/%d-%d-%d", m_path, m_cur_year + 1900, m_cur_mon + 1, m_cur_mday);
     rc = access(file, F_OK);
     if (0 != rc)
-    {   
+    {
         // 目录不存在,创建
         rc = mkdir(file, 0777);
         if (rc != 0)

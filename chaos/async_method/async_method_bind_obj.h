@@ -9,14 +9,14 @@
 #ifndef _CHAOS_ASYNC_METHOD_BIND_OBJ_H_
 #define _CHAOS_ASYNC_METHOD_BIND_OBJ_H_
 
-/*! 
+/*!
  *  @file           async_method_obj.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
  *  @weibo          http://weibo.com/crazyprogramerlyj
  *  @date           2012.3.17
  *  @brief          bind class of obj
- *  @last changed   
+ *  @last changed
  *
  */
 

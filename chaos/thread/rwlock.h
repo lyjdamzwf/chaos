@@ -9,7 +9,7 @@
 #ifndef _CHAOS_RWLOCK_H_
 #define _CHAOS_RWLOCK_H_
 
-/*! 
+/*!
  *  @file           rwlock.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

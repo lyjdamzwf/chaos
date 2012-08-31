@@ -9,7 +9,7 @@
 #ifndef _CHAOS_CONNECTOR_SERVICE_H_
 #define _CHAOS_CONNECTOR_SERVICE_H_
 
-/*! 
+/*!
  *  @file           connector_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

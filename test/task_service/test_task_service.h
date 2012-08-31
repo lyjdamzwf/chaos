@@ -22,7 +22,7 @@ struct timeval fin_tv;
 
 void task_service_productor(string str_, int index_)
 {
-    if ("task_service_press" == str_) 
+    if ("task_service_press" == str_)
     {
         LOGDEBUG((TEST_MODULE, "press index:%d", index_));
         return;
@@ -59,7 +59,7 @@ void test_task_service_performance()
     int index = 0;
     gettimeofday(&begin_tv, NULL);
 
-#if USE_BOOST 
+#if USE_BOOST
     io_service_ptr isptr = io_service_ptr(new boost::asio::io_service());
     gwp = work_ptr(new boost::asio::io_service::work(*isptr));
     boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_service::run, isptr)));
@@ -115,7 +115,7 @@ void test_task_service_timer_persist()
 {
     LOGDEBUG((TEST_MODULE, "test_task_service_timer_persist begin"));
 
-    TS().register_timer(1, bind_func(task_service_timer_event_persist), true); 
+    TS().register_timer(1, bind_func(task_service_timer_event_persist), true);
 
     LOGDEBUG((TEST_MODULE, "test_task_service_timer_persist end"));
 }
@@ -124,12 +124,12 @@ void test_task_service_timer_persist()
 void task_service_timer_event(task_service_t* service_)
 {
     printf("task_service_timer_event called!!!!!\n");
-    service_->register_timer(2, bind_func(&task_service_timer_event, service_), false); 
+    service_->register_timer(2, bind_func(&task_service_timer_event, service_), false);
 }
 
 void test_task_service_timer()
 {
-    TS().register_timer(2, bind_func(&task_service_timer_event, &TS()), false); 
+    TS().register_timer(2, bind_func(&task_service_timer_event, &TS()), false);
 }
 
 void test_mutil_timer(string str_)
@@ -139,8 +139,8 @@ void test_mutil_timer(string str_)
 
 void test_task_service_mutil_timer()
 {
-    TS().register_timer(1, bind_func(test_mutil_timer, string("111")), true); 
-    TS().register_timer(2, bind_func(test_mutil_timer, string("222")), true); 
+    TS().register_timer(1, bind_func(test_mutil_timer, string("111")), true);
+    TS().register_timer(2, bind_func(test_mutil_timer, string("222")), true);
 }
 
 void callback(const string& str_)
@@ -179,7 +179,7 @@ void test_timer_press()
             method = bind_func(&task_service_timer_event, &TS());
         }
 
-        TS().register_timer(interval, method, persist); 
+        TS().register_timer(interval, method, persist);
     }
 }
 

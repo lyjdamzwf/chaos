@@ -159,7 +159,7 @@ int main(int argc_, char* argv_[])
                 g_max_packet_size = atoi(pair_arr[i].arg_val);
             }
             break;
-            
+
             default:
             {
             }
@@ -181,7 +181,7 @@ int main(int argc_, char* argv_[])
         //! mem error
         exit(-1);
     }
-    
+
     connector_service_ptr->set_network_config(network_config);
 
     if (hb_param.timeout_flag)

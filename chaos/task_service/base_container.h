@@ -9,7 +9,7 @@
 #ifndef _CHAOS_BASE_CONTAINER_H_
 #define _CHAOS_BASE_CONTAINER_H_
 
-/*! 
+/*!
  *  @file           base_container.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -113,7 +113,7 @@ public:
 protected:
     bool                                                m_inited;
     bool                                                m_is_lock;
-    mutable mutex_t                                     m_mutex; 
+    mutable mutex_t                                     m_mutex;
     CONTAINER<ELEMENT>                                  m_container_arr[TASK_PRIOR_COUNT];
 };
 

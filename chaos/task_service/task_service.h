@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TASK_SERVICE_H_
 #define _CHAOS_TASK_SERVICE_H_
 
-/*! 
+/*!
  *  @file           task_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -68,7 +68,7 @@ using namespace chaos::log;
 
 #ifndef DEFAULT_TASK_SERVICE_THREAD_NUM
 #define DEFAULT_TASK_SERVICE_THREAD_NUM     1
-#endif 
+#endif
 
 #ifndef ALL_THREAD_MASK
 #define ALL_THREAD_MASK                     0xffffffff
@@ -84,7 +84,7 @@ using namespace chaos::log;
 
 #ifndef TIMEDOUT_US
 #define TIMEDOUT_US                         50000   //! yunjie: 50毫秒
-#endif 
+#endif
 
 #ifndef DEFAULT_SERVICE_NAME
 #define DEFAULT_SERVICE_NAME                "default_service_name"
@@ -146,7 +146,7 @@ public:
     int post_async_stop_signal();
     int clear_all_task();
 
-    //! yunjie: 
+    //! yunjie:
     //! ext_data_ -使用者可以借助ext_data来改变投递规则
     //! is_allow_exec_local_ - 如果当前线程属于task_service的线程组, 就立即执行
     virtual int post(

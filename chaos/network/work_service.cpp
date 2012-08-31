@@ -8,7 +8,7 @@
 
 #include <chaos/network/work_service.h>
 
-/*! 
+/*!
  *  @file           work_service.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -208,7 +208,7 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
                                     (void*)conn_ptr_,
                                     true
                                 );
-    
+
     //! yunjie: 注册错误处理事件, 无视persist
     service_ptr->register_io_event(
                                     peer_socket,
@@ -253,7 +253,7 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
 
     //! yunjie: 将conn_ptr置为NULL
     SAFE_DELETE(conn_ptr);
-    
+
     LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_del_connection_i arg-[fd:%d] end", conn_id_.socket));
     return 0;
 }

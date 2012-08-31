@@ -9,7 +9,7 @@
 #ifndef _CHAOS_ASYNC_METHOD_H_
 #define _CHAOS_ASYNC_METHOD_H_
 
-/*! 
+/*!
  *  @file           async_method.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

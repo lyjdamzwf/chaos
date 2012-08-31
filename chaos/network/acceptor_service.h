@@ -9,7 +9,7 @@
 #ifndef _CHAOS_ACCEPTOR_SERVICE_H_
 #define _CHAOS_ACCEPTOR_SERVICE_H_
 
-/*! 
+/*!
  *  @file           acceptor_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -275,7 +275,7 @@ int acceptor_service_t<CONN_TYPE>::start_listen_i()
         return -1;
     }
 
-    if(-1 == ::listen(sockfd, 128))         //! yunjie: 128是三次握手的积压队列大小, 目前系统都无视了, 大家也无视吧 
+    if(-1 == ::listen(sockfd, 128))         //! yunjie: 128是三次握手的积压队列大小, 目前系统都无视了, 大家也无视吧
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i listen failed."));
         TEMP_FAILURE_RETRY(::close(sockfd));

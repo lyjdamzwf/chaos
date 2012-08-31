@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TIMER_CONTAINER_H_
 #define _CHAOS_TIMER_CONTAINER_H_
 
-/*! 
+/*!
  *  @file           timer_container.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -148,7 +148,7 @@ public:
         while (!m_container_arr[prior_].empty())
         {
             time_event_t* recent_event = m_container_arr[prior_].top();
-            
+
             if (cond_func != NULL)
             {
                 //! yunjie: 条件检查失败, 做各种相应操作
@@ -165,11 +165,11 @@ public:
                     }
                 }
             }
-                
+
             out_task_.push(recent_event);
             ++fetched_count;
             m_container_arr[prior_].pop();
-            
+
             //! yunjie: 已获取指定数量的task, 退出循环
             if (fetched_count >= fetch_count_)
             {
@@ -177,7 +177,7 @@ public:
             }
         }
 BREAK_FLAG:
- 
+
         return fetched_count;
     }
 

@@ -9,7 +9,7 @@
 #ifndef _CHAOS_MSG_BUFFER_H_
 #define _CHAOS_MSG_BUFFER_H_
 
-/*! 
+/*!
  *  @file           msg_buffer.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -100,7 +100,7 @@ public:
 
     //! yunjie: 计算需要移动的数据字节数
     uint32_t calc_move_bytes(uint32_t size_);
-    
+
     void clear();
 
     void loop_2_printf_all();

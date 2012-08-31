@@ -9,7 +9,7 @@
 #ifndef _CHAOS_THREAD_GROUP_H_
 #define _CHAOS_THREAD_GROUP_H_
 
-/*! 
+/*!
  *  @file           thread_group.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -36,7 +36,7 @@ class thread_group_t: private noncopyable_t
 			virtual void exec(thread_t* thd_) = 0;
 			virtual ~callback_t(){};
 		};
-		
+
 		thread_group_t();
 		virtual ~thread_group_t();
 

@@ -9,7 +9,7 @@
 #ifndef _PROCESSOR_HELPER_H_
 #define _PROCESSOR_HELPER_H_
 
-/** 
+/**
  *  @file           processor_helper.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

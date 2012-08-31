@@ -9,7 +9,7 @@
 #ifndef _ATOMICVAL_H_
 #define _ATOMICVAL_H_
 
-/*! 
+/*!
  *  @file           atomic_val.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

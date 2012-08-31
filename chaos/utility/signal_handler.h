@@ -9,7 +9,7 @@
 #ifndef _CHAOS_SIGNAL_HANDLER_H_
 #define _CHAOS_SIGNAL_HANDLER_H_
 
-/** 
+/**
  *  @file           signal_handler.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

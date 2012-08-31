@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TASK_SERVICE_DEFINE_H_
 #define _CHAOS_TASK_SERVICE_DEFINE_H_
 
-/*! 
+/*!
  *  @file           task_serviec_define.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -41,7 +41,7 @@ enum task_prior_e
     TASK_PRIOR_NORMAL,
     TASK_PRIOR_HIGH,
     TASK_PRIOR_COUNT
-}; 
+};
 
 typedef     async_method_t      time_event_callback_t;
 

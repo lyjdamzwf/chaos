@@ -8,7 +8,7 @@
 
 #include <chaos/task_service/task_service_group.h>
 
-/*! 
+/*!
  *  @file           task_service_group.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

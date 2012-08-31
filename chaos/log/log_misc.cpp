@@ -5,8 +5,8 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the License file.
  */
- 
-/*! 
+
+/*!
  *  @file           log_misc.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -40,7 +40,7 @@ int init_log(const std::string& path,
 	singleton_t<log_t>::instance().set_filename(file.c_str());
 	singleton_t<log_t>::instance().set_maxline(max_line);
 	singleton_t<log_t>::instance().set_maxsize(maz_size);
-	if(flag_print_file)	singleton_t<log_t>::instance().enable_print_file(true);	
+	if(flag_print_file)	singleton_t<log_t>::instance().enable_print_file(true);
 	if(flag_print_screen)	singleton_t<log_t>::instance().enable_print_screen(true);
 	if( flag_log_level >=1 ) singleton_t<log_t>::instance().enable_log_level(LOG_FLAG(LF_FATAL), true);
 	if( flag_log_level >=2 ) singleton_t<log_t>::instance().enable_log_level(LOG_FLAG(LF_ERROR), true);

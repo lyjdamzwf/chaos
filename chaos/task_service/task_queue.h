@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TASK_QUEUE_H_
 #define _CHAOS_TASK_QUEUE_H_
 
-/*! 
+/*!
  *  @file           task_queue.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

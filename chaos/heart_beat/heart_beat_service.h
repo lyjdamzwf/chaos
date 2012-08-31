@@ -9,7 +9,7 @@
 #ifndef _CHAOS_HEART_BEAT_SERVICE_H_
 #define _CHAOS_HEART_BEAT_SERVICE_H_
 
-/*! 
+/*!
  *  @file           heart_beat_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -82,7 +82,7 @@ private:
 
 template<typename element_type, typename element_hash>
 heart_beat_service_t<element_type, element_hash>::heart_beat_service_t()
-    : 
+    :
         m_started(false),
         m_service_ptr(NULL)
 {
@@ -214,7 +214,7 @@ int heart_beat_service_t<element_type, element_hash>::start()
                                                                 this,
                                                                 &heart_beat_service_t<element_type, element_hash>::handle_timeout
                                                                )
-                                ); 
+                                );
 
     m_started = true;
 
@@ -304,10 +304,10 @@ int heart_beat_service_t<element_type, element_hash>::handle_timeout()
                     this,
                     &heart_beat_service_t<element_type, element_hash>::handle_timeout
                     )
-                ); 
+                );
     }
 
-    
+
     if (m_element_manager.handle_timeout())
     {
         LOGERROR((HEART_BEAT_MOUDLE, "heart_beat_service_t::handle_timeout "

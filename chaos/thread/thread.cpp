@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-/*! 
+/*!
  *  @file           thread.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -120,7 +120,7 @@ void thread_t::cond_wait()
     LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() begin"));
 
     m_lock.lock();
-    if (m_alive) 
+    if (m_alive)
     {
         m_cond.wait(m_lock);
     }
@@ -138,7 +138,7 @@ void thread_t::cond_wait(
     LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() args-[timeout_sec:%lu, timeout_usec:%lu] begin", timeout_second_, timeout_microsecond_));
 
     m_lock.lock();
-    if (m_alive) 
+    if (m_alive)
     {
         m_cond.wait(m_lock, now_, timeout_second_, timeout_microsecond_);
     }

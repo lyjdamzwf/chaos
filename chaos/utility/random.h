@@ -9,7 +9,7 @@
 #ifndef _CHAOS_RANDOM_H_
 #define _CHAOS_RANDOM_H_
 
-/** 
+/**
  *  @file           random.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

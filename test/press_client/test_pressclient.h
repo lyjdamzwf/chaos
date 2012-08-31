@@ -121,7 +121,7 @@ protected:
     void handle_packet(const packet_header_t& packet_header_, const char* data_ptr_, uint32_t data_size_)
     {
 
-#if CHECK_SUM 
+#if CHECK_SUM
         //! yunjie: check sum begin
         LOGINFO((TEST_MODULE, "test_press_conn_strategy_t::handle_packet check sum"));
         string recv_data;
@@ -163,7 +163,7 @@ protected:
                     done = true;
                 }
                 break;
-                
+
                 case PCA_RESEND:
                 {
                     if (!rand_gen_t::calc_probability(70))

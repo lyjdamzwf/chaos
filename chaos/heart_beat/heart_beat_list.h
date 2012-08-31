@@ -9,7 +9,7 @@
 #ifndef _CHAOS_HEART_BEAT_LIST_H_
 #define _CHAOS_HEART_BEAT_LIST_H_
 
-/*! 
+/*!
  *  @file           heart_beat_list.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

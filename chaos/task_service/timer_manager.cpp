@@ -8,7 +8,7 @@
 
 #include <chaos/task_service/timer_manager.h>
 
-/*! 
+/*!
  *  @file           timer_manager.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

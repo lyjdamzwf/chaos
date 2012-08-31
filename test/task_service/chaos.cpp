@@ -14,7 +14,7 @@ int main(int argc_, char* argv_[])
     TS().start(1);
 
     test_task_service_performance();
-    
+
     application_tool_t::wait_signal();
     TS().stop();
     log_tool_t::stop_log_service();

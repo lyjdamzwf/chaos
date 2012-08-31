@@ -9,7 +9,7 @@
 #ifndef _CHAOS_SPINLOCK_H_
 #define _CHAOS_SPINLOCK_H_
 
-/*! 
+/*!
  *  @file           spinlock.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -42,7 +42,7 @@ class spin_lock_t : private noncopyable_t
 			//! ::pthread_mutexattr_settype(&attr, kind_);
 			::pthread_spin_init(&m_spinlock, 0);
 		}
-	
+
 		~spin_lock_t()
 		{
 			::pthread_spin_destroy(&m_spinlock);

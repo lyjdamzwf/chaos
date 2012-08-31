@@ -9,7 +9,7 @@
 #ifndef _CHAOS_NONCOPYALBE_H_
 #define _CHAOS_NONCOPYALBE_H_
 
-/** 
+/**
  *  @file           noncopyable.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

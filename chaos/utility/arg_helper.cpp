@@ -11,7 +11,7 @@
 
 #include <chaos/utility/arg_helper.h>
 
-/*! 
+/*!
  *  @file           arg_helper.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -59,7 +59,7 @@ int arg_helper_t::parse_arg(
         for (int j = 0 ; j < option_count_; ++j)
         {
             arg_option_t cur_option = options_[j];
-            
+
             if (strlen(cur_arg) <= 1)
             {
                 goto PARSE_ERR;

@@ -9,7 +9,7 @@
 #ifndef _ITOA_H_
 #define _ITOA_H_
 
-/*! 
+/*!
  *  @file           itoa.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

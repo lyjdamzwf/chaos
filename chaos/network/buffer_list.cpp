@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-/*! 
+/*!
  *  @file           buffer_list.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -115,10 +115,10 @@ int buffer_list_t::append(
     for (
             iterator_t it = m_buffer_list.begin();
             it != m_buffer_list.end();
-            ++it 
+            ++it
         )
     {
-        m_the_biggest_buffer_size = it->capacity() > m_the_biggest_buffer_size 
+        m_the_biggest_buffer_size = it->capacity() > m_the_biggest_buffer_size
             ? it->capacity()
             : m_the_biggest_buffer_size;
     }
@@ -162,10 +162,10 @@ int buffer_list_t::recv_to_buffer(fd_t fd_, int&recv_ret_)
     for (
             iterator_t it = m_buffer_list.begin();
             it != m_buffer_list.end();
-            ++it 
+            ++it
         )
     {
-        m_the_biggest_buffer_size = it->capacity() > m_the_biggest_buffer_size 
+        m_the_biggest_buffer_size = it->capacity() > m_the_biggest_buffer_size
             ? it->capacity()
             : m_the_biggest_buffer_size;
     }
@@ -202,7 +202,7 @@ void buffer_list_t::clear()
     for (
             iterator_t it = m_buffer_list.begin();
             it != m_buffer_list.end();
-            ++it 
+            ++it
         )
     {
         it->clear();
@@ -214,7 +214,7 @@ void buffer_list_t::clear()
 string buffer_list_t::format_buffer_list_info()
 {
     char info[65535] = {0};
-    sprintf(info, 
+    sprintf(info,
             "----------------------- buffer list info begin -----------------------\n"
             "biggest buf size:%u biggest list :%u\n\n"
             "cur info -\n"
@@ -225,7 +225,7 @@ string buffer_list_t::format_buffer_list_info()
     for (
             iterator_t it = m_buffer_list.begin();
             it != m_buffer_list.end();
-            ++it 
+            ++it
         )
     {
         sprintf(info + strlen(info),

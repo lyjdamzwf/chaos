@@ -9,7 +9,7 @@
 #ifndef _CHAOS_ARG_HELPER_H_
 #define _CHAOS_ARG_HELPER_H_
 
-/*! 
+/*!
  *  @file           arg_helper.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -95,7 +95,7 @@ public:
 
 private:
     arg_option_t*                       m_arg_options_ptr;
-    arg_pair_t                          m_pair_ret[255]; 
+    arg_pair_t                          m_pair_ret[255];
 };
 
 }

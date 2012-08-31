@@ -13,7 +13,7 @@
 
 #include <chaos/task_service/task_service.h>
 
-/*! 
+/*!
  *  @file           task_service.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -50,7 +50,7 @@ task_service_t::~task_service_t()
 void read_byte_from_fd(fd_t fd_, int event_, void* arg_)
 {
     char byte;
-    int ret; 
+    int ret;
     if ((ret = ::read(fd_, &byte, sizeof(char))) != sizeof(char))
     {
         LOGWARN((TASK_SERVICE_MODULE, "read_byte_from_fd read failed ret:[%d]",
@@ -89,16 +89,16 @@ int task_service_t::start(int32_t thread_num_)
 
     //! yunjie: 如果是单线程驱动task_service的话, timer内部就不需要进行加锁
     bool lock_flag = (m_thread_num <= 1) ? false : true;
-    m_timer_manager.initialize(lock_flag); 
-    m_io_handler.initialize(lock_flag); 
+    m_timer_manager.initialize(lock_flag);
+    m_io_handler.initialize(lock_flag);
 
     //! yunjie: 初始化IPC
 #if COMMUNICATION_MODE == PIPE
-    if (::pipe(m_comm_fds) < 0) 
+    if (::pipe(m_comm_fds) < 0)
     {
         LOGERROR((TASK_SERVICE_MODULE, "task_service_t::start service(%s) create pipe failed, exit", m_service_name.c_str()));
         exit(EXIT_FAILURE);
-    } 
+    }
 
     //! yunjie: 禁止pipe读时进行touch_atime操作
     fcntl(m_comm_fds[0], F_SETFL, O_NOATIME);
@@ -154,7 +154,7 @@ int task_service_t::stop()
 
     m_thread_num = 0;
     m_fetch_num_per_loop = 0xffffffff;
-    
+
     m_started = false;
 
     LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::stop service(%s) end", m_service_name.c_str()));
@@ -253,7 +253,7 @@ void task_service_t::exec_task(thread_t* thd_)
                 it->release();
             }
         }
-        catch (const std::exception& ex) 
+        catch (const std::exception& ex)
         {
             LOGERROR((TASK_SERVICE_MODULE, "task_service_t::exec_task service(%s) exception caught info:[%s]",
                         m_service_name.c_str(),
@@ -302,7 +302,7 @@ int task_service_t::post(
     }
 
     m_task_queue.push(async_method_);
-    
+
 #if COMMUNICATION_MODE == PTHREAD_COND_VAR
     send_cond_signal_t send_cond_signal;
     m_thread_group.exec_all(send_cond_signal);

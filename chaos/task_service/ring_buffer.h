@@ -9,7 +9,7 @@
 #ifndef _CHAOS_RING_BUFFER_H_
 #define _CHAOS_RING_BUFFER_H_
 
-/*! 
+/*!
  *  @file           ring_buffer.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

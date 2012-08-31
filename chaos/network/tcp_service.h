@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TCP_SERVICE_H_
 #define _CHAOS_TCP_SERVICE_H_
 
-/*! 
+/*!
  *  @file           tcp_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -43,7 +43,7 @@ public:
     tcp_service_t();
     virtual ~tcp_service_t();
 
-    int initialize( 
+    int initialize(
                     const string&                   host_,
                     uint32_t                        port_,
                     connection_t::on_conn_event_t   event_func_ = NULL,
@@ -101,7 +101,7 @@ int tcp_service_t<CONN_TYPE>::start(uint16_t work_thread_num_)
     //!         多个线程驱动, 而且出于性能的考虑也不推荐这么做
     int ws_ret = m_work_service_group.start(work_thread_num_);
     int ac_ret = m_acceptor_service.start();
-    
+
     if (-1 == ws_ret || -1 == ac_ret)
     {
         return -1;

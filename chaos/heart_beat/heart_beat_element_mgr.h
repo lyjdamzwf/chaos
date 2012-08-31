@@ -9,7 +9,7 @@
 #ifndef _CHAOS_HEART_BEAT_ELEMENT_MGR_H_
 #define _CHAOS_HEART_BEAT_ELEMENT_MGR_H_
 
-/*! 
+/*!
  *  @file           heart_beat_element_mgr.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

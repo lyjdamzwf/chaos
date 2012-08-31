@@ -52,7 +52,7 @@ statistic_service_t*        stat_service_1104;
     SAFE_DELETE(work_service_group_1104); \
     SAFE_DELETE(log_service_1104); \
     SAFE_DELETE(stat_service_1104); \
-        
+
 #define TS()    (*task_service_1104)
 #define WS()    (*work_service_1104)
 #define LOGS()  (*log_service_1104)

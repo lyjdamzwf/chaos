@@ -9,7 +9,7 @@
 #ifndef _CHAOS_ASYNC_METHOD_BIND_FUNC_H_
 #define _CHAOS_ASYNC_METHOD_BIND_FUNC_H_
 
-/*! 
+/*!
  *  @file           async_method_bind_func.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

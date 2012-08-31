@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-/** 
+/**
  *  @file           signal_handler.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -36,7 +36,7 @@ signal_handler_t::~signal_handler_t()
 }
 
 //! yunjie: 阻塞当前线程对所有信号的接受
-//! 注; 这里是阻塞而不是忽略, 发生在内核态 
+//! 注; 这里是阻塞而不是忽略, 发生在内核态
 int signal_handler_t::block_all_signal()
 {
     sigset_t all_mask;

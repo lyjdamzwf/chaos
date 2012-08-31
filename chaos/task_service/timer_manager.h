@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TIME_MANAGER_H_
 #define _CHAOS_TIME_MANAGER_H_
 
-/*! 
+/*!
  *  @file           time_event.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

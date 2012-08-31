@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-/*! 
+/*!
  *  @file           msg_buffer.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

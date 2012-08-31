@@ -9,7 +9,7 @@
 #ifndef _CHAOS_FAST_MSG_QUEUE_H_
 #define _CHAOS_FAST_MSG_QUEUE_H_
 
-/*! 
+/*!
  *  @file           fast_msg_queue.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

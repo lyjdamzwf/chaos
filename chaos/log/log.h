@@ -9,7 +9,7 @@
 #ifndef _CHAOS_LOG_H_
 #define _CHAOS_LOG_H_
 
-/*! 
+/*!
  *  @file           log.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

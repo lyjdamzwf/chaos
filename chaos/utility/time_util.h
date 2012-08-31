@@ -9,7 +9,7 @@
 #ifndef _TIMEUTIL_H_
 #define _TIMEUTIL_H_
 
-/*! 
+/*!
  *  @file           time_util.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

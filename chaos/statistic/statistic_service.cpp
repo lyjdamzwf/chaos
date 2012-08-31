@@ -6,7 +6,7 @@
  * license that can be found in the License file.
  */
 
-/*! 
+/*!
  *  @file           statistic_service.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -135,7 +135,7 @@ int statistic_service_t::timeout_func_i()
         {
             //! yunjie: 遍历perf table
             perf_table_t::iterator it = m_perf_table.begin();
-            while (it != m_perf_table.end()) 
+            while (it != m_perf_table.end())
             {
                 const string& op_name = it->first;
                 performance_info_t& refer = it->second;
@@ -178,7 +178,7 @@ int statistic_service_t::timeout_func_i()
         {
             //! yunjie: 遍历tp table
             tp_table_t::iterator it = m_tp_table.begin();
-            while (it != m_tp_table.end()) 
+            while (it != m_tp_table.end())
             {
                 const string& op_name = it->first;
                 throughput_info_t& refer = it->second;

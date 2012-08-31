@@ -9,7 +9,7 @@
 #ifndef _CHAOS_MUTEX_H_
 #define _CHAOS_MUTEX_H_
 
-/*! 
+/*!
  *  @file           mutex.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

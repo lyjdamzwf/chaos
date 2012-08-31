@@ -9,7 +9,7 @@
 #ifndef _CHAOS_DEFAULT_CONN_STRATEGY_H_
 #define _CHAOS_DEFAULT_CONN_STRATEGY_H_
 
-/*! 
+/*!
  *  @file           default_conn_strategy.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -118,7 +118,7 @@ protected:
                     {
                         if (buffer_.size() >= data_len)
                         {
-                            //! yunjie: 整个数据包都在同一块buffer, 零拷贝给上层 
+                            //! yunjie: 整个数据包都在同一块buffer, 零拷贝给上层
                             handle_packet(header, buffer_.data(), data_len);
                             buffer_.drain_size(data_len);
                             clear();

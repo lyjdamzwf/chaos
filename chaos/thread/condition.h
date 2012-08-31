@@ -9,7 +9,7 @@
 #ifndef _CHAOS_CONDITION_H_
 #define _CHAOS_CONDITION_H_
 
-/*! 
+/*!
  *  @file           condition.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

@@ -9,7 +9,7 @@
 #ifndef _CHAOS_TASK_SERVICE_GROUP_H_
 #define _CHAOS_TASK_SERVICE_GROUP_H_
 
-/*! 
+/*!
  *  @file           task_service_group.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

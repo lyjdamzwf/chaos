@@ -9,13 +9,13 @@
 #ifndef _CHAOS_CONNECTION_H_
 #define _CHAOS_CONNECTION_H_
 
-/*! 
+/*!
  *  @file           connection.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
  *  @weibo          http://weibo.com/crazyprogramerlyj
  *  @date           2012.4.16
- *  @brief          connection_t对象对应chaos tcp_server中的所有socket, 
+ *  @brief          connection_t对象对应chaos tcp_server中的所有socket,
  *                  connection_t的所有'非'public static的方法都是只运行在
  *                  与其绑定的work_service(单线程)上的, 所以connection_t
  *                  内部不需要加锁.
@@ -132,7 +132,7 @@ public:
     typedef connection_t*                           inner_conn_ptr_t;
     typedef                                     void (*on_conn_event_t)(conn_event_e conn_event_, conn_status_e conn_status_, conn_id_t conn_id_);
 
-    //! ------------------------------------ static function begin ------------------------------------   
+    //! ------------------------------------ static function begin ------------------------------------
 
 public:
     //! yunjie: 当socket状态变化时调用
@@ -150,7 +150,7 @@ protected:
     //! yunjie: 由于async_method目前还不支持重载, 所以要不同函数名
     static int sync_send_packet_wrapper_i(
                             const struct conn_id_t& conn_id_,
-                            const packet_wrapper_t& msg_ 
+                            const packet_wrapper_t& msg_
                           );
     static int sync_send_data_i(
                             const struct conn_id_t& conn_id_,
@@ -158,11 +158,11 @@ protected:
                             uint32_t size_
                           );
 
-    //! ------------------------------------ static function end ------------------------------------   
+    //! ------------------------------------ static function end ------------------------------------
 
 
 
-    //! ------------------------------------ member function begin ------------------------------------   
+    //! ------------------------------------ member function begin ------------------------------------
 
 public:
     connection_t();
@@ -226,7 +226,7 @@ protected:
 
     int close_i();
 
-    //! ------------------------------------ member function end ------------------------------------   
+    //! ------------------------------------ member function end ------------------------------------
 
 protected:
     fd_t                                            m_socket;

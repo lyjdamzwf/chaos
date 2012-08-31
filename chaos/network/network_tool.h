@@ -9,7 +9,7 @@
 #ifndef _CHAOS_NETWORK_TOOL_H_
 #define _CHAOS_NETWORK_TOOL_H_
 
-/*! 
+/*!
  *  @file           network_tool.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

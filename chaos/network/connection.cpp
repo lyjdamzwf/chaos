@@ -11,7 +11,7 @@
 #include <chaos/network/connection.h>
 #include <chaos/network/work_service.h>
 
-/*! 
+/*!
  *  @file           connection.cpp
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -28,7 +28,7 @@ namespace chaos
 namespace network
 {
 
-//! ------------------------------------ static function begin ------------------------------------   
+//! ------------------------------------ static function begin ------------------------------------
 
 void connection_t::on_peer_event(fd_t fd_, int event_type_, void* arg_)
 {
@@ -168,7 +168,7 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
         //! yunjie: 从heart_beart中删除connection
         service_ptr->async_del_hb_element(conn_ptr->m_conn_id);
     }
-    
+
     //! yunjie: connection的一些数据要先拷贝出来,
     //!         因为之后的async_del_connection会
     //!         delete connection对象
@@ -198,7 +198,7 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
 
 int connection_t::sync_send_packet_wrapper_i(
                                 const struct conn_id_t& conn_id_,
-                                const packet_wrapper_t& msg_ 
+                                const packet_wrapper_t& msg_
                              )
 {
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] begin", conn_id_.socket));
@@ -225,7 +225,7 @@ int connection_t::sync_send_packet_wrapper_i(
 
     conn_ptr->m_send_buffer.append(msg_.data(), msg_.size());
     conn_ptr->start_drive_send_i();
-        
+
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] end", conn_id_.socket));
     return 0;
 }
@@ -262,13 +262,13 @@ int connection_t::sync_send_data_i(
     return 0;
 }
 
-//! ------------------------------------ static function end ------------------------------------   
+//! ------------------------------------ static function end ------------------------------------
 
 
 
 
 
-//! ------------------------------------ member function begin ------------------------------------   
+//! ------------------------------------ member function begin ------------------------------------
 
 connection_t::connection_t()
     :
@@ -355,7 +355,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
     {
         int nodelay = 1;
         if(::setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void*)&nodelay, sizeof(nodelay)))
-        {   
+        {
             LOGWARN((CONNECTION_MODULE, "connection_t::initialize set nodelay failed socket:[%u]", m_socket));
             ret = -1;
         }
@@ -586,7 +586,7 @@ int connection_t::close_i()
     return 0;
 }
 
-//! ------------------------------------ member function end ------------------------------------   
+//! ------------------------------------ member function end ------------------------------------
 
 }
 

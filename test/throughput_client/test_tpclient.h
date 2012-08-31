@@ -187,7 +187,7 @@ protected:
     {
         m_transferred_bytes += (data_size_ + HEADER_SIZE);
 
-#if CHECK_SUM 
+#if CHECK_SUM
         //! yunjie: check sum begin
         LOGINFO((TEST_MODULE, "test_tp_conn_strategt_t::handle_packet check sum"));
         string recv_data;

@@ -9,7 +9,7 @@
 #ifndef _CHAOS_THREAD_H_
 #define _CHAOS_THREAD_H_
 
-/*! 
+/*!
  *  @file           thread.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -50,15 +50,15 @@ public:
 
 public:
     thread_t(const string& name_ = string("thread_t"), bool joinable_ = true)
-        : m_name(name_), 
+        : m_name(name_),
           m_joinable(joinable_),
-          m_thread(0), 
-          m_alive(false), 
+          m_thread(0),
+          m_alive(false),
           m_complete(false)
 {
 }
 
-    virtual ~thread_t() 
+    virtual ~thread_t()
     {
         m_thread_func.release();
     }

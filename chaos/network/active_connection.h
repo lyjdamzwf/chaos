@@ -9,7 +9,7 @@
 #ifndef _CHAOS_ACTIVE_CONNECTION_H_
 #define _CHAOS_ACTIVE_CONNECTION_H_
 
-/*! 
+/*!
  *  @file           active_connection.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

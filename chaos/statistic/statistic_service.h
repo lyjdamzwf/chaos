@@ -9,7 +9,7 @@
 #ifndef _CHAOS_STATISTIC_SERVICE_H_
 #define _CHAOS_STATISTIC_SERVICE_H_
 
-/*! 
+/*!
  *  @file           statistic_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -67,7 +67,7 @@ public:
 
     typedef map<string, performance_info_t>             perf_table_t;
     typedef map<string, throughput_info_t>              tp_table_t;
-    
+
 public:
     statistic_service_t();
     ~statistic_service_t();
@@ -121,7 +121,7 @@ private:
 
 private:
     bool                                    m_started;
-    task_service_t*                         m_service_ptr; 
+    task_service_t*                         m_service_ptr;
     bool                                    m_is_own;
     int                                     m_timer_expiration;
 
@@ -139,7 +139,7 @@ public:
                         bool                    is_persist_ = false
                        )
         :
-            m_service(service_), 
+            m_service(service_),
             m_info(info_),
             m_is_persist(is_persist_)
     {

@@ -9,7 +9,7 @@
 #ifndef _CHAOS_WORK_SERVICE_H_
 #define _CHAOS_WORK_SERVICE_H_
 
-/*! 
+/*!
  *  @file           work_service.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com
@@ -45,7 +45,7 @@ using namespace chaos::heart_beat;
 
 #ifndef DEFAULT_CONN_VCT_SIZE
 #define DEFAULT_CONN_VCT_SIZE       65535
-#endif 
+#endif
 
 //! yunjie: heart_beat中对conn_id_t的hash函数
 class hash_conn_id_t
@@ -113,7 +113,7 @@ private:
 private:
     vector<conn_ptr_t>                                                  m_conn_vct;
     bool                                                                m_enable_conn_heart_beat;
-    heart_beat_service_t<conn_id_t, hash_conn_id_t>                     m_conn_heart_beat; 
+    heart_beat_service_t<conn_id_t, hash_conn_id_t>                     m_conn_heart_beat;
 };
 
 

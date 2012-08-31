@@ -9,7 +9,7 @@
 #ifndef _CHAOS_WORK_SERVICE_GROUP_H_
 #define _CHAOS_WORK_SERVICE_GROUP_H_
 
-/*! 
+/*!
  *  @file           work_service_group.h
  *  @author         yunjie.lu
  *  @email          lyjdamzwf@gmail.com

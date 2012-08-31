@@ -217,7 +217,7 @@ int main(int argc_, char* argv_[])
                                             );
     }
 
-    
+
     gettimeofday(&g_timeval, NULL);
     uint64_t total_bytes = 2 * g_active_conn_count * g_send_count * (g_send_packet_size + sizeof(packet_header_t));
     LOGINFO((TEST_MODULE, "test_tp_press_client total need transfer data size:[%lu] bytes, [%lu] MB",
