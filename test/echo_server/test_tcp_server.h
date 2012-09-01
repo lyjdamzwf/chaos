@@ -3,9 +3,12 @@
 
 #include <netinet/tcp.h>
 
-//! yunjie: 可配选项
-
-void tcp_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, conn_id_t conn_id_)
+void tcp_conn_event(
+                    conn_event_e        conn_event_,
+                    conn_status_e       conn_status_,
+                    conn_id_t           conn_id_,
+                    void*               use_data_
+                   )
 {
     switch (conn_event_)
     {

@@ -215,7 +215,7 @@ int connector_service_t<CONN_TYPE>::sync_connect_i(
         LOGWARN((CONNECTOR_SERVICE, "sync_connect failed."));
 
         //! yunjie: 回调通知上层连接失败
-        event_func_(EV_CONNECT_FAILED, ST_UNINIT, conn_id_t());
+        event_func_(EV_CONNECT_FAILED, ST_UNINIT, conn_id_t(), NULL);
 
         if (-1 != m_reconnect_interval)
         {

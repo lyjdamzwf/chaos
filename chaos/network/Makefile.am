@@ -17,4 +17,5 @@ libchaos_network_a_SOURCES = \
 						  tcp_service.cpp \
 						  work_service.cpp \
 						  msg_buffer.cpp \
-						  buffer_list.cpp
+						  buffer_list.cpp \
+						  default_conn_strategy.cpp

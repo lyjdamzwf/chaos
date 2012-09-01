@@ -130,7 +130,12 @@ class connection_t
 {
 public:
     typedef connection_t*                           inner_conn_ptr_t;
-    typedef                                     void (*on_conn_event_t)(conn_event_e conn_event_, conn_status_e conn_status_, conn_id_t conn_id_);
+    typedef                                     void (*on_conn_event_t)(
+                                                        conn_event_e    conn_event_,
+                                                        conn_status_e   conn_status_,
+                                                        conn_id_t       conn_id_,
+                                                        void*           user_data_
+                                                                        );
 
     //! ------------------------------------ static function begin ------------------------------------
 
@@ -138,7 +143,11 @@ public:
     //! yunjie: 当socket状态变化时调用
     static void on_peer_event(fd_t fd_, int event_type_, void* arg_);
 
-    static int async_close(const struct conn_id_t& conn_id_, bool is_del_from_hb_ = true, conn_event_e close_type_ = EV_ACTIVE_CLOSED);
+    static int async_close(
+                            const struct conn_id_t&     conn_id_,
+                            bool                        is_del_from_hb_ = true,
+                            conn_event_e                close_type_ = EV_ACTIVE_CLOSED
+                          );
 
     static int async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_);
     static int async_send(const struct conn_id_t& conn_id_, const char* msg_, uint32_t size_);
@@ -209,10 +218,16 @@ public:
     }
 
 protected:
-    virtual void on_read_complete(buffer_list_t& buffer_) {}
-    virtual void on_write_complete(uint32_t transferred_size_) {}
+    virtual void on_read_complete(buffer_list_t& buffer_) = 0;
+    virtual void on_write_complete(uint32_t transferred_size_) = 0;
 
-protected:
+    void set_userdata(void* data_) { m_user_data = data_; }
+    void* get_userdata() const { return m_user_data; }
+
+    string read_buffer_info() const { return m_read_buffer.format_buffer_list_info(); }
+    string write_buffer_info() const { return m_write_buffer.format_buffer_list_info(); }
+
+private:
     //! yunjie: 当epoll有读事件时回调
     int on_recv_data();
 
@@ -228,7 +243,7 @@ protected:
 
     //! ------------------------------------ member function end ------------------------------------
 
-protected:
+private:
     fd_t                                            m_socket;
     struct timeval                                  m_timestamp;
     work_service_t*                                 m_service_ptr;
@@ -241,14 +256,17 @@ protected:
     on_conn_event_t                                 m_conn_event_callback;
 
     buffer_list_t                                   m_read_buffer;
-    buffer_list_t                                   m_send_buffer;
+    buffer_list_t                                   m_write_buffer;
     bool                                            m_sending_flag;
     bool                                            m_enable_hb;
 
     //! yunjie: 配置信息
     //!         使用config_holder_t让多个connection_t共享一份
-    //！        config信息
+    //！        config信息, 默认为static default_config
     config_holder_t                                 m_config_holder;
+
+    //! yunjie: 业务层注入的数据
+    void*                                           m_user_data;
 };
 
 typedef connection_t::inner_conn_ptr_t              conn_ptr_t;

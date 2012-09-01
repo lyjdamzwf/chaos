@@ -174,6 +174,7 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
     //!         delete connection对象
     conn_status_e conn_status = conn_ptr->get_status();
     on_conn_event_t event_callback = conn_ptr->m_conn_event_callback;
+    void* user_data = conn_ptr->m_user_data;
 
     //! yunjie: 释放操作有可能是在本线程直接执行, 所以必须放最后
     if (EV_DECONSTRUCT != close_type_)
@@ -189,7 +190,7 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
     if (NULL != event_callback)
     {
         //! yunjie: 调用用户注册的回调
-        event_callback(close_type_, conn_status, conn_id_);
+        event_callback(close_type_, conn_status, conn_id_, user_data);
     }
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_close_i args-[fd:%d] end", conn_id_.socket));
@@ -223,7 +224,7 @@ int connection_t::sync_send_packet_wrapper_i(
         return 0;
     }
 
-    conn_ptr->m_send_buffer.append(msg_.data(), msg_.size());
+    conn_ptr->m_write_buffer.append(msg_.data(), msg_.size());
     conn_ptr->start_drive_send_i();
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] end", conn_id_.socket));
@@ -256,7 +257,7 @@ int connection_t::sync_send_data_i(
         return 0;
     }
 
-    conn_ptr->m_send_buffer.append(msg_, size_);
+    conn_ptr->m_write_buffer.append(msg_, size_);
     conn_ptr->start_drive_send_i();
 
     return 0;
@@ -278,18 +279,22 @@ connection_t::connection_t()
         m_conn_status(ST_UNKNOWN),
         m_conn_event_callback(NULL),
         m_sending_flag(false),
-        m_enable_hb(false)
+        m_enable_hb(false),
+        m_user_data(NULL)
 {
     memset(&m_timestamp, 0, sizeof(struct timeval));
 }
 
 connection_t::~connection_t()
 {
-    m_conn_event_callback(EV_DECONSTRUCT, m_conn_status, m_conn_id);
+    if (NULL != m_conn_event_callback)
+    {
+        m_conn_event_callback(EV_DECONSTRUCT, m_conn_status, m_conn_id, m_user_data);
+    }
 
     //! yunjie: 释放I/O缓冲区内存
     m_read_buffer.clear();
-    m_send_buffer.clear();
+    m_write_buffer.clear();
 }
 
 
@@ -326,7 +331,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
     m_enable_hb = enable_hb_;
 
     //! yunjie: 设置I/O缓冲区的最大字节数
-    m_send_buffer.set_buffer_max_limit((*m_config_holder).max_send_buffer_size);
+    m_write_buffer.set_buffer_max_limit((*m_config_holder).max_send_buffer_size);
     m_read_buffer.set_buffer_max_limit((*m_config_holder).max_read_buffer_size);
 
     //! yunjie: 初始化套接字选项
@@ -362,7 +367,10 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
     }
 
     //! yunjie: connection初始化完毕, 回调通知上层
-    m_conn_event_callback(EV_INIT_COMPLETE, m_conn_status, m_conn_id);
+    if (NULL != m_conn_event_callback)
+    {
+        m_conn_event_callback(EV_INIT_COMPLETE, m_conn_status, m_conn_id, m_user_data);
+    }
 
     //! yunjie: 注册到event loop中
     work_service_->async_add_connection(this);
@@ -389,7 +397,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
             conn_ev = EV_UNKNOWN;
         }
 
-        m_conn_event_callback(conn_ev, m_conn_status, m_conn_id);
+        m_conn_event_callback(conn_ev, m_conn_status, m_conn_id, m_user_data);
     }
 
     return ret;
@@ -436,7 +444,7 @@ int connection_t::on_recv_data()
         {
             if (NULL != m_conn_event_callback)
             {
-                m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id);
+                m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id, m_user_data);
             }
         }
 
@@ -464,10 +472,10 @@ int connection_t::on_send_data()
     bool all_finish = true;
     int transferred_size = 0;
 
-    while (m_send_buffer.size())
+    while (m_write_buffer.size())
     {
-        uint32_t msg_size = m_send_buffer.size();
-        int ret = ::send(m_socket, m_send_buffer.data(), msg_size, 0);
+        uint32_t msg_size = m_write_buffer.size();
+        int ret = ::send(m_socket, m_write_buffer.data(), msg_size, 0);
 
         if (0 == ret)
         {
@@ -486,7 +494,7 @@ int connection_t::on_send_data()
             {
                 if (NULL != m_conn_event_callback)
                 {
-                    m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id);
+                    m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id, m_user_data);
                 }
             }
             else
@@ -506,7 +514,7 @@ int connection_t::on_send_data()
         {
             transferred_size += ret;
 
-            m_send_buffer.drain_size(ret);
+            m_write_buffer.drain_size(ret);
 
             if (ret != (int)msg_size)
             {
@@ -541,7 +549,7 @@ int connection_t::on_error_occur()
     if (NULL != m_conn_event_callback)
     {
         //! yunjie: 调用用户注册的回调
-        m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id);
+        m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id, m_user_data);
     }
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::on_error_occur end"));
@@ -580,7 +588,7 @@ int connection_t::close_i()
 
     m_conn_status = ST_CLOSED;
     m_read_buffer.clear();
-    m_send_buffer.clear();
+    m_write_buffer.clear();
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::close_i end"));
     return 0;

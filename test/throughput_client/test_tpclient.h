@@ -23,7 +23,12 @@ atomic_val_t<int>               g_connected_num;
 string                          g_send_data;
 
 
-void tcp_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, conn_id_t conn_id_)
+void tcp_conn_event(
+                    conn_event_e        conn_event_,
+                    conn_status_e       conn_status_,
+                    conn_id_t           conn_id_,
+                    void*               use_data_
+                   )
 {
     switch (conn_event_)
     {
@@ -130,8 +135,8 @@ void tcp_conn_event(conn_event_e conn_event_, conn_status_e conn_status_, conn_i
 #define STAT_TP(x) \
 if (m_transferred_bytes == 2 * g_send_count * (g_send_packet_size + sizeof(packet_header_t)))                                       \
 {                                                                                                                                   \
-    LOGWARN((TEST_MODULE, "\nsend_buffer -\n%s", m_send_buffer.format_buffer_list_info().c_str()));                                   \
-    LOGWARN((TEST_MODULE, "\nread_buffer -\n%s", m_read_buffer.format_buffer_list_info().c_str()));                                   \
+    LOGWARN((TEST_MODULE, "\nsend_buffer -\n%s", write_buffer_info().c_str()));                                   \
+    LOGWARN((TEST_MODULE, "\nread_buffer -\n%s", read_buffer_info().c_str()));                                   \
     if (++g_finished_conn == g_active_conn_count) \
     {   \
         struct timeval now;                                                                                                         \

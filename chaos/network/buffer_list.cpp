@@ -211,7 +211,7 @@ void buffer_list_t::clear()
     m_buffer_list.clear();
 }
 
-string buffer_list_t::format_buffer_list_info()
+string buffer_list_t::format_buffer_list_info() const
 {
     char info[65535] = {0};
     sprintf(info,
@@ -223,7 +223,7 @@ string buffer_list_t::format_buffer_list_info()
             m_the_biggest_list
            );
     for (
-            iterator_t it = m_buffer_list.begin();
+            const_iterator_t it = m_buffer_list.begin();
             it != m_buffer_list.end();
             ++it
         )

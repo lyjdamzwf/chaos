@@ -44,6 +44,7 @@ libchaos_a_SOURCES = \
 					 network/tcp_service.cpp \
 					 network/work_service.cpp \
 					 network/work_service_group.cpp \
+					 network/default_conn_strategy.cpp \
 					 statistic/statistic_service.cpp \
 					 task_service/io_multiplex_handler.cpp \
 					 task_service/task_service.cpp \

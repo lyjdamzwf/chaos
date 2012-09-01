@@ -83,7 +83,7 @@ public:
     uint32_t drain_size(uint32_t size_);
     void clear();
 
-    string format_buffer_list_info();
+    string format_buffer_list_info() const;
 
 private:
     list<msg_buffer_t>                  m_buffer_list;
