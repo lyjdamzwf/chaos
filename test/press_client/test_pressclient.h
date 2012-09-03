@@ -22,6 +22,9 @@ enum press_conn_action_e
     PCA_END
 };
 
+class test_press_conn_strategy_t;
+connector_service_t<test_press_conn_strategy_t>* g_connector_service_ptr;
+
 int test_press_client(int conn_num_);
 
 void tcp_press_conn_event(
@@ -119,6 +122,7 @@ void tcp_press_conn_event(
         }
     }
 }
+
 
 class test_press_conn_strategy_t : public default_conn_strategy_t
 {
@@ -249,13 +253,11 @@ private:
 };
 
 
-connector_service_t<test_press_conn_strategy_t>* connector_service_ptr = NULL;
-
 int test_press_client(int conn_num_)
 {
     for (int i = 0; i < conn_num_; ++i)
     {
-        connector_service_ptr->async_connect(
+        g_connector_service_ptr->async_connect(
                                                 LOCALHOST,
                                                 8880,
                                                 tcp_press_conn_event,

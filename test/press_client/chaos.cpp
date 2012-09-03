@@ -174,28 +174,28 @@ int main(int argc_, char* argv_[])
 
     log_tool_t::start_log_service("pressclient.log", log_level, 1, 1);
 
-    connector_service_ptr =
+    g_connector_service_ptr =
         new connector_service_t<test_press_conn_strategy_t>();
-    if (NULL == connector_service_ptr)
+    if (NULL == g_connector_service_ptr)
     {
         //! mem error
         exit(-1);
     }
 
-    connector_service_ptr->set_network_config(network_config);
+    g_connector_service_ptr->set_network_config(network_config);
 
     if (hb_param.timeout_flag)
     {
-        connector_service_ptr->enable_conn_heart_beat(hb_param);
+        g_connector_service_ptr->enable_conn_heart_beat(hb_param);
     }
-    connector_service_ptr->start(work_thread_num);
+    g_connector_service_ptr->start(work_thread_num);
 
     test_press_client(g_press_conn_num);
 
     application_tool_t::wait_signal();
 
-    connector_service_ptr->stop();
-    delete connector_service_ptr;
+    g_connector_service_ptr->stop();
+    delete g_connector_service_ptr;
 
     log_tool_t::stop_log_service();
 
@@ -203,5 +203,4 @@ int main(int argc_, char* argv_[])
 
     return 0;
 }
-
 

@@ -26,6 +26,8 @@ arg_option_t       arg_options[] =
     arg_option_t("tn", "enable tcp nodelay option", false, NULL),
 };
 
+tcp_service_t<test_server_echo_conn_t>* tcp_service_ptr = NULL;
+
 int main(int argc_, char* argv_[])
 {
     NEW_SERVICE();
@@ -159,7 +161,7 @@ int main(int argc_, char* argv_[])
     //! SS().set_timeout(10);
     //! SS().start(&LOGS());
 
-    tcp_service_t<test_server_echo_conn_t>* tcp_service_ptr = new tcp_service_t<test_server_echo_conn_t>();
+    tcp_service_ptr = new tcp_service_t<test_server_echo_conn_t>();
     if (NULL == tcp_service_ptr)
     {
         //! mem error

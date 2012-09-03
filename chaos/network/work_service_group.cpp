@@ -79,6 +79,49 @@ task_service_t* work_service_group_t::new_service()
     return new work_service_t(m_service_name);
 }
 
+int work_service_group_t::async_broadcast(
+                                            const packet_wrapper_t&     msg_,
+                                            broadcast_filter_t          filter_
+                                         )
+{
+    for (
+            task_service_container_t::iterator it = m_task_service_group.begin();
+            it != m_task_service_group.end();
+            ++it
+        )
+    {
+        work_service_t* work_ptr = (work_service_t*)(*it);
+        if (NULL != work_ptr)
+        {
+            work_ptr->async_broadcast(msg_, filter_);
+        }
+    }
+
+    return 0;
+}
+
+int work_service_group_t::async_broadcast(
+                                            const char*                 msg_,
+                                            uint32_t                    size_,
+                                            broadcast_filter_t          filter_
+                                         )
+{
+    for (
+            task_service_container_t::iterator it = m_task_service_group.begin();
+            it != m_task_service_group.end();
+            ++it
+        )
+    {
+        work_service_t* work_ptr = (work_service_t*)(*it);
+        if (NULL != work_ptr)
+        {
+            work_ptr->async_broadcast(msg_, size_, filter_);
+        }
+    }
+
+    return 0;
+}
+
 }
 
 }

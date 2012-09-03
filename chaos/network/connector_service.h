@@ -55,6 +55,17 @@ public:
                         bool                            is_add_to_hb_ = true
                     );
 
+    int async_broadcast(
+                        const packet_wrapper_t&     msg_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+    int async_broadcast(
+                        const char*                 msg_,
+                        uint32_t                    size_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+
+
     void set_reconnect_interval(int reconnect_interval_)
     {
         m_reconnect_interval = reconnect_interval_;
@@ -246,6 +257,29 @@ int connector_service_t<CONN_TYPE>::sync_connect_i(
                 " args-[host:%s, port:%u] end",
                 host_.c_str(), port_
             ));
+    return 0;
+}
+
+template<typename CONN_TYPE>
+int connector_service_t<CONN_TYPE>::async_broadcast(
+                                                const packet_wrapper_t&     msg_,
+                                                broadcast_filter_t          filter_
+                                              )
+{
+    m_work_service_group.async_broadcast(msg_, filter_);
+
+    return 0;
+}
+
+template<typename CONN_TYPE>
+int connector_service_t<CONN_TYPE>::async_broadcast(
+                                                const char*                 msg_,
+                                                uint32_t                    size_,
+                                                broadcast_filter_t          filter_
+                                             )
+{
+    m_work_service_group.async_broadcast(msg_, size_, filter_);
+
     return 0;
 }
 

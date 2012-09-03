@@ -42,6 +42,16 @@ public:
                 int thread_num_per_service_ = DEFAULT_THREAD_NUM_PER_SERVICE
              );
 
+    int async_broadcast(
+                        const packet_wrapper_t&     msg_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+    int async_broadcast(
+                        const char*                 msg_,
+                        uint32_t                    size_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+
 protected:
     //! yunjie: 父类的virtual方法
     task_service_t* new_service();

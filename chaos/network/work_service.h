@@ -77,6 +77,8 @@ struct conn_heart_beat_param_t
     uint32_t                                max_limit;
 };
 
+typedef     bool (*broadcast_filter_t) (const conn_id_t&, void*);
+
 class work_service_t : public task_service_t
 {
 public:
@@ -92,6 +94,16 @@ public:
 
     int async_add_connection(conn_ptr_t conn_ptr_);
     int async_del_connection(const conn_id_t& conn_id_);
+
+    int async_broadcast(
+                        const packet_wrapper_t&     msg_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+    int async_broadcast(
+                        const char*                 msg_,
+                        uint32_t                    size_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
 
     void async_add_hb_element(conn_id_t& conn_id_);
     void async_update_hb_element(conn_id_t& conn_id_);
@@ -109,6 +121,17 @@ private:
 
     int sync_add_connection_i(conn_ptr_t conn_ptr_);
     int sync_del_connection_i(const conn_id_t& conn_id_);
+
+    int sync_broadcast_packet_wrapper_i(
+                                        const packet_wrapper_t&     msg_,
+                                        broadcast_filter_t          filter_ = NULL
+                                        );
+    int sync_broadcast_data_i(
+                                const char*                 msg_,
+                                uint32_t                    size_,
+                                broadcast_filter_t          filter_ = NULL
+                             );
+
 
 private:
     vector<conn_ptr_t>                                                  m_conn_vct;

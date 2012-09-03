@@ -128,6 +128,8 @@ enum conn_event_e
 
 class connection_t
 {
+    friend class work_service_t;
+
 public:
     typedef connection_t*                           inner_conn_ptr_t;
     typedef                                     void (*on_conn_event_t)(

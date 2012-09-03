@@ -35,6 +35,8 @@ extern uint32_t g_send_count;
 extern uint32_t g_send_packet_size;
 extern uint32_t g_active_conn_count;
 
+connector_service_t<test_tp_conn_strategt_t>* connector_service_ptr = NULL;
+
 int main(int argc_, char* argv_[])
 {
     NEW_SERVICE();
@@ -190,7 +192,7 @@ int main(int argc_, char* argv_[])
     g_send_data.append((char*)&header, HEADER_SIZE);
     g_send_data.append(g_send_packet_size, 'a');
 
-    connector_service_t<test_tp_conn_strategt_t>* connector_service_ptr =
+    connector_service_ptr =
         new connector_service_t<test_tp_conn_strategt_t>();
     if (NULL == connector_service_ptr)
     {

@@ -59,6 +59,16 @@ public:
         m_acceptor_service.set_network_config(config_);
     }
 
+    int async_broadcast(
+                        const packet_wrapper_t&     msg_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+    int async_broadcast(
+                        const char*                 msg_,
+                        uint32_t                    size_,
+                        broadcast_filter_t          filter_ = NULL
+                       );
+
 private:
     acceptor_service_t<CONN_TYPE>                       m_acceptor_service;
     work_service_group_t                                m_work_service_group;
@@ -127,6 +137,30 @@ template<typename CONN_TYPE>
 void tcp_service_t<CONN_TYPE>::enable_conn_heart_beat(const conn_heart_beat_param_t& param_)
 {
     m_work_service_group.enable_conn_heart_beat(param_);
+}
+
+
+template<typename CONN_TYPE>
+int tcp_service_t<CONN_TYPE>::async_broadcast(
+                                                const packet_wrapper_t&     msg_,
+                                                broadcast_filter_t          filter_
+                                              )
+{
+    m_work_service_group.async_broadcast(msg_, filter_);
+
+    return 0;
+}
+
+template<typename CONN_TYPE>
+int tcp_service_t<CONN_TYPE>::async_broadcast(
+                                                const char*                 msg_,
+                                                uint32_t                    size_,
+                                                broadcast_filter_t          filter_
+                                             )
+{
+    m_work_service_group.async_broadcast(msg_, size_, filter_);
+
+    return 0;
 }
 
 }

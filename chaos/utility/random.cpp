@@ -59,12 +59,16 @@ int  rand_gen_t::rand_str(string& dest_, uint32_t len_)
 
 bool rand_gen_t::calc_probability(int rate_)
 {
-    if (rate_ < 0 || rate_ > 100)
+    if (rate_ <= 0)
     {
         return false;
     }
+    else if (rate_ >= 100)
+    {
+        return true;
+    }
 
-    int val = rand_gen_t::get_rand(0, 101);
+    int val = rand_gen_t::get_rand(1, 100);
     bool ret = val <= rate_ ? true : false ;
 
     return ret;
