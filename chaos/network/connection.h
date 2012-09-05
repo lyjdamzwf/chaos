@@ -51,6 +51,9 @@ using namespace chaos::utility;
 using namespace chaos::task_service;
 using namespace chaos::log;
 
+template<typename T>
+class acceptor_service_t;
+
 class work_service_t;
 
 typedef std::string                  packet_wrapper_t;
@@ -128,7 +131,9 @@ enum conn_event_e
 
 class connection_t
 {
+    template<typename T> friend class acceptor_service_t;
     friend class work_service_t;
+    friend class active_connection_t;
 
 public:
     typedef connection_t*                           inner_conn_ptr_t;
@@ -175,7 +180,7 @@ protected:
 
     //! ------------------------------------ member function begin ------------------------------------
 
-public:
+protected:
     connection_t();
     virtual ~connection_t();
 
@@ -219,7 +224,6 @@ public:
         return m_enable_hb;
     }
 
-protected:
     virtual void on_read_complete(buffer_list_t& buffer_) = 0;
     virtual void on_write_complete(uint32_t transferred_size_) = 0;
 
