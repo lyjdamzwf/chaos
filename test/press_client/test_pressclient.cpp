@@ -6,6 +6,8 @@ uint32_t g_press_conn_num = PRESS_CONN_NUM;
 uint32_t g_max_packet_size = MAX_PACKET_SIZE;
 connector_service_t<test_press_conn_strategy_t>* g_connector_service_ptr;
 
+volatile bool press_client_t::started = false;
+
 void entity_t::handle_wrapper_message(
                                         const packet_header_t&  packet_header_,
                                         const packet_wrapper_t& message_,
@@ -24,19 +26,24 @@ void entity_t::handle_message(
                              )
 {
 #if CHECK_SUM
-    //! yunjie: check sum begin
-    LOGINFO((TEST_MODULE, "entity_t::handle_message check sum"));
-    string recv_data;
-    recv_data.append((char*)&packet_header_, HEADER_SIZE);
-    recv_data.append((char*)data_ptr_, data_size_);
-    if (memcmp(recv_data.c_str(), m_last_packet.c_str(), m_last_packet.size()))
+    if (packet_header_.cmd != BROADCAST_CMD)
     {
-        LOGWARN((TEST_MODULE, "entity_t::handle_message recv_data check sum failed!!!!!!"));
-        sleep(10);
-        printf("exit!!!!\n");
-        exit(0);
+        //! yunjie: check sum begin
+        LOGINFO((TEST_MODULE, "entity_t::handle_message check sum"));
+        string recv_data;
+        recv_data.append((char*)&packet_header_, HEADER_SIZE);
+        recv_data.append((char*)data_ptr_, data_size_);
+        if (0 != m_last_packet.size()
+            && (recv_data.size() != m_last_packet.size()
+            || memcmp(recv_data.c_str(), m_last_packet.c_str(), m_last_packet.size()))
+           )
+        {
+            LOGWARN((TEST_MODULE, "entity_t::handle_message recv_data check sum failed!!!!!!"));
+            printf("check sum failed exit!!!! last packet size:[%lu] recv size:[%d]\n", m_last_packet.size(), data_size_);
+            exit(0);
+        }
+        //! yunjie: check sum end
     }
-    //! yunjie: check sum end
 #endif
 
     bool done = false;
@@ -48,7 +55,7 @@ void entity_t::handle_message(
         {
             case PCA_REPEAT:
                 {
-                    if (!rand_gen_t::calc_probability(70))
+                    if (!rand_gen_t::calc_probability(REPEAT_PRO))
                     {
                         goto NEXT_ACTION;
                     }
@@ -68,7 +75,7 @@ void entity_t::handle_message(
 
             case PCA_RESEND:
                 {
-                    if (!rand_gen_t::calc_probability(70))
+                    if (!rand_gen_t::calc_probability(RESEND_PRO))
                     {
                         goto NEXT_ACTION;
                     }
@@ -100,9 +107,35 @@ void entity_t::handle_message(
                 }
                 break;
 
+            case PCA_BROADCAST:
+                {
+                    if (!rand_gen_t::calc_probability(BC_PRO))
+                    {
+                        goto NEXT_ACTION;
+                    }
+
+                    packet_wrapper_t packet;
+
+                    char content_buffer[256] = {0};
+                    snprintf(content_buffer, sizeof(content_buffer), "broadcast message from socket:[%d]", conn_id_.socket);
+
+                    packet_header_t header;
+                    header.cmd = BROADCAST_CMD;
+                    header.data_len = strlen(content_buffer);
+
+                    packet.append((char*)&header, sizeof(packet_header_t));
+                    packet.append(content_buffer, header.data_len);
+
+                    g_connector_service_ptr->async_broadcast(packet);
+
+                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_BROADCAST"));
+                    done = true;
+                }
+                break;
+
             case PCA_CLOSE:
                 {
-                    if (!rand_gen_t::calc_probability(20))
+                    if (!rand_gen_t::calc_probability(CLOSE_PRO))
                     {
                         goto NEXT_ACTION;
                     }
@@ -116,7 +149,7 @@ void entity_t::handle_message(
 
             case PCA_WAIT_HEART_BEAT:
                 {
-                    if (!rand_gen_t::calc_probability(20))
+                    if (!rand_gen_t::calc_probability(HB_PRO))
                     {
                         goto NEXT_ACTION;
                     }
@@ -241,14 +274,17 @@ void press_client_t::tcp_press_conn_event(
 
 int press_client_t::test_press_client(int conn_num_)
 {
-    for (int i = 0; i < conn_num_; ++i)
+    if (started)
     {
-        g_connector_service_ptr->async_connect(
-                LOCALHOST,
-                8880,
-                tcp_press_conn_event,
-                true
-                );
+        for (int i = 0; i < conn_num_; ++i)
+        {
+            g_connector_service_ptr->async_connect(
+                    LOCALHOST,
+                    8880,
+                    tcp_press_conn_event,
+                    true
+                    );
+        }
     }
 
     return 0;
@@ -260,7 +296,7 @@ void test_press_conn_strategy_t::handle_packet(
                                 uint32_t                data_size_
                                               )
 {
-    if (rand_gen_t::calc_probability(50))
+    if (!rand_gen_t::calc_probability(CROSS_THREAD))
     {
         get_entity()->handle_message(packet_header_, data_ptr_, data_size_, get_conn_id()); 
     }

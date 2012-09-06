@@ -11,16 +11,26 @@
 
 #define CHECK_SUM 1
 
+#define BROADCAST_CMD 0x1104
 
 enum press_conn_action_e
 {
     PCA_BEGIN = 0,
     PCA_REPEAT,
     PCA_RESEND,
+    PCA_BROADCAST,
     PCA_CLOSE,
     PCA_WAIT_HEART_BEAT,
     PCA_END
 };
+
+#define CROSS_THREAD    50
+
+#define REPEAT_PRO  70
+#define RESEND_PRO  70
+#define BC_PRO      60
+#define CLOSE_PRO   20
+#define HB_PRO      20
 
 class entity_t
 {
@@ -54,6 +64,8 @@ public:
                                       );
 
     static int test_press_client(int conn_num_);
+
+    static volatile bool           started;
 };
 
 class test_press_conn_strategy_t : public default_conn_strategy_t

@@ -345,10 +345,10 @@ int work_service_t::sync_broadcast_packet_wrapper_i(
     for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
         conn_ptr_t conn_ptr = *it;
-        const conn_id_t& conn_id = conn_ptr->get_conn_id();
 
         if (NULL != conn_ptr)
         {
+            const conn_id_t& conn_id = conn_ptr->get_conn_id();
             if (filter_)
             {
                 if (filter_(conn_id, conn_ptr->get_userdata()))
@@ -374,10 +374,10 @@ int work_service_t::sync_broadcast_data_i(
     for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
         conn_ptr_t conn_ptr = *it;
-        const conn_id_t& conn_id = conn_ptr->get_conn_id();
 
         if (NULL != conn_ptr)
         {
+            const conn_id_t& conn_id = conn_ptr->get_conn_id();
             if (filter_)
             {
                 if (filter_(conn_id, conn_ptr->get_userdata()))
