@@ -429,7 +429,7 @@ int connection_t::on_recv_data()
 
     if (0 == recv_ret)
     {
-        LOGWARN((CONNECTION_MODULE, "connection_t::on_recv_data recv recv_ret == 0 socket fd:[%u]", m_socket));
+        LOGWARN((CONNECTION_MODULE, "connection_t::on_recv_data recv_ret == 0 socket fd:[%u]", m_socket));
 
         async_close(m_conn_id, true, EV_PASSIVE_CLOSED);
 
@@ -437,7 +437,7 @@ int connection_t::on_recv_data()
     }
     else if (recv_ret < 0)
     {
-        LOGWARN((CONNECTION_MODULE, "connection_t::on_recv_data recv recv_ret:[%d] socket fd:[%u] errno:[%m]", recv_ret, m_socket, errno));
+        LOGWARN((CONNECTION_MODULE, "connection_t::on_recv_data recv_ret:[%d] socket fd:[%u] errno:[%m]", recv_ret, m_socket, errno));
 
         //! yunjie: 如果不是EAGAIN或EINTR, 那么就调用callback返回错误信息
         if (errno != EAGAIN && errno != EINTR)

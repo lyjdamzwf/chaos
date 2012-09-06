@@ -33,6 +33,8 @@ arg_option_t       arg_options[] =
     arg_option_t("mps", "max packet size", true, NULL),
 };
 
+extern connector_service_t<test_press_conn_strategy_t>* g_connector_service_ptr;
+
 int main(int argc_, char* argv_[])
 {
     NEW_SERVICE();
@@ -173,6 +175,7 @@ int main(int argc_, char* argv_[])
     application_tool_t::block_all_signal();
 
     log_tool_t::start_log_service("pressclient.log", log_level, 1, 1);
+    TS().start();
 
     g_connector_service_ptr =
         new connector_service_t<test_press_conn_strategy_t>();
@@ -190,13 +193,14 @@ int main(int argc_, char* argv_[])
     }
     g_connector_service_ptr->start(work_thread_num);
 
-    test_press_client(g_press_conn_num);
+    press_client_t::test_press_client(g_press_conn_num);
 
     application_tool_t::wait_signal();
 
     g_connector_service_ptr->stop();
     delete g_connector_service_ptr;
 
+    TS().stop();
     log_tool_t::stop_log_service();
 
     DEL_SERVICE();

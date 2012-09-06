@@ -5,6 +5,8 @@ using namespace std;
 #include "../misc_def.h"
 #include "test_log.h"
 
+EXTERN_SERVICE_DECL
+
 int main(int argc_, char* argv_[])
 {
     NEW_SERVICE();

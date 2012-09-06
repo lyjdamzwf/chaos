@@ -204,12 +204,12 @@ protected:
         return m_socket;
     }
 
-    const struct conn_id_t& get_conn_id() const
+    const struct conn_id_t get_conn_id() const
     {
         return m_conn_id;
     }
 
-    const struct timeval& get_timestamp() const
+    const struct timeval get_timestamp() const
     {
         return m_timestamp;
     }

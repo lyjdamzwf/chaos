@@ -31,13 +31,16 @@ using namespace chaos::network;
 
 #define LOCALHOST       "127.0.0.1"
 
-//! yunjie: 所有service对象, 注: service类不要使用单例, 因为static变量析构顺序的不确定性和依赖性, 会导致关闭进程时crash
+//! yunjie: 所有service对象, 注: service类不要使用单例
+//  因为static变量析构顺序的不确定性和依赖性, 会导致关
+//  闭进程时crash
 
-task_service_t*             task_service_1104;
-work_service_t*             work_service_1104;
-work_service_group_t*       work_service_group_1104;
-task_service_t*             log_service_1104;
-statistic_service_t*        stat_service_1104;
+#define EXTERN_SERVICE_DECL \
+extern task_service_t*             task_service_1104; \
+extern work_service_t*             work_service_1104; \
+extern work_service_group_t*       work_service_group_1104; \
+extern task_service_t*             log_service_1104; \
+extern statistic_service_t*        stat_service_1104; \
 
 #define NEW_SERVICE() \
     task_service_1104 = new task_service_t("global task service"); \
@@ -59,6 +62,7 @@ statistic_service_t*        stat_service_1104;
 #define WSG()   (*work_service_group_1104)
 #define SS()    (*stat_service_1104)
 
+EXTERN_SERVICE_DECL
 
 //! yunjie: 日志模块封装
 class log_tool_t
@@ -124,8 +128,6 @@ public:
 private:
     volatile static bool             is_started;
 };
-
-volatile bool log_tool_t::is_started = false;
 
 class application_tool_t
 {

@@ -100,7 +100,10 @@ int io_multiplex_handler_t::wait_io_notification()
     //! yunjie: epoll_wait 非正常返回值处理.
     if (res == -1)
     {
-        LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification epoll_wait failed, res:[%d]", res));
+        LOGWARN((IO_MULTIPLEX_MODULE,
+                    "io_multiplex_handler_t::wait_notification epoll_wait failed, res:[%d] errno:[%m]",
+                    res, errno
+               ));
         return (0);
     }
 

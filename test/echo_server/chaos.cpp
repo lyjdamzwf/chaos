@@ -5,6 +5,8 @@ using namespace std;
 #include "../misc_def.h"
 #include "test_tcp_server.h"
 
+EXTERN_SERVICE_DECL
+
 arg_option_t       arg_options[] =
 {
     //! yunjie: 信息输出
