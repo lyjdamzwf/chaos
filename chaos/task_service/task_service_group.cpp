@@ -35,6 +35,12 @@ task_service_group_t::task_service_group_t(const string& service_name_)
 task_service_group_t::~task_service_group_t()
 {
     stop();
+
+    for (uint32_t i = 0; i < m_removed_service_group.size(); ++i)
+    {
+        task_service_t*& task_service_ptr = m_removed_service_group[i];
+        SAFE_DELETE(task_service_ptr);
+    }
 }
 
 task_service_t* task_service_group_t::new_service()
@@ -106,23 +112,20 @@ int task_service_group_t::stop()
         task_service_t*& task_service_ptr = m_task_service_group[i];
         if (NULL == task_service_ptr)
         {
-            LOGWARN((TASK_SERVICE_MODULE, "task_service_group_t::stop task service is NULL, return."));
-            return -1;
+            LOGWARN((TASK_SERVICE_MODULE, "task_service_group_t::stop task service is NULL"));
+            continue;
         }
 
         if (-1 == task_service_ptr->stop())
         {
             LOGWARN((TASK_SERVICE_MODULE, "task_service_group_t::stop task_service stop failed."));
         }
-    }
 
-    //! yunjie: delete必须在所有service都停止之后才能进行
-    //!         否则可能发生service2向已经delete的service1
-    //!         进行消息投递, 导致崩溃
-    for (uint32_t i = 0; i < m_task_service_group.size(); ++i)
-    {
-        task_service_t*& task_service_ptr = m_task_service_group[i];
-        SAFE_DELETE(task_service_ptr);
+        //! yunjie: 将service ptr放到移除容器中
+        //          真正的delete将会在析构时进行, 是
+        //          为了防止stop之后业务层还继续post
+        //          消息造成崩溃
+        m_removed_service_group.push_back(task_service_ptr);
     }
 
     m_task_service_group.clear();

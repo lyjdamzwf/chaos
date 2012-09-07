@@ -65,6 +65,9 @@ protected:
     bool                                                m_started;
     string                                              m_service_name;
     task_service_container_t                            m_task_service_group;
+
+    //! yunjie: 被移除的service ptr容器, 会在析构函数时进行delete
+    task_service_container_t                            m_removed_service_group;
 };
 
 }

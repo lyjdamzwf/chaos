@@ -32,7 +32,7 @@ class work_service_group_t : public task_service_group_t
 {
 public:
     work_service_group_t();
-    ~work_service_group_t();
+    virtual ~work_service_group_t();
 
     //! yunjie: enable_conn_heart_beat要在start之前调用才会生效
     void enable_conn_heart_beat(const conn_heart_beat_param_t& param_);

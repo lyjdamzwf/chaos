@@ -36,6 +36,7 @@ work_service_t::work_service_t(const string& service_name_)
 
 work_service_t::~work_service_t()
 {
+    LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::~work_service_t"));
 }
 
 void work_service_t::conn_timedout_callback(conn_id_t& conn_id_)
@@ -351,7 +352,7 @@ int work_service_t::sync_broadcast_packet_wrapper_i(
             const conn_id_t& conn_id = conn_ptr->get_conn_id();
             if (filter_)
             {
-                if (filter_(conn_id, conn_ptr->get_userdata()))
+                if (!filter_(conn_id, conn_ptr->get_userdata()))
                     continue;
             }
 
@@ -380,7 +381,7 @@ int work_service_t::sync_broadcast_data_i(
             const conn_id_t& conn_id = conn_ptr->get_conn_id();
             if (filter_)
             {
-                if (filter_(conn_id, conn_ptr->get_userdata()))
+                if (!filter_(conn_id, conn_ptr->get_userdata()))
                     continue;
             }
 

@@ -28,7 +28,7 @@ enum press_conn_action_e
 
 #define REPEAT_PRO  70
 #define RESEND_PRO  70
-#define BC_PRO      60
+#define BC_PRO      0
 #define CLOSE_PRO   20
 #define HB_PRO      20
 
@@ -64,8 +64,6 @@ public:
                                       );
 
     static int test_press_client(int conn_num_);
-
-    static volatile bool           started;
 };
 
 class test_press_conn_strategy_t : public default_conn_strategy_t
@@ -78,6 +76,8 @@ protected:
                       );
 
 private:
+    void init_entity() { get_entity(); }
+
     entity_t* get_entity()
     {
         entity_t* ret;

@@ -6,7 +6,10 @@ uint32_t g_press_conn_num = PRESS_CONN_NUM;
 uint32_t g_max_packet_size = MAX_PACKET_SIZE;
 connector_service_t<test_press_conn_strategy_t>* g_connector_service_ptr;
 
-volatile bool press_client_t::started = false;
+static bool broadcast_filter(const conn_id_t& conn_id_, void* user_data_)
+{
+    return false; 
+}
 
 void entity_t::handle_wrapper_message(
                                         const packet_header_t&  packet_header_,
@@ -126,7 +129,7 @@ void entity_t::handle_message(
                     packet.append((char*)&header, sizeof(packet_header_t));
                     packet.append(content_buffer, header.data_len);
 
-                    g_connector_service_ptr->async_broadcast(packet);
+                    g_connector_service_ptr->async_broadcast(packet, broadcast_filter);
 
                     LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_BROADCAST"));
                     done = true;
@@ -174,6 +177,11 @@ NEXT_ACTION:
     }
 }
 
+static void delete_entity(entity_t* entity_)
+{
+    SAFE_DELETE(entity_);
+}
+
 void press_client_t::tcp_press_conn_event(
                                             conn_event_e    conn_event_,
                                             conn_status_e   conn_status_,
@@ -193,7 +201,7 @@ void press_client_t::tcp_press_conn_event(
         {
             LOGINFO((TEST_MODULE, "tcp_conn_event deconstruct sockfd:[%d]", conn_id_.socket));
             entity_t* entity_ptr = (entity_t*)user_data_;
-            SAFE_DELETE(entity_ptr);
+            TS().post(bind_func(delete_entity, entity_ptr));
         }
         break;
 
@@ -274,17 +282,14 @@ void press_client_t::tcp_press_conn_event(
 
 int press_client_t::test_press_client(int conn_num_)
 {
-    if (started)
+    for (int i = 0; i < conn_num_; ++i)
     {
-        for (int i = 0; i < conn_num_; ++i)
-        {
-            g_connector_service_ptr->async_connect(
-                    LOCALHOST,
-                    8880,
-                    tcp_press_conn_event,
-                    true
-                    );
-        }
+        g_connector_service_ptr->async_connect(
+                LOCALHOST,
+                8880,
+                tcp_press_conn_event,
+                true
+                );
     }
 
     return 0;

@@ -176,7 +176,6 @@ int main(int argc_, char* argv_[])
 
     log_tool_t::start_log_service("pressclient.log", log_level, 1, 1);
     TS().start();
-    press_client_t::started = true;
 
     g_connector_service_ptr =
         new connector_service_t<test_press_conn_strategy_t>();
@@ -198,13 +197,12 @@ int main(int argc_, char* argv_[])
 
     application_tool_t::wait_signal();
 
-    press_client_t::started = false;
     g_connector_service_ptr->stop();
-    delete g_connector_service_ptr;
 
     TS().stop();
     log_tool_t::stop_log_service();
 
+    delete g_connector_service_ptr;
     DEL_SERVICE();
 
     return 0;
