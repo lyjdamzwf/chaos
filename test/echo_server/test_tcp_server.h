@@ -94,7 +94,7 @@ protected:
                     "test_server_echo_conn_t::handle_packet fd:[%d] cmd:[%d] content:[%s]",
                     native_socket(), packet_header_.cmd, string(data_ptr_, data_size_).c_str()
                ));
-       */
+               */
 
         packet_wrapper_t packet;
         packet.append((char*)&packet_header_, sizeof(packet_header_));

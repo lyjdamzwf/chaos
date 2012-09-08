@@ -11,7 +11,8 @@
 
 #define CHECK_SUM 1
 
-#define BROADCAST_CMD 0x1104
+#define BROADCAST_CMD   1104
+#define GENERAL_CMD     1121
 
 enum press_conn_action_e
 {
@@ -28,7 +29,7 @@ enum press_conn_action_e
 
 #define REPEAT_PRO  70
 #define RESEND_PRO  70
-#define BC_PRO      0
+#define BC_PRO      50
 #define CLOSE_PRO   20
 #define HB_PRO      20
 
@@ -47,7 +48,7 @@ public:
                         uint32_t                data_size_,
                         const conn_id_t&        conn_id_
                        );
-    
+
 private:
     string                          m_last_packet;
 };

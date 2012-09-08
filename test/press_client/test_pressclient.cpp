@@ -1,6 +1,6 @@
 #include "test_pressclient.h"
 
-EXTERN_SERVICE_DECL 
+EXTERN_SERVICE_DECL
 
 uint32_t g_press_conn_num = PRESS_CONN_NUM;
 uint32_t g_max_packet_size = MAX_PACKET_SIZE;
@@ -8,7 +8,7 @@ connector_service_t<test_press_conn_strategy_t>* g_connector_service_ptr;
 
 static bool broadcast_filter(const conn_id_t& conn_id_, void* user_data_)
 {
-    return false; 
+    return true;
 }
 
 void entity_t::handle_wrapper_message(
@@ -28,25 +28,36 @@ void entity_t::handle_message(
                                 const conn_id_t&        conn_id_
                              )
 {
-#if CHECK_SUM
-    if (packet_header_.cmd != BROADCAST_CMD)
+    //! yunjie: 如果收到的不是自己发的broadcast消息则不响应
+    if (packet_header_.cmd == BROADCAST_CMD
+        && conn_id_.socket != packet_header_.ext
+       )
     {
-        //! yunjie: check sum begin
-        LOGINFO((TEST_MODULE, "entity_t::handle_message check sum"));
-        string recv_data;
-        recv_data.append((char*)&packet_header_, HEADER_SIZE);
-        recv_data.append((char*)data_ptr_, data_size_);
-        if (0 != m_last_packet.size()
-            && (recv_data.size() != m_last_packet.size()
-            || memcmp(recv_data.c_str(), m_last_packet.c_str(), m_last_packet.size()))
-           )
-        {
-            LOGWARN((TEST_MODULE, "entity_t::handle_message recv_data check sum failed!!!!!!"));
-            printf("check sum failed exit!!!! last packet size:[%lu] recv size:[%d]\n", m_last_packet.size(), data_size_);
-            exit(0);
-        }
-        //! yunjie: check sum end
+        return;
     }
+
+#if CHECK_SUM
+    //! yunjie: check sum begin
+    LOGINFO((TEST_MODULE, "entity_t::handle_message check sum"));
+    string recv_data;
+    recv_data.append((char*)&packet_header_, HEADER_SIZE);
+    recv_data.append((char*)data_ptr_, data_size_);
+
+    if (0 != m_last_packet.size()
+        && (recv_data.size() != m_last_packet.size()
+        || memcmp(recv_data.c_str(), m_last_packet.c_str(), m_last_packet.size()))
+       )
+    {
+        LOGWARN((TEST_MODULE, "entity_t::handle_message recv_data check sum failed!!!!!!"));
+        LOGWARN((TEST_MODULE, "check sum failed exit!!!! fd:[%d] last packet - [cmd:%d, size:%lu]"
+                    " recv packet - [cmd:%d, size:%lu]",
+                    conn_id_.socket, *(header_cmd_t*)m_last_packet.data(), m_last_packet.size(),
+                    packet_header_.cmd, recv_data.size()
+                ));
+        sleep(1);
+        exit(0);
+    }
+    //! yunjie: check sum end
 #endif
 
     bool done = false;
@@ -87,8 +98,8 @@ void entity_t::handle_message(
                     uint32_t body_size = packet_size - sizeof(packet_header_t);
 
                     packet_header_t header;
-                    header.cmd = 1121;
-                    header.ext = 1104;
+                    header.cmd = GENERAL_CMD;
+                    header.ext = conn_id_.socket;
                     header.data_len = body_size;
 
                     char data[g_max_packet_size];
@@ -124,12 +135,16 @@ void entity_t::handle_message(
 
                     packet_header_t header;
                     header.cmd = BROADCAST_CMD;
+                    header.ext = conn_id_.socket;
                     header.data_len = strlen(content_buffer);
 
                     packet.append((char*)&header, sizeof(packet_header_t));
                     packet.append(content_buffer, header.data_len);
 
                     g_connector_service_ptr->async_broadcast(packet, broadcast_filter);
+
+                    m_last_packet.clear();
+                    m_last_packet.append(packet);
 
                     LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_BROADCAST"));
                     done = true;
@@ -219,8 +234,8 @@ void press_client_t::tcp_press_conn_event(
             uint32_t body_size = packet_size - sizeof(packet_header_t);
 
             packet_header_t header;
-            header.cmd = 1121;
-            header.ext = 1104;
+            header.cmd = GENERAL_CMD;
+            header.ext = conn_id_.socket;
             header.data_len = body_size;
 
             char data[g_max_packet_size];
@@ -303,7 +318,7 @@ void test_press_conn_strategy_t::handle_packet(
 {
     if (!rand_gen_t::calc_probability(CROSS_THREAD))
     {
-        get_entity()->handle_message(packet_header_, data_ptr_, data_size_, get_conn_id()); 
+        get_entity()->handle_message(packet_header_, data_ptr_, data_size_, get_conn_id());
     }
     else
     {
@@ -313,7 +328,7 @@ void test_press_conn_strategy_t::handle_packet(
                     &entity_t::handle_wrapper_message,
                     packet_header_,
                     message,
-                    get_conn_id() 
+                    get_conn_id()
                     )
                 );
     }

@@ -138,6 +138,16 @@ int io_multiplex_handler_t::wait_io_notification()
             }
             */
 
+            char ev_type[50] = {0};
+            if (what & EPOLLIN) strcat(ev_type, "EPOLLIN");
+            if (what & EPOLLOUT) strcat(ev_type, "&EPOLLOUT");
+
+            LOGWARN((IO_MULTIPLEX_MODULE,
+                        "io_multiplex_handler_t::wait_notification EPOLLHUP or EPOLLERR occured"
+                        " fd:[%d] EPOLLEVENT type:[%s] errno:[%m]",
+                        fd, ev_type, errno
+                   ));
+
             if (NULL != io_event.error_cb)
             {
                 io_event.error_cb(fd, IO_ERROR_EVENT, io_event.error_cb_arg);
