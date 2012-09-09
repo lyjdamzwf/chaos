@@ -25,7 +25,7 @@ enum press_conn_action_e
     PCA_END
 };
 
-#define CROSS_THREAD    50
+#define CROSS_THREAD    100
 
 #define REPEAT_PRO  70
 #define RESEND_PRO  70
@@ -39,15 +39,19 @@ public:
     void handle_wrapper_message(
                                 const packet_header_t&  packet_header_,
                                 const packet_wrapper_t& message_,
-                                const conn_id_t&        conn_id_
+                                const conn_id_t&        conn_id_,
+                                const string&           service_name_
                                );
 
     void handle_message(
                         const packet_header_t&  packet_header_,
                         const char*             data_ptr_,
                         uint32_t                data_size_,
-                        const conn_id_t&        conn_id_
+                        const conn_id_t&        conn_id_,
+                        const string&           service_name_
                        );
+
+    string last_packet() const { return m_last_packet; }
 
 private:
     string                          m_last_packet;

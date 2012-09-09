@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include "test_pressclient.h"
 
 EXTERN_SERVICE_DECL
@@ -14,10 +16,11 @@ static bool broadcast_filter(const conn_id_t& conn_id_, void* user_data_)
 void entity_t::handle_wrapper_message(
                                         const packet_header_t&  packet_header_,
                                         const packet_wrapper_t& message_,
-                                        const conn_id_t&        conn_id_
+                                        const conn_id_t&        conn_id_,
+                                        const string&           service_name_
                                      )
 {
-    handle_message(packet_header_, message_.c_str(), message_.size(), conn_id_);
+    handle_message(packet_header_, message_.c_str(), message_.size(), conn_id_, service_name_);
 }
 
 
@@ -25,20 +28,24 @@ void entity_t::handle_message(
                                 const packet_header_t&  packet_header_,
                                 const char*             data_ptr_,
                                 uint32_t                data_size_,
-                                const conn_id_t&        conn_id_
+                                const conn_id_t&        conn_id_,
+                                const string&           service_name_
                              )
 {
     //! yunjie: 如果收到的不是自己发的broadcast消息则不响应
-    if (packet_header_.cmd == BROADCAST_CMD
-        && conn_id_.socket != packet_header_.ext
-       )
+    if (packet_header_.cmd == BROADCAST_CMD)
     {
-        return;
+        void* zero_ret = memchr(data_ptr_, 0, data_size_);
+        if (NULL == zero_ret)
+            return;
+        conn_id_t* conn_id_ptr = (conn_id_t*)((char*)zero_ret + 1);
+        if (!(conn_id_ == *conn_id_ptr))
+            return;
     }
 
 #if CHECK_SUM
     //! yunjie: check sum begin
-    LOGINFO((TEST_MODULE, "entity_t::handle_message check sum"));
+    //! LOGINFO((TEST_MODULE, "entity_t::handle_message check sum"));
     string recv_data;
     recv_data.append((char*)&packet_header_, HEADER_SIZE);
     recv_data.append((char*)data_ptr_, data_size_);
@@ -48,14 +55,20 @@ void entity_t::handle_message(
         || memcmp(recv_data.c_str(), m_last_packet.c_str(), m_last_packet.size()))
        )
     {
-        LOGWARN((TEST_MODULE, "entity_t::handle_message recv_data check sum failed!!!!!!"));
-        LOGWARN((TEST_MODULE, "check sum failed exit!!!! fd:[%d] last packet - [cmd:%d, size:%lu]"
+        LOGWARN((TEST_MODULE, "entity_t::check sum failed"
+                    " service:[%s] fd:[%d]"
+                    " last packet - [cmd:%d, size:%lu]"
                     " recv packet - [cmd:%d, size:%lu]",
-                    conn_id_.socket, *(header_cmd_t*)m_last_packet.data(), m_last_packet.size(),
+                    service_name_.c_str(), conn_id_.socket,
+                    *(header_cmd_t*)m_last_packet.data(), m_last_packet.size(),
                     packet_header_.cmd, recv_data.size()
                 ));
-        sleep(1);
-        exit(0);
+
+        //! yunjie: 0表示发送给同一进程组的所有进程
+        //          raise只能发给当前线程
+        kill(0, SIGINT);
+
+        return;
     }
     //! yunjie: check sum end
 #endif
@@ -77,12 +90,14 @@ void entity_t::handle_message(
                     packet_wrapper_t packet;
                     packet.append((char*)&packet_header_, sizeof(packet_header_));
                     packet.append((char*)data_ptr_, data_size_);
+                    m_last_packet = packet;
+
                     connection_t::async_send(conn_id_, packet);
 
-                    m_last_packet.clear();
-                    m_last_packet.append(packet);
-
-                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_REPEAT packet body size:[%u]", data_size_));
+                    LOGINFO((TEST_MODULE,
+                                "entity_t::handle_message PCA_REPEAT service:[%s] fd:[%d] packet size:[%u]",
+                                service_name_.c_str(), conn_id_.socket, packet.size()
+                           ));
                     done = true;
                 }
                 break;
@@ -111,12 +126,14 @@ void entity_t::handle_message(
                         packet.append(data, body_size);
                     }
 
+                    m_last_packet = packet;
+
                     connection_t::async_send(conn_id_, packet);
 
-                    m_last_packet.clear();
-                    m_last_packet.append(packet);
-
-                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_RESEND packet body size:[%u]", body_size));
+                    LOGINFO((TEST_MODULE,
+                                "entity_t::handle_message PCA_RESEND service:[%s] fd:[%d] packet size:[%u]",
+                                service_name_.c_str(), conn_id_.socket, packet.size()
+                           ));
                     done = true;
                 }
                 break;
@@ -130,23 +147,28 @@ void entity_t::handle_message(
 
                     packet_wrapper_t packet;
 
-                    char content_buffer[256] = {0};
-                    snprintf(content_buffer, sizeof(content_buffer), "broadcast message from socket:[%d]", conn_id_.socket);
+                    char content_buffer[512] = {0};
+                    snprintf(content_buffer, sizeof(content_buffer), "broadcast message from socket:%d", conn_id_.socket);
+                    //! yunjie: 将conn_id放到字符串'\0'的后面
+                    memcpy(&content_buffer[strlen(content_buffer) + 1], &conn_id_, sizeof(conn_id_t));
+                    int data_len = strlen(content_buffer) + 1 + sizeof(conn_id_t);
 
                     packet_header_t header;
                     header.cmd = BROADCAST_CMD;
                     header.ext = conn_id_.socket;
-                    header.data_len = strlen(content_buffer);
+                    header.data_len = data_len;
 
                     packet.append((char*)&header, sizeof(packet_header_t));
                     packet.append(content_buffer, header.data_len);
 
+                    m_last_packet = packet;
+
                     g_connector_service_ptr->async_broadcast(packet, broadcast_filter);
 
-                    m_last_packet.clear();
-                    m_last_packet.append(packet);
-
-                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_BROADCAST"));
+                    LOGINFO((TEST_MODULE,
+                                "entity_t::handle_message PCA_BROADCAST service:[%s] fd:[%d] packet size:[%lu]",
+                                service_name_.c_str(), conn_id_.socket, packet.size()
+                           ));
                     done = true;
                 }
                 break;
@@ -160,7 +182,9 @@ void entity_t::handle_message(
 
                     connection_t::async_close(conn_id_);
 
-                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_CLOSE"));
+                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_CLOSE service:[%s] fd:[%d]",
+                                service_name_.c_str(), conn_id_.socket
+                           ));
                     done = true;
                 }
                 break;
@@ -172,7 +196,9 @@ void entity_t::handle_message(
                         goto NEXT_ACTION;
                     }
 
-                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_WAIT_HEART_BEAT do nothing"));
+                    LOGINFO((TEST_MODULE, "entity_t::handle_message PCA_WAIT_HEART_BEAT service:[%s] fd:[%d]",
+                                service_name_.c_str(), conn_id_.socket
+                           ));
                     done = true;
                 }
                 break;
@@ -318,7 +344,7 @@ void test_press_conn_strategy_t::handle_packet(
 {
     if (!rand_gen_t::calc_probability(CROSS_THREAD))
     {
-        get_entity()->handle_message(packet_header_, data_ptr_, data_size_, get_conn_id());
+        get_entity()->handle_message(packet_header_, data_ptr_, data_size_, get_conn_id(), string("work service"));
     }
     else
     {
@@ -328,7 +354,8 @@ void test_press_conn_strategy_t::handle_packet(
                     &entity_t::handle_wrapper_message,
                     packet_header_,
                     message,
-                    get_conn_id()
+                    get_conn_id(),
+                    TS().get_name()
                     )
                 );
     }

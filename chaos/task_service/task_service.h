@@ -180,6 +180,8 @@ public:
         return m_stop_signal;
     }
 
+    const char* get_name() const { return m_service_name.c_str(); }
+
     //! yunjie: 非线程安全
     timeval get_cached_time()
     {
