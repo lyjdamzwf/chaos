@@ -52,3 +52,32 @@ Chaos 0.5.26-beta                                               2012.8.26
 
     *) 重构automake目录结构，支持make install
 
+
+Chaos 0.5.30-beta                                               2012.9.10
+    *) aysnc_method实现宏模板化
+
+    *) 将bind_func, bind_memfunc改为全局模板函数
+
+    *) 优化bind_func, bind_memfunc函数的参数传递
+       从两次拷贝减少为一次, 代价是如果参数是functor
+       则必须显示加上&符号
+
+    *) connection增加userdata
+
+    *) connection成员私有化, 部分成员函数也私有化
+
+    *) 增加default_conn_strategy.cpp文件
+
+    *) tcp_service, connector_service支持broadcast功能
+
+    *) 提高connection_t数据的安全性
+
+    *) 增加misc_impl.cpp
+
+    *) press_client多线程处理
+
+    *) 解决关闭时work_service提前delete造成的崩溃现象
+
+    *) 修复test_pressclient checksum的bug
+
+
