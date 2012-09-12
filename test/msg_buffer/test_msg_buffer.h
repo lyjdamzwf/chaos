@@ -86,4 +86,25 @@ void test_buffer_list_limit()
     cout << bl.format_buffer_list_info() << endl;
 }
 
+void test_serialize()
+{
+    serialize_t ser;
+    ser.dump();
+
+    ser.prepend("12345", strlen("12345"));
+    ser.dump();
+
+    ser << (int)1;
+    ser.dump();
+
+    ser << (uint64_t)1;
+    ser.dump();
+
+    ser.prepend("66666", strlen("66666"));
+    ser.dump();
+
+    ser.prepend("aaa", strlen("aaa"));
+    ser.dump();
+}
+
 #endif //! _CHAOS_TEST_MSG_BUFFER_H_

@@ -38,6 +38,7 @@
 #include <chaos/network/network_config.h>
 #include <chaos/network/network_tool.h>
 #include <chaos/network/buffer_list.h>
+#include <chaos/network/serialize.h>
 
 namespace chaos
 {
@@ -56,7 +57,7 @@ class acceptor_service_t;
 
 class work_service_t;
 
-typedef std::string                  packet_wrapper_t;
+typedef serialize_t                                     packet_wrapper_t;
 
 struct conn_id_t
 {
@@ -84,6 +85,18 @@ struct conn_id_t
         return socket == conn_id_.socket
             && timestamp.tv_sec == conn_id_.timestamp.tv_sec
             && timestamp.tv_usec == conn_id_.timestamp.tv_usec;
+    }
+
+    bool operator!=(const conn_id_t& conn_id_) const
+    {
+        return !((*this) == conn_id_);
+    }
+
+    bool operator<(const conn_id_t& conn_id_) const
+    {
+        return socket < conn_id_.socket
+            && timestamp.tv_sec < conn_id_.timestamp.tv_sec
+            && timestamp.tv_usec < conn_id_.timestamp.tv_usec;
     }
 
     fd_t                    socket;
@@ -158,7 +171,6 @@ public:
 
     static int async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_);
     static int async_send(const struct conn_id_t& conn_id_, const char* msg_, uint32_t size_);
-
 
 protected:
     static int sync_close_i(const struct conn_id_t& conn_id_, bool is_del_from_hb_, conn_event_e close_type_);

@@ -20,7 +20,7 @@ void entity_t::handle_wrapper_message(
                                         const string&           service_name_
                                      )
 {
-    handle_message(packet_header_, message_.c_str(), message_.size(), conn_id_, service_name_);
+    handle_message(packet_header_, message_.data(), message_.size(), conn_id_, service_name_);
 }
 
 
@@ -52,7 +52,7 @@ void entity_t::handle_message(
 
     if (0 != m_last_packet.size()
         && (recv_data.size() != m_last_packet.size()
-        || memcmp(recv_data.c_str(), m_last_packet.c_str(), m_last_packet.size()))
+        || memcmp(recv_data.data(), m_last_packet.data(), m_last_packet.size()))
        )
     {
         LOGWARN((TEST_MODULE, "entity_t::check sum failed"

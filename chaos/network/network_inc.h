@@ -20,5 +20,6 @@
 #include <chaos/network/tcp_service.h>
 #include <chaos/network/active_connection.h>
 #include <chaos/network/connector_service.h>
+#include <chaos/network/serialize.h>
 
 #endif //! _CHAOS_NETWORK_INC_H_

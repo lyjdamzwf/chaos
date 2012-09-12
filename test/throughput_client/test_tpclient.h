@@ -20,7 +20,7 @@ uint32_t                        g_active_conn_count = ACTIVE_CONN_COUNT;
 atomic_val_t<uint64_t>          g_finished_conn;
 struct timeval                  g_timeval;
 atomic_val_t<int>               g_connected_num;
-string                          g_send_data;
+packet_wrapper_t                g_send_data;
 
 
 void tcp_conn_event(

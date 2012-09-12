@@ -51,10 +51,10 @@ public:
                         const string&           service_name_
                        );
 
-    string last_packet() const { return m_last_packet; }
+    packet_wrapper_t last_packet() const { return m_last_packet; }
 
 private:
-    string                          m_last_packet;
+    packet_wrapper_t                    m_last_packet;
 };
 
 class press_client_t
