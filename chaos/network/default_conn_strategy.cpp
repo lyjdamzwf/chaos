@@ -157,6 +157,8 @@ void default_conn_strategy_t::clear()
     {
         m_packet_body_buffer.resize(16 * 1024, 0);
     }
+
+    m_body_readed_bytes = 0;
 }
 
 }

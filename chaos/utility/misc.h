@@ -30,6 +30,8 @@ namespace utility
 #define NONE_COLOR_HEAD             "\033[0m"
 #define COLOR_END                   "\033[0m"
 
+#define STRERR                      strerror(errno)
+
 }
 
 }

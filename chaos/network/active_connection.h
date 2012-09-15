@@ -67,7 +67,7 @@ int active_connection_t::sync_connect(
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
     if(sockfd < 0)
     {
-        LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect generate sockfd failed errno:[%m].", errno));
+        LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect generate sockfd failed errno:[%s].", STRERR));
         return -1;
     }
 
@@ -78,7 +78,7 @@ int active_connection_t::sync_connect(
 
     if (::connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
     {
-        LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect connect failed errno:[%m].", errno));
+        LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect connect failed errno:[%s].", STRERR));
         return -1;
     }
 
@@ -100,7 +100,6 @@ int active_connection_t::sync_connect(
     LOGTRACE((CONNECTION_MODULE, "active_connection_t::sync_connect end"));
     return 0;
 }
-
 
 }
 
