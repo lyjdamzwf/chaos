@@ -54,7 +54,7 @@ int io_multiplex_handler_t::initialize(bool lock_)
     //! yunjie: 32000参数对linux 2.6 内核之后的版本已经无效.
     if ((int)(m_epoll_fd = ::epoll_create(32000)) == -1)
     {
-        LOGERROR((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize epoll_create failed, errno:[%m] return.", errno));
+        LOGERROR((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::initialize epoll_create failed, errno:[%s] return.", STRERR));
 
         return -1;
     }
@@ -101,8 +101,8 @@ int io_multiplex_handler_t::wait_io_notification()
     if (res == -1)
     {
         LOGWARN((IO_MULTIPLEX_MODULE,
-                    "io_multiplex_handler_t::wait_notification epoll_wait failed, res:[%d] errno:[%m]",
-                    res, errno
+                    "io_multiplex_handler_t::wait_notification epoll_wait failed, res:[%d] errno:[%s]",
+                    res, STRERR
                ));
         return (0);
     }
@@ -144,8 +144,8 @@ int io_multiplex_handler_t::wait_io_notification()
 
             LOGWARN((IO_MULTIPLEX_MODULE,
                         "io_multiplex_handler_t::wait_notification EPOLLHUP or EPOLLERR occured"
-                        " fd:[%d] EPOLLEVENT type:[%s] errno:[%m]",
-                        fd, ev_type, errno
+                        " fd:[%d] EPOLLEVENT type:[%s] errno:[%s]",
+                        fd, ev_type, STRERR
                    ));
 
             if (NULL != io_event.error_cb)
@@ -156,12 +156,12 @@ int io_multiplex_handler_t::wait_io_notification()
         else
         {
             int epoll_operate = 0;
+            callback_on_event_t tmp_cb = NULL;
+            void* tmp_arg = NULL;
             if (what & EPOLLIN)                                 //! yunjie: 读事件
             {
-                if (NULL != io_event.read_cb)
-                {
-                    io_event.read_cb(fd, IO_READ_EVENT, io_event.read_cb_arg);       //! yunjie: 调用读回调
-                }
+                tmp_cb = io_event.read_cb;
+                tmp_arg = io_event.read_cb_arg;
 
                 //! yunjie: 如果读事件不是persist的, 需要进行epoll信息的修改
                 //! yunjie: 注意, 此时的io_event有可能已经被callback clear, 所以要来判断fd是否不为0
@@ -178,7 +178,6 @@ int io_multiplex_handler_t::wait_io_notification()
                         if (::epoll_ctl(m_epoll_fd, epoll_operate, io_event.listen_fd, &epev) == -1)
                         {
                             LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification system call epoll_ctl failed fd:%d.", io_event.listen_fd));
-                            continue;
                         }
                     }
                     else
@@ -186,7 +185,6 @@ int io_multiplex_handler_t::wait_io_notification()
                         if (remove_fd_from_epoll_i(io_event.listen_fd) == -1)
                         {
                             LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification remove_fd_from_epoll_i failed fd:%d.", io_event.listen_fd));
-                            continue;
                         }
                     }
 
@@ -194,14 +192,18 @@ int io_multiplex_handler_t::wait_io_notification()
                     io_event.read_cb_arg = NULL;
                     io_event.read_persist = false;
                 }
+
+                if (NULL != tmp_cb)
+                {
+                    //! yunjie: 调用读回调
+                    tmp_cb(fd, IO_READ_EVENT, tmp_arg);
+                }
             }
 
             if (what & EPOLLOUT)                                //! yunjie: 写事件
             {
-                if (NULL != io_event.write_cb)
-                {
-                    io_event.write_cb(fd, IO_WRITE_EVENT, io_event.write_cb_arg);     //! yunjie: 调用写回调
-                }
+                tmp_cb = io_event.write_cb;
+                tmp_arg = io_event.write_cb_arg;
 
                 //! yunjie: 如果写事件不是persist的, 需要进行epoll信息的修改
                 //! yunjie: 注意, 此时的io_event有可能已经被callback clear, 所以要来判断fd是否不为0
@@ -218,7 +220,6 @@ int io_multiplex_handler_t::wait_io_notification()
                         if (::epoll_ctl(m_epoll_fd, epoll_operate, io_event.listen_fd, &epev) == -1)
                         {
                             LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification system call epoll_ctl failed fd:%d.", io_event.listen_fd));
-                            continue;
                         }
                     }
                     else
@@ -226,13 +227,18 @@ int io_multiplex_handler_t::wait_io_notification()
                         if (remove_fd_from_epoll_i(io_event.listen_fd) == -1)
                         {
                             LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::wait_notification remove_fd_from_epoll_i failed fd:%d.", io_event.listen_fd));
-                            continue;
                         }
                     }
 
                     io_event.write_cb = NULL;
                     io_event.write_cb_arg = NULL;
                     io_event.write_persist = false;
+                }
+
+                if (NULL != tmp_cb)
+                {
+                    //! yunjie: 调用写回调
+                    tmp_cb(fd, IO_WRITE_EVENT, tmp_arg);
                 }
             }
         }
@@ -414,7 +420,7 @@ int io_multiplex_handler_t::remove_fd_from_epoll_i(fd_t fd_)
 {
     if (-1 == ::epoll_ctl(m_epoll_fd, EPOLL_CTL_DEL, fd_, NULL))    //! yunjie: 删除之前添加到epoll的监听事件, 这里的epoll_event参数可以忽略
     {
-        LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::remove_fd_from_epoll_i remove fd from epoll failed socket:[%d] errno:[%m].", fd_, errno));
+        LOGWARN((IO_MULTIPLEX_MODULE, "io_multiplex_handler_t::remove_fd_from_epoll_i remove fd from epoll failed socket:[%d] errno:[%s].", fd_, STRERR));
         return -1;
     }
 

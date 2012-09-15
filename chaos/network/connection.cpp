@@ -437,8 +437,6 @@ int connection_t::on_recv_data()
     }
     else if (recv_ret < 0)
     {
-        LOGWARN((CONNECTION_MODULE, "connection_t::on_recv_data recv_ret:[%d] socket fd:[%u] errno:[%m]", recv_ret, m_socket, errno));
-
         //! yunjie: 如果不是EAGAIN或EINTR, 那么就调用callback返回错误信息
         if (errno != EAGAIN && errno != EINTR)
         {
@@ -447,6 +445,8 @@ int connection_t::on_recv_data()
                 m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id, m_user_data);
             }
         }
+
+        LOGWARN((CONNECTION_MODULE, "connection_t::on_recv_data recv_ret:[%d] socket fd:[%u] errno:[%s]", recv_ret, m_socket, STRERR));
 
         return 0;
     }
@@ -469,26 +469,22 @@ int connection_t::on_send_data()
         m_service_ptr->async_update_hb_element(m_conn_id);
     }
 
-    bool all_finish = true;
-    int transferred_size = 0;
+    uint32_t transferred_size = 0;
 
     while (m_write_buffer.size())
     {
         uint32_t msg_size = m_write_buffer.size();
-        int ret = ::send(m_socket, m_write_buffer.data(), msg_size, 0);
+        int32_t ret = ::send(m_socket, m_write_buffer.data(), msg_size, 0);
 
         if (0 == ret)
         {
             LOGWARN((CONNECTION_MODULE, "connection_t::on_send_data send ret == 0 socket fd:[%u]", m_socket));
 
             async_close(m_conn_id, true, EV_PASSIVE_CLOSED);
-
             return 0;
         }
         else if (ret < 0)
         {
-            LOGWARN((CONNECTION_MODULE, "connection_t::on_send_data  send ret:[%d] socket fd:[%u] errno:[%m]", ret, m_socket, errno));
-
             //! yunjie: 如果不是EAGAIN或EINTR, 那么就调用callback返回错误信息
             if (errno != EAGAIN && errno != EINTR)
             {
@@ -508,7 +504,8 @@ int connection_t::on_send_data()
                         );
             }
 
-            return 0;
+            LOGWARN((CONNECTION_MODULE, "connection_t::on_send_data  send ret:[%d] socket fd:[%u] errno:[%s]", ret, m_socket, STRERR));
+            break;
         }
         else
         {
@@ -516,7 +513,7 @@ int connection_t::on_send_data()
 
             m_write_buffer.drain_size(ret);
 
-            if (ret != (int)msg_size)
+            if (ret != (int32_t)msg_size)
             {
                 m_service_ptr->register_io_event(
                         m_socket,
@@ -525,15 +522,18 @@ int connection_t::on_send_data()
                         (void*)this,
                         false
                         );
-                all_finish = false;
                 break;
             }
         }
     }
 
-    //! yunjie: 使用者可以实现的虚方法
-    on_write_complete(transferred_size);
-    if (all_finish)
+    if (transferred_size)
+    {
+        //! yunjie: 使用者可以实现的虚方法
+        on_write_complete(transferred_size);
+    }
+
+    if (!m_write_buffer.size())
     {
         m_sending_flag = false;
     }

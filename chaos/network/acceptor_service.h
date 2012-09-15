@@ -269,7 +269,7 @@ int acceptor_service_t<CONN_TYPE>::start_listen_i()
 
     if(-1 == ::bind(sockfd, (struct sockaddr *)&local_addr, sizeof(local_addr)))
     {
-        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i bind failed errno:[%m]", errno));
+        LOGWARN((ACCEPTOR_SERVICE_MODULE, "acceptor_service_t::start_listen_i bind failed errno:[%s]", STRERR));
         TEMP_FAILURE_RETRY(::close(sockfd));
 
         return -1;
@@ -356,8 +356,8 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE,
                     "acceptor_service_t::on_listen_callback accept failed"
-                    " accepted_fd is [%d], errno:[%m] args-[fd:%d, event_type:%d], return",
-                    accepted_fd, errno, fd_, event_type_
+                    " accepted_fd is [%d], errno:[%s] args-[fd:%d, event_type:%d], return",
+                    accepted_fd, STRERR, fd_, event_type_
                ));
         return;
     }

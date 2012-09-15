@@ -91,8 +91,8 @@ protected:
         //! TP_STAT(SS(), "throughput", (data_size_ + HEADER_SIZE));
         /*
         LOGINFO((TEST_MODULE,
-                    "test_server_echo_conn_t::handle_packet fd:[%d] cmd:[%d] content:[%s]",
-                    native_socket(), packet_header_.cmd, string(data_ptr_, data_size_).c_str()
+                    "test_server_echo_conn_t::handle_packet fd:[%d] cmd:[%d] data size:[%d]",
+                    native_socket(), packet_header_.cmd, data_size_
                ));
                */
 
