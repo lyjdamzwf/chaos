@@ -167,6 +167,7 @@ private:
     void clear_i()
     {
         m_prepend_pos = HEAD_SIZE - 1;
+        m_buffer.clear();
         m_buffer.append(HEAD_SIZE, 0);
     }
 
