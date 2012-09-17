@@ -117,13 +117,11 @@ void entity_t::handle_message(
                     header.ext = conn_id_.socket;
                     header.data_len = body_size;
 
-                    char data[g_max_packet_size];
-
                     packet_wrapper_t packet;
                     packet.append((char*)&header, sizeof(header));
                     if (0 != body_size)
                     {
-                        packet.append(data, body_size);
+                        packet.append(body_size, 'a');
                     }
 
                     m_last_packet = packet;
@@ -264,13 +262,11 @@ void press_client_t::tcp_press_conn_event(
             header.ext = conn_id_.socket;
             header.data_len = body_size;
 
-            char data[g_max_packet_size];
-
             packet_wrapper_t packet;
             packet.append((char*)&header, sizeof(header));
             if (0 != body_size)
             {
-                packet.append(data, body_size);
+                packet.append(body_size, 'a');
             }
 
             connection_t::async_send(conn_id_, packet);
