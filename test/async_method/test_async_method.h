@@ -60,14 +60,14 @@ void test_async_method()
     const string tmp_str = "yunjie";
     string tmp_str2 = "luyunjie";
 
-    async_method_t m1 = bind_memfunc(&hw, &hw_t::call0);
-    async_method_t m2 = bind_memfunc(&hw, &hw_t::call1, 123456);
-    async_method_t m3 = bind_memfunc(&hw, &hw_t::call2, 1121, string("lyj"));
-    async_method_t m4 = bind_memfunc(&hw, &hw_t::call3, 1121, string("lyj"), 123.456);
-    async_method_t m5 = bind_memfunc(&hw, &hw_t::call4, 1121, string("lyj"), 123.456, string("zark"));
-    async_method_t m6 = bind_memfunc(&hw, &hw_t::call5, 1121, string("lyj"), 123.456, string("zark"), (uint64_t)123456789);
-    async_method_t m7 = bind_func(&test_static_func, tmp_str);
-    async_method_t m8 = bind_func(&foo_t::test_static_func, tmp_str2);
+    async_method_t m1 = bindfunc(&hw, &hw_t::call0);
+    async_method_t m2 = bindfunc(&hw, &hw_t::call1, 123456);
+    async_method_t m3 = bindfunc(&hw, &hw_t::call2, 1121, string("lyj"));
+    async_method_t m4 = bindfunc(&hw, &hw_t::call3, 1121, string("lyj"), 123.456);
+    async_method_t m5 = bindfunc(&hw, &hw_t::call4, 1121, string("lyj"), 123.456, string("zark"));
+    async_method_t m6 = bindfunc(&hw, &hw_t::call5, 1121, string("lyj"), 123.456, string("zark"), (uint64_t)123456789);
+    async_method_t m7 = bindfunc(&test_static_func, tmp_str);
+    async_method_t m8 = bindfunc(&foo_t::test_static_func, tmp_str2);
 
     vector<async_method_t>  task_queue;
     task_queue.push_back(m1);

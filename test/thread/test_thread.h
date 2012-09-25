@@ -12,7 +12,7 @@ void thread_func(string str_, int count_)
 void test_thread()
 {
     thread_t thd;
-    thd.start(bind_func(thread_func, string("my name is yunjie.lu"), 10));
+    thd.start(bindfunc(thread_func, string("my name is yunjie.lu"), 10));
 
     printf("thread join\n");
     thd.join();

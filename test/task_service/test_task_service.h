@@ -2,7 +2,7 @@
 #define _CHAOS_TEST_TASK_SERVICE_H_
 
 #define USE_BOOST 0
-#define TASK_SERVICE_PERFORMANCE_COUNT 10000000
+#define TASK_SERVICE_PERFORMANCE_COUNT 100000000
 
 #if USE_BOOST
 #include "boost/function.hpp"
@@ -47,7 +47,7 @@ void test_task_service_press()
             thread_t::sleep(2);
         }
 
-        TS().post(bind_func(&task_service_productor, string("task_service_press"), index));
+        TS().post(bindfunc(&task_service_productor, string("task_service_press"), index));
         ++index ;
     }
 }
@@ -77,7 +77,7 @@ void test_task_service_performance()
 #else
     while (index <= TASK_SERVICE_PERFORMANCE_COUNT)
     {
-        TS().post(bind_func(&task_service_productor, string("task_service"), index++));
+        TS().post(bindfunc(&task_service_productor, string("task_service"), index++));
     }
     LOGDEBUG((TEST_MODULE, "chaos post end"));
 #endif
@@ -115,7 +115,7 @@ void test_task_service_timer_persist()
 {
     LOGDEBUG((TEST_MODULE, "test_task_service_timer_persist begin"));
 
-    TS().register_timer(1, bind_func(task_service_timer_event_persist), true);
+    TS().register_timer(1, bindfunc(task_service_timer_event_persist), true);
 
     LOGDEBUG((TEST_MODULE, "test_task_service_timer_persist end"));
 }
@@ -124,12 +124,12 @@ void test_task_service_timer_persist()
 void task_service_timer_event(task_service_t* service_)
 {
     printf("task_service_timer_event called!!!!!\n");
-    service_->register_timer(2, bind_func(&task_service_timer_event, service_), false);
+    service_->register_timer(2, bindfunc(&task_service_timer_event, service_), false);
 }
 
 void test_task_service_timer()
 {
-    TS().register_timer(2, bind_func(&task_service_timer_event, &TS()), false);
+    TS().register_timer(2, bindfunc(&task_service_timer_event, &TS()), false);
 }
 
 void test_mutil_timer(string str_)
@@ -139,8 +139,8 @@ void test_mutil_timer(string str_)
 
 void test_task_service_mutil_timer()
 {
-    TS().register_timer(1, bind_func(test_mutil_timer, string("111")), true);
-    TS().register_timer(2, bind_func(test_mutil_timer, string("222")), true);
+    TS().register_timer(1, bindfunc(test_mutil_timer, string("111")), true);
+    TS().register_timer(2, bindfunc(test_mutil_timer, string("222")), true);
 }
 
 void callback(const string& str_)
@@ -157,7 +157,7 @@ void async_call(const string& str_, void(*callback)(const string&))
 void test_callback()
 {
     string str = "call";
-    TS().post(bind_func(&async_call, str, &callback));
+    TS().post(bindfunc(&async_call, str, &callback));
 }
 
 #define PRESS_TIMER_COUNT 20000
@@ -172,11 +172,11 @@ void test_timer_press()
 
         if (persist)
         {
-            method = bind_func(task_service_timer_event_persist);
+            method = bindfunc(task_service_timer_event_persist);
         }
         else
         {
-            method = bind_func(&task_service_timer_event, &TS());
+            method = bindfunc(&task_service_timer_event, &TS());
         }
 
         TS().register_timer(interval, method, persist);

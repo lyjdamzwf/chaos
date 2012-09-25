@@ -40,11 +40,12 @@ namespace async_method
 using namespace std;
 
 #define BIND_FUNC_ENTRY(num) \
-template <typename F BIND_NAME_LIST_##num(typename A)> \
-async_method_t bind_func(F f_ BIND_ARG_LIST_##num) \
+template <typename R COMMA_##num BIND_NAME_LIST_##num(typename B) COMMA_##num BIND_NAME_LIST_##num(typename A)> \
+async_method_t bindfunc(R (*f_)(BIND_NAME_LIST_##num(B)) BIND_ARG_LIST_##num) \
 { \
+    typedef R (*F)(BIND_NAME_LIST_##num(B)); \
     async_method_base_t* async_method_ptr = \
-    new async_method_bind_func_##num##_t<F BIND_NAME_LIST_##num(A)>( \
+    new async_method_bind_func_##num##_t<F COMMA_##num BIND_NAME_LIST_##num(A)>( \
                                 f_ BIND_NEW_CTOR_LIST_##num \
                                                                    ); \
     async_method_t async_method(async_method_ptr); \
@@ -52,11 +53,12 @@ async_method_t bind_func(F f_ BIND_ARG_LIST_##num) \
 }
 
 #define BIND_OBJ_ENTRY(num) \
-template <typename F, typename CLS_TYPE BIND_NAME_LIST_##num(typename A)> \
-async_method_t bind_memfunc(CLS_TYPE obj_, F f_ BIND_ARG_LIST_##num) \
+template <typename R, typename CLS_TYPE COMMA_##num BIND_NAME_LIST_##num(typename B) COMMA_##num BIND_NAME_LIST_##num(typename A)> \
+async_method_t bindfunc(CLS_TYPE* obj_, R (CLS_TYPE::*f_)(BIND_NAME_LIST_##num(B)) BIND_ARG_LIST_##num) \
 { \
+    typedef R (CLS_TYPE::*F)(BIND_NAME_LIST_##num(B)); \
     async_method_base_t* async_method_ptr = \
-    new async_method_bind_obj_##num##_t<CLS_TYPE, F BIND_NAME_LIST_##num(A)>( \
+    new async_method_bind_obj_##num##_t<CLS_TYPE, F COMMA_##num BIND_NAME_LIST_##num(A)>( \
                                 obj_, f_ BIND_NEW_CTOR_LIST_##num \
                                                                             ); \
     async_method_t async_method(async_method_ptr); \

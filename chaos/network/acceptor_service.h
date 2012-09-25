@@ -181,7 +181,7 @@ int acceptor_service_t<CONN_TYPE>::start(int thread_num_)
     m_thread_num = thread_num_;
 
     //! yunjie: 发起一个异步事件 - 注册监听端口
-    this->post(bind_memfunc(this, &acceptor_service_t::start_listen_i));
+    this->post(bindfunc(this, &acceptor_service_t::start_listen_i));
 
     m_started = true;
 
@@ -204,7 +204,7 @@ int acceptor_service_t<CONN_TYPE>::stop()
     this->remove_fd_from_epoll(m_listen_socket);
 
     //! yunjie: 关闭监听socket
-    this->post(bind_memfunc(this, &acceptor_service_t::stop_listen_i));
+    this->post(bindfunc(this, &acceptor_service_t::stop_listen_i));
 
     task_service_t::stop();
 

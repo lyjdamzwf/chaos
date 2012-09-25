@@ -33,35 +33,61 @@ namespace async_method
 
 using namespace std;
 
+#define COMMA_0
+#define COMMA_1 ,
+#define COMMA_2 ,
+#define COMMA_3 ,
+#define COMMA_4 ,
+#define COMMA_5 ,
+#define COMMA_6 ,
+#define COMMA_7 ,
+#define COMMA_8 ,
+#define COMMA_9 ,
+
 #define BIND_NAME_LIST_0(name)
 
 #define BIND_NAME_LIST_1(name) \
-    , name##0
+    name##0
 
 #define BIND_NAME_LIST_2(name) \
-    , name##0, name##1
+    name##0, name##1
 
 #define BIND_NAME_LIST_3(name) \
-    , name##0, name##1, name##2
+    name##0, name##1, name##2
 
 #define BIND_NAME_LIST_4(name) \
-    , name##0, name##1, name##2, name##3
+    name##0, name##1, name##2, name##3
 
 #define BIND_NAME_LIST_5(name) \
-    , name##0, name##1, name##2, name##3, name##4
+    name##0, name##1, name##2, name##3, name##4
 
 #define BIND_NAME_LIST_6(name) \
-    , name##0, name##1, name##2, name##3, name##4, name##5
+    name##0, name##1, name##2, name##3, name##4, name##5
 
 #define BIND_NAME_LIST_7(name) \
-    , name##0, name##1, name##2, name##3, name##4, name##5, name##6
+    name##0, name##1, name##2, name##3, name##4, name##5, name##6
 
 #define BIND_NAME_LIST_8(name) \
-    , name##0, name##1, name##2, name##3, name##4, name##5, name##6, name##7
+    name##0, name##1, name##2, name##3, name##4, name##5, name##6, name##7
 
 #define BIND_NAME_LIST_9(name) \
-    , name##0, name##1, name##2, name##3, name##4, name##5, name##6, name##7, name##8
+    name##0, name##1, name##2, name##3, name##4, name##5, name##6, name##7, name##8
 
+
+
+//! ----------------------------------------------------------------------------------------
+
+
+#define BIND_FUNC_ARG_DEC_0
+#define BIND_FUNC_ARG_DEC_1 B0
+#define BIND_FUNC_ARG_DEC_2 B0,B1
+#define BIND_FUNC_ARG_DEC_3 B0,B1,B2
+#define BIND_FUNC_ARG_DEC_4 B0,B1,B2,B3
+#define BIND_FUNC_ARG_DEC_5 B0,B1,B2,B3,B4
+#define BIND_FUNC_ARG_DEC_6 B0,B1,B2,B3,B4,B5
+#define BIND_FUNC_ARG_DEC_7 B0,B1,B2,B3,B4,B5,B6
+#define BIND_FUNC_ARG_DEC_8 B0,B1,B2,B3,B4,B5,B6,B7
+#define BIND_FUNC_ARG_DEC_9 B0,B1,B2,B3,B4,B5,B6,B7,B8
 
 
 //! ----------------------------------------------------------------------------------------

@@ -175,12 +175,11 @@ public:
 protected:
     static int sync_close_i(const struct conn_id_t& conn_id_, bool is_del_from_hb_, conn_event_e close_type_);
 
-    //! yunjie: 由于async_method目前还不支持重载, 所以要不同函数名
-    static int sync_send_packet_wrapper_i(
+    static int sync_send_i(
                             const struct conn_id_t& conn_id_,
                             const packet_wrapper_t& msg_
                           );
-    static int sync_send_data_i(
+    static int sync_send_i(
                             const struct conn_id_t& conn_id_,
                             const char* msg_,
                             uint32_t size_

@@ -35,7 +35,7 @@ void entity_t::handle_message(
     //! yunjie: 如果收到的不是自己发的broadcast消息则不响应
     if (packet_header_.cmd == BROADCAST_CMD)
     {
-        void* zero_ret = memchr(data_ptr_, 0, data_size_);
+        const void* zero_ret = memchr(data_ptr_, 0, data_size_);
         if (NULL == zero_ret)
             return;
         conn_id_t* conn_id_ptr = (conn_id_t*)((char*)zero_ret + 1);
@@ -240,7 +240,7 @@ void press_client_t::tcp_press_conn_event(
         {
             LOGINFO((TEST_MODULE, "tcp_conn_event deconstruct sockfd:[%d]", conn_id_.socket));
             entity_t* entity_ptr = (entity_t*)user_data_;
-            TS().post(bind_func(delete_entity, entity_ptr));
+            TS().post(bindfunc(delete_entity, entity_ptr));
         }
         break;
 
@@ -345,7 +345,7 @@ void test_press_conn_strategy_t::handle_packet(
     else
     {
         packet_wrapper_t message(data_ptr_, data_size_);
-        TS().post(bind_memfunc(
+        TS().post(bindfunc(
                     get_entity(),
                     &entity_t::handle_wrapper_message,
                     packet_header_,

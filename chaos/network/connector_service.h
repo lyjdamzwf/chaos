@@ -182,7 +182,7 @@ int connector_service_t<CONN_TYPE>::async_connect(
     work_service_t* service_ptr = (work_service_t*)(m_work_service_group[service_index]);
 
     service_ptr->post(
-                        bind_memfunc(
+                        bindfunc(
                                     this,
                                     &connector_service_t<CONN_TYPE>::sync_connect_i,
                                     host_,
@@ -236,7 +236,7 @@ int connector_service_t<CONN_TYPE>::sync_connect_i(
 
             service_ptr->register_timer(
                                             m_reconnect_interval,
-                                            bind_memfunc(
+                                            bindfunc(
                                                             this,
                                                             &connector_service_t<CONN_TYPE>::sync_connect_i,
                                                             host_,

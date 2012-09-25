@@ -29,7 +29,7 @@ namespace async_method
 {
 
 #define BIND_FUNC_IMPL(num) \
-template <typename F BIND_NAME_LIST_##num(typename A)> \
+template <typename F COMMA_##num BIND_NAME_LIST_##num(typename A)> \
 class async_method_bind_func_##num##_t : public async_method_base_t \
 { \
 public: \

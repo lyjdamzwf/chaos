@@ -29,11 +29,11 @@ namespace async_method
 {
 
 #define BIND_OBJ_IMPL(num) \
-template <typename CLS_TYPE, typename F BIND_NAME_LIST_##num(typename A)> \
+template <typename CLS_TYPE, typename F COMMA_##num BIND_NAME_LIST_##num(typename A)> \
 class async_method_bind_obj_##num##_t : public async_method_base_t \
 { \
 public: \
-    async_method_bind_obj_##num##_t(CLS_TYPE obj_, F f_ BIND_CTOR_ARG_##num) \
+    async_method_bind_obj_##num##_t(CLS_TYPE* obj_, F f_ BIND_CTOR_ARG_##num) \
         : m_obj_ptr(obj_), m_func(f_) BIND_CTOR_LIST_##num \
     {} \
     void exec() \
@@ -44,8 +44,8 @@ public: \
         } \
     } \
 private: \
-    CLS_TYPE m_obj_ptr; \
-    F        m_func; \
+    CLS_TYPE* m_obj_ptr; \
+    F         m_func; \
     BIND_MEMBER_LIST_##num \
 };
 

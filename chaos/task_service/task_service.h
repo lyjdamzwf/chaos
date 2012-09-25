@@ -107,7 +107,7 @@ public:
         {
             if (NULL != thd_)
             {
-                async_method_t thread_method = bind_memfunc(&m_task_service, &task_service_t::exec_task, thd_);
+                async_method_t thread_method = bindfunc(&m_task_service, &task_service_t::exec_task, thd_);
                 thd_->start(thread_method);
             }
         }

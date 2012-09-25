@@ -165,7 +165,7 @@ int task_service_t::post_async_stop_signal()
 {
     LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::post_async_stop_signal service(%s) begin", m_service_name.c_str()));
 
-    this->post(bind_memfunc(this, &task_service_t::set_stop_signal, true));
+    this->post(bindfunc(this, &task_service_t::set_stop_signal, true));
 
     LOGTRACE((TASK_SERVICE_MODULE, "task_service_t::post_async_stop_signal service(%s) end", m_service_name.c_str()));
 
@@ -335,7 +335,7 @@ void task_service_t::register_timer(
     //! yunjie: 因为one loop mutilthread内部容器会加锁, 如果在callback中本地上下文执行可能会死锁
     bool is_allow_exec_local = (m_thread_num > 1 ? false : true);
 
-    this->post(bind_memfunc(&m_timer_manager, &timer_manager_t::register_timer, interval_, callback_, persist_, start_time_), NULL, TASK_PRIOR_NORMAL, is_allow_exec_local);
+    this->post(bindfunc(&m_timer_manager, &timer_manager_t::register_timer, interval_, callback_, persist_, start_time_), NULL, TASK_PRIOR_NORMAL, is_allow_exec_local);
 }
 
 void task_service_t::register_io_event(
@@ -349,7 +349,7 @@ void task_service_t::register_io_event(
     //! yunjie: 因为one loop mutilthread内部容器会加锁, 如果在callback中本地上下文执行可能会死锁
     bool is_allow_exec_local = (m_thread_num > 1 ? false : true);
 
-    this->post(bind_memfunc(&m_io_handler, &io_multiplex_handler_t::register_io_event, fd_, event_type_flag_, callback_, cb_arg_, is_persist_), NULL, TASK_PRIOR_NORMAL, is_allow_exec_local);
+    this->post(bindfunc(&m_io_handler, &io_multiplex_handler_t::register_io_event, fd_, event_type_flag_, callback_, cb_arg_, is_persist_), NULL, TASK_PRIOR_NORMAL, is_allow_exec_local);
 }
 
 void task_service_t::remove_fd_from_epoll(fd_t fd_)
@@ -357,7 +357,7 @@ void task_service_t::remove_fd_from_epoll(fd_t fd_)
     //! yunjie: 因为one loop mutilthread内部容器会加锁, 如果在callback中本地上下文执行可能会死锁
     bool is_allow_exec_local = (m_thread_num > 1 ? false : true);
 
-    this->post(bind_memfunc(&m_io_handler, &io_multiplex_handler_t::remove_fd_from_epoll, fd_), NULL, TASK_PRIOR_NORMAL, is_allow_exec_local);
+    this->post(bindfunc(&m_io_handler, &io_multiplex_handler_t::remove_fd_from_epoll, fd_), NULL, TASK_PRIOR_NORMAL, is_allow_exec_local);
 }
 
 }

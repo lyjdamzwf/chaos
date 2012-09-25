@@ -72,7 +72,7 @@ public:
     {
         if (is_started)
         {
-            LOGS().post(bind_memfunc(&singleton_t<log_t>::instance(), &log_t::handle_print_screen, msg_));
+            LOGS().post(bindfunc(&singleton_t<log_t>::instance(), &log_t::handle_print_screen, msg_));
         }
     }
 
@@ -80,7 +80,7 @@ public:
     {
         if (is_started)
         {
-            LOGS().post(bind_memfunc(&singleton_t<log_t>::instance(), &log_t::handle_print_file, msg_));
+            LOGS().post(bindfunc(&singleton_t<log_t>::instance(), &log_t::handle_print_file, msg_));
         }
     }
 
