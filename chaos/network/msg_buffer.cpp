@@ -32,6 +32,7 @@ msg_buffer_t::msg_buffer_t()
         m_heap_size(0),
         m_data_offset(0),
         m_data_size(0),
+        m_is_limit(true),
         m_buffer_max_limit(DEFAULT_MAX_MSG_BUFFER_SIZE)
 {
 }
@@ -55,39 +56,128 @@ int msg_buffer_t::reserve(uint32_t size_)
     return ret;
 }
 
-uint32_t msg_buffer_t::append(const void* data_, uint32_t size_)
+void msg_buffer_t::adjust_space_for_tail_i(uint32_t size_)
 {
-    uint32_t ret = 0;
-
     if (!is_init_i())  //! yunjie: 第一次分配
     {
         if (-1 == init_buffer_i(size_))
         {
             //! yunjie: mem error
-            return 0;
+            return;
         }
     }
-    else if (size_ > remain_free_tail_space_i())      //! yunjie: 尾部剩余的堆空间不足
+    else if (size_ > remain_tail_capacity())      //! yunjie: 尾部剩余的堆空间不足
     {
         //! yunjie: 判断头尾空闲内存的总和是否足够
-        if (remain_free_head_space_i() +  remain_free_tail_space_i() >= size_)
+        if (remain_head_capacity() +  remain_tail_capacity() >= size_)
         {
             //! yunjie: 将数据内存块对齐到头
             marshal_i();
         }
         else
         {
-            if (-1 == expand_i(size_ + m_heap_size))
+            if (expand_i(size_ + m_heap_size))
             {
-                //! yunjie: mem error or param error
-                return 0;
+                //! yunjie: expand failed
+                if (remain_head_capacity())
+                {
+                    marshal_i();
+                }
             }
         }
     }
+}
 
-    ret = append_i((char*)data_, size_);
+void msg_buffer_t::adjust_space_for_head_i(uint32_t size_)
+{
+    if (size_ > remain_head_capacity())      //! yunjie: 尾部剩余的堆空间不足
+    {
+        //! yunjie: 判断头尾空闲内存的总和是否足够
+        if (remain_head_capacity() +  remain_tail_capacity() >= size_)
+        {
+            //! yunjie: 将数据内存块对齐到头
+            marshal_i(size_);
+        }
+        else
+        {
+            if (expand_i(size_ + m_heap_size, size_))
+            {
+                //! yunjie: expand failed
+                if (remain_tail_capacity())
+                {
+                    marshal_i(remain_head_capacity() + remain_tail_capacity());
+                }
+            }
+        }
+    }
+}
 
-    return ret;
+uint32_t msg_buffer_t::append(const void* data_, uint32_t size_)
+{
+    adjust_space_for_tail_i(size_);
+    uint32_t append_size = size_ > remain_tail_capacity()
+                            ? remain_tail_capacity()
+                            : size_;
+
+    append_i((char*)data_, append_size);
+
+    return append_size;
+}
+
+uint32_t msg_buffer_t::append(uint32_t size_, char val_)
+{
+    adjust_space_for_tail_i(size_);
+    uint32_t append_size = size_ > remain_tail_capacity()
+                            ? remain_tail_capacity()
+                            : size_;
+
+    memset(write_ptr_i(), val_, append_size);
+    m_data_size += append_size;
+
+    return append_size;
+}
+
+
+
+uint32_t msg_buffer_t::prepend(const void* data_, uint32_t size_)
+{
+    if (!m_data_size)
+    {
+        return append(data_, size_);
+    }
+
+    assert(is_init_i());
+
+    adjust_space_for_head_i(size_);
+    
+    uint32_t prepend_size = size_ > remain_head_capacity()
+                            ? remain_head_capacity()
+                            : size_;
+
+    prepend_i((char*)data_, prepend_size);
+
+    return prepend_size;
+}
+
+uint32_t msg_buffer_t::prepend(uint32_t size_, char val_)
+{
+    if (!m_data_size)
+    {
+        return append(size_, val_);
+    }
+
+    assert(is_init_i());
+
+    adjust_space_for_head_i(size_);
+
+    uint32_t prepend_size = size_ > remain_head_capacity()
+                            ? remain_head_capacity()
+                            : size_;
+    m_data_offset -= prepend_size;
+    memset(m_heap_buffer + m_data_offset, val_, prepend_size);
+    m_data_size += prepend_size;
+
+    return prepend_size;
 }
 
 int msg_buffer_t::recv_to_buffer(fd_t fd_, int& recv_ret_)
@@ -102,12 +192,12 @@ int msg_buffer_t::recv_to_buffer(fd_t fd_, int& recv_ret_)
     }
 
     //! yunjie: 被读取了一部分, 如果尾部没有空间就进行marshal
-    uint32_t remain_free_tail_space = remain_free_tail_space_i();
+    uint32_t remain_free_tail_space = remain_tail_capacity();
     if (0 == remain_free_tail_space)
     {
         marshal_i();
 
-        if (0 == (remain_free_tail_space = remain_free_tail_space_i()))
+        if (0 == (remain_free_tail_space = remain_tail_capacity()))
         {
             return -1;
         }
@@ -157,9 +247,9 @@ uint32_t msg_buffer_t::drain_size(uint32_t size_)
 
 uint32_t msg_buffer_t::calc_move_bytes(uint32_t size_)
 {
-    if (NULL != m_heap_buffer && size_ > remain_free_tail_space_i())      //! yunjie: 尾部剩余的堆空间不足
+    if (NULL != m_heap_buffer && size_ > remain_tail_capacity())      //! yunjie: 尾部剩余的堆空间不足
     {
-        if (remain_free_head_space_i() +  remain_free_tail_space_i() >= size_)
+        if (remain_head_capacity() +  remain_tail_capacity() >= size_)
         {
             //! yunjie: 有效数据的marshal
             return m_data_size;
@@ -178,7 +268,7 @@ void msg_buffer_t::clear()
 {
     if (NULL != m_heap_buffer)
     {
-        free(m_heap_buffer);
+        chaos_free(m_heap_buffer);
         m_heap_buffer = NULL;
     }
 
@@ -231,106 +321,92 @@ void msg_buffer_t::loop_2_printf_data()
     printf("------------ loop_2_printf_data ------------\n\n");
 }
 
-
-bool msg_buffer_t::is_init_i() const
-{
-    return (NULL != m_heap_buffer);
-}
-
 int msg_buffer_t::init_buffer_i(uint32_t size_)
 {
-    if (is_init_i())
+    assert(!is_init_i());
+
+    uint32_t real_size = size_ < MIN_MSG_BUFFER_SIZE ? MIN_MSG_BUFFER_SIZE : size_;
+
+    uint32_t alloc_size = align_to_jesize(real_size);
+
+    if (m_is_limit && alloc_size > m_buffer_max_limit)
+    {
+        alloc_size = m_buffer_max_limit;
+    }
+
+    m_heap_buffer = (char*)chaos_malloc(alloc_size);
+    if (NULL == m_heap_buffer)
+    {
+        return -1;
+    }
+
+    m_heap_size = alloc_size;
+
+    return 0;
+}
+
+int msg_buffer_t::expand_i(uint32_t size_, uint32_t copy_offset_)
+{
+    assert(size_ > m_heap_size);
+    assert(size_ >= copy_offset_);
+
+    if (m_is_limit && m_heap_size >= m_buffer_max_limit)
     {
         return 1;
     }
 
-    uint32_t alloc_size = ((size_ > MIN_MSG_BUFFER_SIZE) ? align_num_i(size_, MIN_MSG_BUFFER_SIZE) : MIN_MSG_BUFFER_SIZE);
+    uint32_t alloc_size = align_to_jesize(size_);
 
-    if (alloc_size > m_buffer_max_limit)
+    if (m_is_limit && alloc_size > m_buffer_max_limit)
     {
         alloc_size = m_buffer_max_limit;
     }
 
-    m_heap_buffer = (char*)malloc(alloc_size);
-    if (NULL == m_heap_buffer)
+    if (m_heap_size >= jemalloc_min_in_place_expandable
+        && !copy_offset_
+        && chaos_rallocm((void**)((char**)&m_heap_buffer), NULL, alloc_size, 0, ALLOCM_NO_MOVE) == ALLOCM_SUCCESS)
     {
-        //! yunjie: mem error
-        return -1;
+        m_heap_size = alloc_size;
+
+        return 0;
     }
 
-    m_heap_size = alloc_size;
-
-    return 0;
-}
-
-int msg_buffer_t::expand_i(uint32_t size_)
-{
-    if (size_ <= m_heap_size)
-    {
-        return -1;
-    }
-
-    uint32_t alloc_size = align_num_i(size_, MIN_MSG_BUFFER_SIZE);
-
-    if (alloc_size > m_buffer_max_limit)
-    {
-        alloc_size = m_buffer_max_limit;
-    }
-
-    //! yunjie: 重新分配新内存
-    char* new_addr = (char*)realloc(m_heap_buffer, alloc_size);
+    char* new_addr = (char*)chaos_malloc(alloc_size);
     if (NULL == new_addr)
     {
-        //! yunjie: mem error
         return -1;
     }
+
+    memcpy(new_addr + copy_offset_, data(), size());
+
+    chaos_free(m_heap_buffer);
 
     m_heap_buffer = new_addr;
     m_heap_size = alloc_size;
+    m_data_offset = copy_offset_;
 
     return 0;
 }
 
-uint32_t msg_buffer_t::align_num_i(uint32_t num_, uint32_t base_)
+void msg_buffer_t::append_i(const char* src_, uint32_t size_)
 {
-    uint32_t remainder = num_ % base_;
-    uint32_t ret = num_ / base_ * base_;
-    ret += remainder ? base_ : 0;
-
-    return ret;
+    memcpy(write_ptr_i(), src_, size_);
+    m_data_size += size_;
 }
 
-uint32_t msg_buffer_t::append_i(const char* src_, uint32_t size_)
+void msg_buffer_t::prepend_i(const char* src_, uint32_t size_)
 {
-    uint32_t copy_bytes = size_ > remain_free_tail_space_i()
-                                ? remain_free_tail_space_i()
-                                : size_;
-    memcpy(write_ptr_i(), src_, copy_bytes );
-    m_data_size += copy_bytes ;
-
-    return copy_bytes;
+    m_data_offset -= size_;
+    memcpy(m_heap_buffer + m_data_offset, src_, size_);
+    m_data_size += size_;
 }
 
-uint32_t msg_buffer_t::remain_free_head_space_i() const
+void msg_buffer_t::marshal_i(uint32_t offset_)
 {
-    return m_data_offset;
-}
+    assert(m_data_size);
 
-uint32_t msg_buffer_t::remain_free_tail_space_i() const
-{
-    return m_heap_size - m_data_offset - m_data_size;
-}
-
-
-void msg_buffer_t::marshal_i()
-{
-    if (0 == m_data_offset)
-    {
-        return;
-    }
-
-    memmove(m_heap_buffer, data(), m_data_size);
-    m_data_offset = 0;
+    memmove(m_heap_buffer + offset_, data(), size());
+    m_data_offset = offset_;
 }
 
 }

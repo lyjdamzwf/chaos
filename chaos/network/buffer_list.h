@@ -60,9 +60,9 @@ public:
 
     //! yunjie: 当前read iterator指向的buffer的剩余可使
     //！        用空间字节数
-    uint32_t remain_capacity() const
+    uint32_t remain_tail_capacity() const
     {
-        return m_read_it->remain_capacity();
+        return m_read_it->remain_tail_capacity();
     }
 
     //! yunjie: 当前read iterator指向的buffer是否已经

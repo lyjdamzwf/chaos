@@ -1,24 +1,144 @@
 #ifndef _CHAOS_TEST_MSG_BUFFER_H_
 #define _CHAOS_TEST_MSG_BUFFER_H_
 
+#include <vector>
+#include <string>
+using namespace std;
+
+static vector<string> s_vt;
+static vector<msg_buffer_t> b_vt;
+
+#define VT_INFO(len)    \
+s_vt[len - 1].data(), s_vt[len - 1].size()
+
 void test_msg_buffer()
 {
-    msg_buffer_t buffer;
-    buffer.loop_2_printf_data();
-    buffer.loop_2_printf_all();
+    for (int i = 1; i <= 5000; ++i)
+    {
+        s_vt.push_back(string(i, (char)i));
+    }
 
-    string s1(6, (char)1);
-    cout << "append ret:" << buffer.append(s1.c_str(), s1.size()) << endl;
-    buffer.loop_2_printf_data();
-    buffer.loop_2_printf_all();
+    for (int i = 1; i <= 20; ++i)
+    {
+        b_vt.push_back(msg_buffer_t());
+    }
 
-    cout << "append ret:" << buffer.append("1234", 4) << endl;
-    buffer.loop_2_printf_data();
-    buffer.loop_2_printf_all();
+    cout << "\n\n\n############# append ret:"
+         << b_vt[0].append(18, 32)
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
 
-    cout << "append ret:" << buffer.append("9999999", 7) << endl;
-    buffer.loop_2_printf_data();
-    buffer.loop_2_printf_all();
+    cout << "\n\n\n############# append ret:"
+         << b_vt[0].append(VT_INFO(5)) 
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    b_vt[0].set_no_limit();
+
+    cout << "\n\n\n############# append ret:"
+         << b_vt[0].append(VT_INFO(7)) 
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    b_vt[0].set_buffer_max_limit(64);
+    cout << "\n\n\n############# append ret:"
+         << b_vt[0].append(200, 6)
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# drain ret:"
+         << b_vt[0].drain_size(5)
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[0].prepend(VT_INFO(3)) 
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[0].prepend(VT_INFO(6)) 
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# drain ret:"
+         << b_vt[0].drain_size(128)
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# append ret:"
+         << b_vt[0].append(VT_INFO(50)) 
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[0].prepend(VT_INFO(10)) 
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# drain ret:"
+         << b_vt[0].drain_size(20)
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[0].prepend(VT_INFO(10))
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[0].append(23, 19)
+         << "#############\n"
+         << endl;
+    b_vt[0].loop_2_printf_data();
+    b_vt[0].loop_2_printf_all();
+
+    /**
+    cout << "\n\n\n############# append ret:"
+         << b_vt[1].append(VT_INFO(50)) 
+         << "#############\n"
+         << endl;
+    b_vt[1].loop_2_printf_data();
+    b_vt[1].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[2].prepend(VT_INFO(18)) 
+         << "#############\n"
+         << endl;
+    b_vt[2].loop_2_printf_data();
+    b_vt[2].loop_2_printf_all();
+
+    cout << "\n\n\n############# prepend ret:"
+         << b_vt[3].prepend(VT_INFO(50)) 
+         << "#############\n"
+         << endl;
+    b_vt[3].loop_2_printf_data();
+    b_vt[3].loop_2_printf_all();
+    */
 }
 
 void test_msg_buffer_limit()

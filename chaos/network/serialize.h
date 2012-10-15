@@ -26,6 +26,8 @@
 #include <string>
 using namespace std;
 
+#include <chaos/network/msg_buffer.h>
+
 namespace chaos
 {
 
@@ -33,7 +35,6 @@ namespace network
 {
 
 #define HEAD_SIZE           8
-#define MAX_STACK_SIZE      (16*1024)
 
 class serialize_t
 {
@@ -55,65 +56,53 @@ public:
 
     serialize_t(const serialize_t& rhs_)
     {
-        m_prepend_pos = rhs_.m_prepend_pos;
         m_buffer = rhs_.m_buffer;
+        m_remain_head_bytes = rhs_.m_remain_head_bytes;
     }
 
     const serialize_t& operator=(const serialize_t& rhs_)
     {
-        m_prepend_pos = rhs_.m_prepend_pos;
         m_buffer = rhs_.m_buffer;
+        m_remain_head_bytes = rhs_.m_remain_head_bytes;
 
         return *this;
     }
 
-	uint32_t head_left() const { return m_prepend_pos + 1; }
-	uint32_t size() const { return m_buffer.size() - head_left(); }
-	const char* data() const { return &m_buffer[m_prepend_pos + 1]; }
-
-	uint32_t first_of(char b) const
-	{
-		uint32_t c = m_buffer.size();
-		for (uint32_t i = m_prepend_pos + 1; i < c; ++ i)
-		{
-			if (m_buffer[i] == b)
-			{
-				return i;
-			}
-		}
-
-		return -1;
-	}
+	uint32_t size() const { return m_buffer.size() - m_remain_head_bytes; }
+	const char* data() const { return m_buffer.data() + m_remain_head_bytes; }
 
     void reserve(uint32_t size_) { if (size_ > m_buffer.capacity()) m_buffer.reserve(size_); }
 
 	void clear() { clear_i(); }
 
-	void append(const char* buf_, uint32_t len_)
+	uint32_t append(const char* buf_, uint32_t len_)
 	{
-		m_buffer.append(buf_, len_);
+		return m_buffer.append(buf_, len_);
 	}
 
-    void append(uint32_t size_, char val_)
+    uint32_t append(uint32_t size_, char val_)
     {
-        m_buffer.append(size_, val_);
+        return m_buffer.append(size_, val_);
     }
 
-	void prepend(const char* buf_, uint32_t len_)
+	uint32_t prepend(const char* buf_, uint32_t len_)
 	{
-        uint32_t len = len_ <= head_left() ? len_ : head_left();
-
-        if (len)
+        if (!m_remain_head_bytes)
         {
-            memcpy(const_cast<char*>(m_buffer.c_str()) + m_prepend_pos - len + 1, buf_, len);
-            m_prepend_pos -= len;
+            m_buffer.prepend(buf_, len_);
         }
 
-        if (len < len_)
+        m_buffer.drain_size(m_remain_head_bytes);
+        uint32_t prepend_ret = m_buffer.prepend(buf_, len_);
+
+        m_remain_head_bytes = (m_remain_head_bytes > len_) ? m_remain_head_bytes - len_ : 0;
+
+        if (m_remain_head_bytes)
         {
-            m_buffer.insert(0, buf_ + len, len_ - len);
-            m_prepend_pos = -1;
+            m_buffer.prepend(m_remain_head_bytes, 0);
         }
+
+        return prepend_ret;
     }
 
     template<typename T>
@@ -135,7 +124,8 @@ public:
     serialize_t& operator<<(const std::string& v)
 	{
 		(*this) << static_cast<uint32_t>(v.length());
-		m_buffer.insert(m_buffer.end(), v.begin(), v.end());
+        append(v.data(), v.length());
+
 		return *this;
 	}
 
@@ -148,7 +138,8 @@ public:
 		}
 		uint32_t len = static_cast<uint32_t>(strlen(v));
 		(*this) << len;
-		m_buffer.insert(m_buffer.end(), v, v + len);
+        append(v, len);
+
 		return *this;
 	}
 
@@ -156,9 +147,8 @@ public:
     {
         for (uint32_t i = 0; i < m_buffer.size(); ++i)
         {
-            printf("%d: %p - %d\n", i, &m_buffer[i], m_buffer[i]);
+            printf("%d: %p - %d\n", i, &(m_buffer.data()[i]), m_buffer.data()[i]);
         }
-        printf("prepend pos:%d\n", m_prepend_pos);
         printf("data():%p\n", data());
         printf("size():%d\n\n", size());
     }
@@ -166,14 +156,15 @@ public:
 private:
     void clear_i()
     {
-        m_prepend_pos = HEAD_SIZE - 1;
         m_buffer.clear();
+
         m_buffer.append(HEAD_SIZE, 0);
+        m_remain_head_bytes = HEAD_SIZE;
     }
 
 private:
-    uint32_t                        m_prepend_pos;
-    string                          m_buffer;
+    msg_buffer_t                    m_buffer;
+    uint32_t                        m_remain_head_bytes;
 };
 
 }
