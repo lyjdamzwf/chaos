@@ -9,6 +9,8 @@
 #define MIN_PACKET_SIZE (sizeof(packet_header_t))
 #define MAX_PACKET_SIZE (sizeof(packet_header_t) + 4096)
 
+#define BROADCAST_PACKET_SIZE           4096
+
 #define CHECK_SUM 1
 
 #define BROADCAST_CMD   1104
@@ -36,9 +38,11 @@ enum press_conn_action_e
 class entity_t
 {
 public:
+    ~entity_t();
+
     void handle_wrapper_message(
                                 const packet_header_t&  packet_header_,
-                                const packet_wrapper_t& message_,
+                                packet_wrapper_t& message_,
                                 const conn_id_t&        conn_id_,
                                 const string&           service_name_
                                );

@@ -102,7 +102,8 @@ int work_service_t::async_del_connection(const conn_id_t& conn_id_)
 }
 
 int work_service_t::async_broadcast(
-                                    const packet_wrapper_t&     msg_,
+                                    packet_wrapper_t&           msg_,
+                                    bool                        auto_clear_,
                                     broadcast_filter_t          filter_
                                    )
 {
@@ -111,6 +112,7 @@ int work_service_t::async_broadcast(
                 this,
                 &work_service_t::sync_broadcast_packet_wrapper_i,
                 msg_,
+                auto_clear_,
                 filter_
                 )
             );
@@ -138,6 +140,7 @@ int work_service_t::async_broadcast(
                     this,
                     &work_service_t::sync_broadcast_packet_wrapper_i,
                     msg_wrapper,
+                    true,
                     filter_
                     )
                 );
@@ -339,10 +342,13 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
 }
 
 int work_service_t::sync_broadcast_packet_wrapper_i(
-        const packet_wrapper_t&     msg_,
+        packet_wrapper_t&           msg_,
+        bool                        auto_clear_,
         broadcast_filter_t          filter_
         )
 {
+    SAFE_FREE_HOLDER(auto_clear_, msg_);
+
     for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
         conn_ptr_t conn_ptr = *it;
@@ -356,9 +362,10 @@ int work_service_t::sync_broadcast_packet_wrapper_i(
                     continue;
             }
 
-            connection_t::sync_send_i(
+            connection_t::sync_send_wrapper_i(
                         conn_id,
-                        msg_
+                        msg_,
+                        false
                     );
         }
     }

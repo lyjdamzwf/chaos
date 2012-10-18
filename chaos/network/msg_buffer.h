@@ -38,18 +38,23 @@ namespace network
 using namespace utility;
 using namespace task_service;
 
-//#define MIN_MSG_BUFFER_SIZE     1024
-//#define DEFAULT_MAX_MSG_BUFFER_SIZE     (16*1024)
-#define MIN_MSG_BUFFER_SIZE     8
-#define DEFAULT_MAX_MSG_BUFFER_SIZE     20
+#define MIN_MSG_BUFFER_SIZE     1024
+#define DEFAULT_MAX_MSG_BUFFER_SIZE     (16*1024)
+//! #define MIN_MSG_BUFFER_SIZE     8
+//! #define DEFAULT_MAX_MSG_BUFFER_SIZE     20
 
 using namespace std;
 
-class msg_buffer_t
+class msg_buffer_t : public memory_holder_t
 {
 public:
     msg_buffer_t();
     ~msg_buffer_t();
+
+    msg_buffer_t(const msg_buffer_t& rhs_);
+    const msg_buffer_t& operator=(const msg_buffer_t& rhs_);
+
+    void clone(msg_buffer_t& obj_);
 
     //! yunjie: 返回有效数据块的指针
     inline const char* data() const
@@ -111,18 +116,6 @@ public:
         return true;
     }
 
-    const msg_buffer_t& operator=(const msg_buffer_t& rhs_)
-    {
-        m_heap_buffer = rhs_.m_heap_buffer;
-        m_heap_size = rhs_.m_heap_size;
-        m_data_offset = rhs_.m_data_offset;
-        m_data_size = rhs_.m_data_size;
-        m_is_limit = rhs_.m_is_limit;
-        m_buffer_max_limit = rhs_.m_buffer_max_limit;
-
-        return *this;
-    }
-
     //! yunjie: -1表示分配内存失败, 0表示成功, 但
     //!         不一定能分配到指定长度, 之后请调用
     //!         remain_capacity()查看
@@ -145,7 +138,12 @@ public:
     //! yunjie: 计算需要移动的数据字节数
     uint32_t calc_move_bytes(uint32_t size_);
 
-    void clear();
+    //! yunjie: 重置数据变量并释放内存块
+    void release();
+
+    //! yunjie: 危险操作, 会重置指针, 但不会释放
+    //          多线程buffer swap时需要该功能
+    void reset();
 
     void loop_2_printf_all();
     void loop_2_printf_data();

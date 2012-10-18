@@ -31,7 +31,7 @@ void test_msg_buffer()
     b_vt[0].loop_2_printf_all();
 
     cout << "\n\n\n############# append ret:"
-         << b_vt[0].append(VT_INFO(5)) 
+         << b_vt[0].append(VT_INFO(5))
          << "#############\n"
          << endl;
     b_vt[0].loop_2_printf_data();
@@ -40,7 +40,7 @@ void test_msg_buffer()
     b_vt[0].set_no_limit();
 
     cout << "\n\n\n############# append ret:"
-         << b_vt[0].append(VT_INFO(7)) 
+         << b_vt[0].append(VT_INFO(7))
          << "#############\n"
          << endl;
     b_vt[0].loop_2_printf_data();
@@ -62,14 +62,14 @@ void test_msg_buffer()
     b_vt[0].loop_2_printf_all();
 
     cout << "\n\n\n############# prepend ret:"
-         << b_vt[0].prepend(VT_INFO(3)) 
+         << b_vt[0].prepend(VT_INFO(3))
          << "#############\n"
          << endl;
     b_vt[0].loop_2_printf_data();
     b_vt[0].loop_2_printf_all();
 
     cout << "\n\n\n############# prepend ret:"
-         << b_vt[0].prepend(VT_INFO(6)) 
+         << b_vt[0].prepend(VT_INFO(6))
          << "#############\n"
          << endl;
     b_vt[0].loop_2_printf_data();
@@ -83,14 +83,14 @@ void test_msg_buffer()
     b_vt[0].loop_2_printf_all();
 
     cout << "\n\n\n############# append ret:"
-         << b_vt[0].append(VT_INFO(50)) 
+         << b_vt[0].append(VT_INFO(50))
          << "#############\n"
          << endl;
     b_vt[0].loop_2_printf_data();
     b_vt[0].loop_2_printf_all();
 
     cout << "\n\n\n############# prepend ret:"
-         << b_vt[0].prepend(VT_INFO(10)) 
+         << b_vt[0].prepend(VT_INFO(10))
          << "#############\n"
          << endl;
     b_vt[0].loop_2_printf_data();
@@ -119,21 +119,21 @@ void test_msg_buffer()
 
     /**
     cout << "\n\n\n############# append ret:"
-         << b_vt[1].append(VT_INFO(50)) 
+         << b_vt[1].append(VT_INFO(50))
          << "#############\n"
          << endl;
     b_vt[1].loop_2_printf_data();
     b_vt[1].loop_2_printf_all();
 
     cout << "\n\n\n############# prepend ret:"
-         << b_vt[2].prepend(VT_INFO(18)) 
+         << b_vt[2].prepend(VT_INFO(18))
          << "#############\n"
          << endl;
     b_vt[2].loop_2_printf_data();
     b_vt[2].loop_2_printf_all();
 
     cout << "\n\n\n############# prepend ret:"
-         << b_vt[3].prepend(VT_INFO(50)) 
+         << b_vt[3].prepend(VT_INFO(50))
          << "#############\n"
          << endl;
     b_vt[3].loop_2_printf_data();
@@ -224,6 +224,12 @@ void test_serialize()
     ser.dump();
 
     ser.prepend("aaa", strlen("aaa"));
+    ser.dump();
+
+    ser.prepend(3, 13);
+    ser.dump();
+
+    ser.append(20, 120);
     ser.dump();
 }
 

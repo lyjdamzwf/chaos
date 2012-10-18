@@ -169,16 +169,21 @@ public:
                             conn_event_e                close_type_ = EV_ACTIVE_CLOSED
                           );
 
-    static int async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_);
+    static int async_send(
+                            const struct conn_id_t& conn_id_,
+                            packet_wrapper_t&       msg_,
+                            bool                    auto_clear_
+                         );
     static int async_send(const struct conn_id_t& conn_id_, const char* msg_, uint32_t size_);
 
 protected:
     static int sync_close_i(const struct conn_id_t& conn_id_, bool is_del_from_hb_, conn_event_e close_type_);
 
-    static int sync_send_i(
-                            const struct conn_id_t& conn_id_,
-                            const packet_wrapper_t& msg_
-                          );
+    static int sync_send_wrapper_i(
+                                    const struct conn_id_t& conn_id_,
+                                    packet_wrapper_t&       msg_,
+                                    bool                    auto_clear_
+                                 );
     static int sync_send_i(
                             const struct conn_id_t& conn_id_,
                             const char* msg_,

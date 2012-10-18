@@ -32,13 +32,44 @@ msg_buffer_t::msg_buffer_t()
         m_heap_size(0),
         m_data_offset(0),
         m_data_size(0),
-        m_is_limit(true),
+        m_is_limit(false),
         m_buffer_max_limit(DEFAULT_MAX_MSG_BUFFER_SIZE)
 {
 }
 
 msg_buffer_t::~msg_buffer_t()
 {
+}
+
+msg_buffer_t::msg_buffer_t(const msg_buffer_t& rhs_)
+{
+    m_heap_buffer = rhs_.m_heap_buffer;
+    m_heap_size = rhs_.m_heap_size;
+    m_data_offset = rhs_.m_data_offset;
+    m_data_size = rhs_.m_data_size;
+    m_is_limit = rhs_.m_is_limit;
+    m_buffer_max_limit = rhs_.m_buffer_max_limit;
+}
+
+const msg_buffer_t& msg_buffer_t::operator=(const msg_buffer_t& rhs_)
+{
+    m_heap_buffer = rhs_.m_heap_buffer;
+    m_heap_size = rhs_.m_heap_size;
+    m_data_offset = rhs_.m_data_offset;
+    m_data_size = rhs_.m_data_size;
+    m_is_limit = rhs_.m_is_limit;
+    m_buffer_max_limit = rhs_.m_buffer_max_limit;
+
+    return *this;
+}
+
+void msg_buffer_t::clone(msg_buffer_t& obj_)
+{
+    obj_.release();
+    obj_.append(data(), size());
+    obj_.m_data_size = size();
+    obj_.m_is_limit = m_is_limit;
+    obj_.m_buffer_max_limit = m_buffer_max_limit;
 }
 
 int msg_buffer_t::reserve(uint32_t size_)
@@ -149,7 +180,7 @@ uint32_t msg_buffer_t::prepend(const void* data_, uint32_t size_)
     assert(is_init_i());
 
     adjust_space_for_head_i(size_);
-    
+
     uint32_t prepend_size = size_ > remain_head_capacity()
                             ? remain_head_capacity()
                             : size_;
@@ -264,7 +295,7 @@ uint32_t msg_buffer_t::calc_move_bytes(uint32_t size_)
     return 0;
 }
 
-void msg_buffer_t::clear()
+void msg_buffer_t::release()
 {
     if (NULL != m_heap_buffer)
     {
@@ -272,6 +303,14 @@ void msg_buffer_t::clear()
         m_heap_buffer = NULL;
     }
 
+    m_heap_size = 0;
+    m_data_offset = 0;
+    m_data_size = 0;
+}
+
+void msg_buffer_t::reset()
+{
+    m_heap_buffer = NULL;
     m_heap_size = 0;
     m_data_offset = 0;
     m_data_size = 0;
@@ -362,9 +401,12 @@ int msg_buffer_t::expand_i(uint32_t size_, uint32_t copy_offset_)
         alloc_size = m_buffer_max_limit;
     }
 
+    //! yunjie: 只是为了去除强转警告
+    void* tmp_ptr = m_heap_buffer;
+
     if (m_heap_size >= jemalloc_min_in_place_expandable
-        && !copy_offset_
-        && chaos_rallocm((void**)((char**)&m_heap_buffer), NULL, alloc_size, 0, ALLOCM_NO_MOVE) == ALLOCM_SUCCESS)
+        && !copy_offset_        //! yunjie: copy_offset > 0说明头部空间不足, 不能ExpandInPalce
+        && chaos_rallocm(&tmp_ptr, NULL, alloc_size, 0, ALLOCM_NO_MOVE) == ALLOCM_SUCCESS)
     {
         m_heap_size = alloc_size;
 

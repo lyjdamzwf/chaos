@@ -26,6 +26,8 @@
 #include <string>
 using namespace std;
 
+#include <chaos/utility/utility_inc.h>
+
 #include <chaos/network/msg_buffer.h>
 
 namespace chaos
@@ -34,19 +36,23 @@ namespace chaos
 namespace network
 {
 
-#define HEAD_SIZE           8
+using namespace chaos::utility;
 
-class serialize_t
+#define HEAD_SIZE           12
+
+class serialize_t : public memory_holder_t
 {
 public:
 	serialize_t()
+        :
+            m_reserved_head_bytes(0)
     {
-        clear_i();
     }
 
 	serialize_t(const void* data_, uint32_t size_)
+        :
+            m_reserved_head_bytes(0)
     {
-        clear_i();
         append((const char*)data_, size_);
     }
 
@@ -57,49 +63,98 @@ public:
     serialize_t(const serialize_t& rhs_)
     {
         m_buffer = rhs_.m_buffer;
-        m_remain_head_bytes = rhs_.m_remain_head_bytes;
+        m_reserved_head_bytes = rhs_.m_reserved_head_bytes;
     }
 
     const serialize_t& operator=(const serialize_t& rhs_)
     {
         m_buffer = rhs_.m_buffer;
-        m_remain_head_bytes = rhs_.m_remain_head_bytes;
+        m_reserved_head_bytes = rhs_.m_reserved_head_bytes;
 
         return *this;
     }
 
-	uint32_t size() const { return m_buffer.size() - m_remain_head_bytes; }
-	const char* data() const { return m_buffer.data() + m_remain_head_bytes; }
+    void clone(serialize_t& obj_)
+    {
+        m_buffer.clone(obj_.m_buffer);
+        obj_.m_reserved_head_bytes = m_reserved_head_bytes;
+    }
+
+	uint32_t size() const { return m_buffer.size() - m_reserved_head_bytes; }
+	const char* data() const { return m_buffer.data() + m_reserved_head_bytes; }
 
     void reserve(uint32_t size_) { if (size_ > m_buffer.capacity()) m_buffer.reserve(size_); }
 
-	void clear() { clear_i(); }
+    //! yunjie: 重置数据变量并释放内存块
+	void release()
+    {
+        m_buffer.release();
+        m_reserved_head_bytes = 0;
+    }
+
+    //! yunjie: 危险操作, 会重置指针, 但不会释放
+    //          多线程buffer swap时需要该功能
+    void reset()
+    {
+        m_buffer.reset();
+        m_reserved_head_bytes = 0;
+    }
 
 	uint32_t append(const char* buf_, uint32_t len_)
 	{
+        if (NULL == m_buffer.space())
+        {
+            m_reserved_head_bytes = m_buffer.append(HEAD_SIZE, 0);
+        }
+
 		return m_buffer.append(buf_, len_);
 	}
 
     uint32_t append(uint32_t size_, char val_)
     {
+        if (NULL == m_buffer.space())
+        {
+            m_reserved_head_bytes = m_buffer.append(HEAD_SIZE, 0);
+        }
+
         return m_buffer.append(size_, val_);
     }
 
 	uint32_t prepend(const char* buf_, uint32_t len_)
 	{
-        if (!m_remain_head_bytes)
+        if (!m_reserved_head_bytes)
         {
-            m_buffer.prepend(buf_, len_);
+            return m_buffer.prepend(buf_, len_);
         }
 
-        m_buffer.drain_size(m_remain_head_bytes);
+        m_buffer.drain_size(m_reserved_head_bytes);
         uint32_t prepend_ret = m_buffer.prepend(buf_, len_);
 
-        m_remain_head_bytes = (m_remain_head_bytes > len_) ? m_remain_head_bytes - len_ : 0;
+        m_reserved_head_bytes = (m_reserved_head_bytes > len_) ? m_reserved_head_bytes - len_ : 0;
 
-        if (m_remain_head_bytes)
+        if (m_reserved_head_bytes)
         {
-            m_buffer.prepend(m_remain_head_bytes, 0);
+            m_buffer.prepend(m_reserved_head_bytes, 0);
+        }
+
+        return prepend_ret;
+    }
+
+	uint32_t prepend(uint32_t size_, char val_)
+	{
+        if (!m_reserved_head_bytes)
+        {
+            return m_buffer.prepend(size_, val_);
+        }
+
+        m_buffer.drain_size(m_reserved_head_bytes);
+        uint32_t prepend_ret = m_buffer.prepend(size_, val_);
+
+        m_reserved_head_bytes = (m_reserved_head_bytes > size_) ? m_reserved_head_bytes - size_: 0;
+
+        if (m_reserved_head_bytes)
+        {
+            m_buffer.prepend(m_reserved_head_bytes, 0);
         }
 
         return prepend_ret;
@@ -145,26 +200,17 @@ public:
 
     void dump() const
     {
-        for (uint32_t i = 0; i < m_buffer.size(); ++i)
+        printf("\n\n------------------ serialize dump ------------------\n");
+        for (uint32_t i = 0; i < size(); ++i)
         {
-            printf("%d: %p - %d\n", i, &(m_buffer.data()[i]), m_buffer.data()[i]);
+            printf("%d: %p - %d\n", i, &(data()[i]), data()[i]);
         }
-        printf("data():%p\n", data());
-        printf("size():%d\n\n", size());
-    }
-
-private:
-    void clear_i()
-    {
-        m_buffer.clear();
-
-        m_buffer.append(HEAD_SIZE, 0);
-        m_remain_head_bytes = HEAD_SIZE;
+        printf("data():%p, size():%d, remain_head_bytes:%d\n", data(), size(), m_reserved_head_bytes);
     }
 
 private:
     msg_buffer_t                    m_buffer;
-    uint32_t                        m_remain_head_bytes;
+    uint32_t                        m_reserved_head_bytes;
 };
 
 }

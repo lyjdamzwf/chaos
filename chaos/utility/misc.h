@@ -32,6 +32,38 @@ namespace utility
 
 #define STRERR                      strerror(errno)
 
+class memory_holder_t
+{
+public:
+    virtual ~memory_holder_t() {}
+    virtual void release() = 0;
+};
+
+class memory_holder_safe_free_t
+{
+public:
+    memory_holder_safe_free_t(bool is_rel_, memory_holder_t* t_)
+        :
+            m_is_release(is_rel_),
+            m_t(t_)
+    {
+    }
+
+    ~memory_holder_safe_free_t()
+    {
+        if (m_is_release && NULL != m_t)
+        {
+            m_t->release();
+        }
+    }
+
+    bool                                m_is_release;
+    memory_holder_t*                    m_t;
+};
+
+#define SAFE_FREE_HOLDER(is_rel, x) \
+memory_holder_safe_free_t __##1104##x##1121##__(is_rel, &x);
+
 }
 
 }

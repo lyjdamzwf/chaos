@@ -54,7 +54,7 @@ void tcp_conn_event(
         {
             LOGINFO((TEST_MODULE, "tcp_conn_event connect success sockfd:[%d]", conn_id_.socket));
 
-            connection_t::async_send(conn_id_, g_send_data);
+            connection_t::async_send(conn_id_, g_send_data, false);
 
             uint32_t connected_num = ++g_connected_num;
             if (connected_num == g_active_conn_count)
@@ -208,7 +208,7 @@ protected:
         STAT_TP("client")
         else
         {
-            connection_t::async_send(this->get_conn_id(), g_send_data);
+            connection_t::async_send(this->get_conn_id(), g_send_data, false);
         }
     }
 

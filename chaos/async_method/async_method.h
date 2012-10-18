@@ -39,6 +39,8 @@ namespace async_method
 
 using namespace std;
 
+using namespace chaos::utility;
+
 #define BIND_FUNC_ENTRY(num) \
 template <typename R COMMA_##num BIND_NAME_LIST_##num(typename B) COMMA_##num BIND_NAME_LIST_##num(typename A)> \
 async_method_t bindfunc(R (*f_)(BIND_NAME_LIST_##num(B)) BIND_ARG_LIST_##num) \
@@ -65,7 +67,7 @@ async_method_t bindfunc(CLS_TYPE* obj_, R (CLS_TYPE::*f_)(BIND_NAME_LIST_##num(B
     return async_method; \
 }
 
-class async_method_t
+class async_method_t : public memory_holder_t
 {
 public:
     async_method_t()

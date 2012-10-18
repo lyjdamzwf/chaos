@@ -96,7 +96,8 @@ public:
     int async_del_connection(const conn_id_t& conn_id_);
 
     int async_broadcast(
-                        const packet_wrapper_t&     msg_,
+                        packet_wrapper_t&           msg_,
+                        bool                        auto_clear_,
                         broadcast_filter_t          filter_ = NULL
                        );
     int async_broadcast(
@@ -123,7 +124,8 @@ private:
     int sync_del_connection_i(const conn_id_t& conn_id_);
 
     int sync_broadcast_packet_wrapper_i(
-                                        const packet_wrapper_t&     msg_,
+                                        packet_wrapper_t&           msg_,
+                                        bool                        auto_clear_,
                                         broadcast_filter_t          filter_ = NULL
                                         );
     int sync_broadcast_data_i(

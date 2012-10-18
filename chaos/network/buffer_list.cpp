@@ -190,7 +190,7 @@ uint32_t buffer_list_t::drain_size(uint32_t size_)
     {
         iterator_t tmp_it = m_read_it;
         ++m_read_it;
-        tmp_it->clear();
+        tmp_it->release();
         m_buffer_list.erase(tmp_it);
     }
 
@@ -205,7 +205,7 @@ void buffer_list_t::clear()
             ++it
         )
     {
-        it->clear();
+        it->release();
     }
 
     m_buffer_list.clear();

@@ -7,11 +7,11 @@ using namespace std;
 
 int main(int argc_, char* argv_[])
 {
-    test_msg_buffer();
+    //! test_msg_buffer();
     //test_buffer_list();
     //test_msg_buffer_limit();
     //test_buffer_list_limit();
-    //! test_serialize();
+    test_serialize();
 
     /**
     char c[] = "yunjie";

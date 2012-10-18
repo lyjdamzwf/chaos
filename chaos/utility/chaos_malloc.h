@@ -9,7 +9,7 @@ namespace chaos
 namespace utility
 {
 
-#define chaos_malloc(size)          je_malloc(size)
+#define chaos_malloc                je_malloc
 #define chaos_callos                je_calloc
 #define chaos_realloc               je_realloc
 #define chaos_free                  je_free
@@ -20,14 +20,14 @@ static const size_t jemalloc_min_in_place_expandable = 4096;
 inline size_t align_to_jesize(size_t size_)
 {
     if (size_ <= 64)
-    {   
+    {
         return 64;
     }
 
     if (size_ <= 512)
     {
         return (size_ + 63) & ~size_t(63);
-    }                      
+    }
 
     if (size_ <= 3840)
     {

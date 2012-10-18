@@ -92,7 +92,7 @@ int connection_t::async_close(const struct conn_id_t& conn_id_, bool is_del_from
     return 0;
 }
 
-int connection_t::async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_)
+int connection_t::async_send(const struct conn_id_t& conn_id_, packet_wrapper_t& msg_, bool auto_clear_)
 {
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send begin"));
 
@@ -103,7 +103,12 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const packet_wrap
         return -1;
     }
 
-    service_ptr->post(bindfunc(&connection_t::sync_send_i, conn_id_, msg_));
+    service_ptr->post(bindfunc(&connection_t::sync_send_wrapper_i, conn_id_, msg_, auto_clear_));
+
+    if (auto_clear_)
+    {
+        msg_.reset();
+    }
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
     return 0;
@@ -129,7 +134,7 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const char* msg_,
     {
         //! yunjie: 为保证数据跨线程安全性, 包装成packet_wrapper_t, post异步消息
         packet_wrapper_t msg_wrapper(msg_, size_);
-        service_ptr->post(bindfunc(&connection_t::sync_send_i, conn_id_, msg_wrapper));
+        service_ptr->post(bindfunc(&connection_t::sync_send_wrapper_i, conn_id_, msg_wrapper, true));
     }
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
@@ -197,37 +202,40 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
     return 0;
 }
 
-int connection_t::sync_send_i(
-                                const struct conn_id_t& conn_id_,
-                                const packet_wrapper_t& msg_
-                             )
+int connection_t::sync_send_wrapper_i(
+                                        const struct conn_id_t& conn_id_,
+                                        packet_wrapper_t&       msg_,
+                                        bool                    auto_clear_
+                                     )
 {
-    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] begin", conn_id_.socket));
+    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i args-[fd:%d] begin", conn_id_.socket));
+
+    SAFE_FREE_HOLDER(auto_clear_, msg_);
 
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
     {
-        LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_i error, return. args-[fd:%d]", conn_id_.socket));
+        LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i error, return. args-[fd:%d]", conn_id_.socket));
         return -1;
     }
 
     conn_ptr_t conn_ptr = service_ptr->get_conn(conn_id_);
     if (NULL == conn_ptr)
     {
-        LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_i close failed, because connection not found, return. args-[fd:%d]", conn_id_.socket));
+        LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i close failed, because connection not found, return. args-[fd:%d]", conn_id_.socket));
         return -1;
     }
 
     if (ST_CLOSED == conn_ptr->get_status())
     {
-        LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_i connection has closed, return. args-[fd:%d]", conn_id_.socket));
+        LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i connection has closed, return. args-[fd:%d]", conn_id_.socket));
         return 0;
     }
 
     conn_ptr->m_write_buffer.append(msg_.data(), msg_.size());
     conn_ptr->start_drive_send_i();
 
-    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_i args-[fd:%d] end", conn_id_.socket));
+    LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i args-[fd:%d] end", conn_id_.socket));
     return 0;
 }
 

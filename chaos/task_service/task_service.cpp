@@ -249,8 +249,9 @@ void task_service_t::exec_task(thread_t* thd_)
             //! yunjie: 处理异步请求
             for (deque<async_method_t>::iterator it = tasks.begin(); it != tasks.end(); ++it)
             {
-                (*it)();
-                it->release();
+                async_method_t task = (*it);
+                SAFE_FREE_HOLDER(true, task);
+                task();
             }
         }
         catch (const std::exception& ex)

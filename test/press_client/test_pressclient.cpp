@@ -13,14 +13,20 @@ static bool broadcast_filter(const conn_id_t& conn_id_, void* user_data_)
     return true;
 }
 
+entity_t::~entity_t()
+{
+    m_last_packet.release();
+}
+
 void entity_t::handle_wrapper_message(
                                         const packet_header_t&  packet_header_,
-                                        const packet_wrapper_t& message_,
+                                        packet_wrapper_t& message_,
                                         const conn_id_t&        conn_id_,
                                         const string&           service_name_
                                      )
 {
     handle_message(packet_header_, message_.data(), message_.size(), conn_id_, service_name_);
+    message_.release();
 }
 
 
@@ -90,14 +96,15 @@ void entity_t::handle_message(
                     packet_wrapper_t packet;
                     packet.append((char*)&packet_header_, sizeof(packet_header_));
                     packet.append((char*)data_ptr_, data_size_);
-                    m_last_packet = packet;
 
-                    connection_t::async_send(conn_id_, packet);
+                    packet.clone(m_last_packet);
 
                     LOGINFO((TEST_MODULE,
                                 "entity_t::handle_message PCA_REPEAT service:[%s] fd:[%d] packet size:[%u]",
                                 service_name_.c_str(), conn_id_.socket, packet.size()
                            ));
+
+                    connection_t::async_send(conn_id_, packet, true);
                     done = true;
                 }
                 break;
@@ -124,14 +131,14 @@ void entity_t::handle_message(
                         packet.append(body_size, 'a');
                     }
 
-                    m_last_packet = packet;
-
-                    connection_t::async_send(conn_id_, packet);
+                    packet.clone(m_last_packet);
 
                     LOGINFO((TEST_MODULE,
                                 "entity_t::handle_message PCA_RESEND service:[%s] fd:[%d] packet size:[%u]",
                                 service_name_.c_str(), conn_id_.socket, packet.size()
                            ));
+
+                    connection_t::async_send(conn_id_, packet, true);
                     done = true;
                 }
                 break;
@@ -145,11 +152,11 @@ void entity_t::handle_message(
 
                     packet_wrapper_t packet;
 
-                    char content_buffer[512] = {0};
+                    char content_buffer[BROADCAST_PACKET_SIZE] = {0};
                     snprintf(content_buffer, sizeof(content_buffer), "broadcast message from socket:%d", conn_id_.socket);
                     //! yunjie: 将conn_id放到字符串'\0'的后面
                     memcpy(&content_buffer[strlen(content_buffer) + 1], &conn_id_, sizeof(conn_id_t));
-                    int data_len = strlen(content_buffer) + 1 + sizeof(conn_id_t);
+                    int data_len = sizeof(content_buffer);
 
                     packet_header_t header;
                     header.cmd = BROADCAST_CMD;
@@ -159,14 +166,14 @@ void entity_t::handle_message(
                     packet.append((char*)&header, sizeof(packet_header_t));
                     packet.append(content_buffer, header.data_len);
 
-                    m_last_packet = packet;
-
-                    g_connector_service_ptr->async_broadcast(packet, broadcast_filter);
+                    packet.clone(m_last_packet);
 
                     LOGINFO((TEST_MODULE,
                                 "entity_t::handle_message PCA_BROADCAST service:[%s] fd:[%d] packet size:[%lu]",
                                 service_name_.c_str(), conn_id_.socket, packet.size()
                            ));
+
+                    g_connector_service_ptr->async_broadcast(packet, true, broadcast_filter);
                     done = true;
                 }
                 break;
@@ -269,7 +276,7 @@ void press_client_t::tcp_press_conn_event(
                 packet.append(body_size, 'a');
             }
 
-            connection_t::async_send(conn_id_, packet);
+            connection_t::async_send(conn_id_, packet, true);
         }
         break;
 

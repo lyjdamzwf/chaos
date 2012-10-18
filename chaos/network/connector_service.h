@@ -56,7 +56,8 @@ public:
                     );
 
     int async_broadcast(
-                        const packet_wrapper_t&     msg_,
+                        packet_wrapper_t&           msg_,
+                        bool                        auto_clear_,
                         broadcast_filter_t          filter_ = NULL
                        );
     int async_broadcast(
@@ -262,11 +263,12 @@ int connector_service_t<CONN_TYPE>::sync_connect_i(
 
 template<typename CONN_TYPE>
 int connector_service_t<CONN_TYPE>::async_broadcast(
-                                                const packet_wrapper_t&     msg_,
+                                                packet_wrapper_t&           msg_,
+                                                bool                        auto_clear_,
                                                 broadcast_filter_t          filter_
                                               )
 {
-    m_work_service_group.async_broadcast(msg_, filter_);
+    m_work_service_group.async_broadcast(msg_, auto_clear_, filter_);
 
     return 0;
 }
