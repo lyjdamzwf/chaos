@@ -493,16 +493,17 @@ int connection_t::on_send_data()
         }
         else if (ret < 0)
         {
-            //! yunjie: 如果不是EAGAIN或EINTR, 那么就调用callback返回错误信息
-            if (errno != EAGAIN && errno != EINTR)
+            if (EINTR == errno)
             {
-                if (NULL != m_conn_event_callback)
-                {
-                    m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id, m_user_data);
-                }
+                //! yunjie: 立刻重新send
+                LOGWARN((CONNECTION_MODULE, "connection_t::on_send_data recv EINTR send ret:[%d] socket fd:[%u] errno:[%s]",
+                            ret, m_socket, STRERR
+                        ));
+                continue;
             }
-            else
+            else if (EAGAIN == errno)
             {
+                //! yunjie: 重新注册I/O事件
                 m_service_ptr->register_io_event(
                         m_socket,
                         WRITE_EVENT_FLAG,
@@ -511,8 +512,18 @@ int connection_t::on_send_data()
                         false
                         );
             }
+            else
+            {
+                //! yunjie: 非EINTR,非EAGAIN, 调用上层错误处理函数
+                if (NULL != m_conn_event_callback)
+                {
+                    m_conn_event_callback(EV_ERROR_OCCURRED, m_conn_status, m_conn_id, m_user_data);
+                }
+            }
 
-            LOGWARN((CONNECTION_MODULE, "connection_t::on_send_data  send ret:[%d] socket fd:[%u] errno:[%s]", ret, m_socket, STRERR));
+            LOGWARN((CONNECTION_MODULE, "connection_t::on_send_data send ret:[%d] socket fd:[%u] errno:[%s]",
+                        ret, m_socket, STRERR
+                    ));
             break;
         }
         else

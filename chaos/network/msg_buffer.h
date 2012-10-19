@@ -54,6 +54,7 @@ public:
     msg_buffer_t(const msg_buffer_t& rhs_);
     const msg_buffer_t& operator=(const msg_buffer_t& rhs_);
 
+    //! yunjie: 将数据深拷贝一份到obj_
     void clone(msg_buffer_t& obj_);
 
     //! yunjie: 返回有效数据块的指针
@@ -135,8 +136,8 @@ public:
     //! yunjie: 返回实际删除的字节数
     uint32_t drain_size(uint32_t size_);
 
-    //! yunjie: 计算需要移动的数据字节数
-    uint32_t calc_move_bytes(uint32_t size_);
+    //! yunjie: 计算append指定大小数据需要移动的数据字节数
+    uint32_t calc_append_move_bytes(uint32_t size_);
 
     //! yunjie: 重置数据变量并释放内存块
     void release();
@@ -145,6 +146,7 @@ public:
     //          多线程buffer swap时需要该功能
     void reset();
 
+    //! yunjie: 测试接口, 查看内部数据用
     void loop_2_printf_all();
     void loop_2_printf_data();
 
@@ -156,7 +158,10 @@ private:
 
     int init_buffer_i(uint32_t size_);
 
+    //! yunjie: 为尾部腾出空间
     void adjust_space_for_tail_i(uint32_t size_);
+
+    //! yunjie: 为头部腾出空间
     void adjust_space_for_head_i(uint32_t size_);
 
     int expand_i(uint32_t size_, uint32_t copy_offset_ = 0);

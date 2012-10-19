@@ -67,7 +67,7 @@ int buffer_list_t::append(
         //! yunjie: 查看需要移动的内存是否过大, 如果是并且有
         //          剩余空间, 那么就只拷贝一部分数据
         if (
-            m_write_it->calc_move_bytes(size) > m_max_move_bytes
+            m_write_it->calc_append_move_bytes(size) > m_max_move_bytes
             && remain_capacity
             )
         {

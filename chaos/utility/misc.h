@@ -64,6 +64,21 @@ public:
 #define SAFE_FREE_HOLDER(is_rel, x) \
 memory_holder_safe_free_t __##1104##x##1121##__(is_rel, &x);
 
+#define EXCEPTION_BEGIN \
+try \
+{
+
+#define EXCEPTION_END(module, ext)   \
+} \
+catch (std::exception& e) \
+{ \
+    LOGWARN((module, "%s, %s, exception:[%s]", __PRETTY_FUNCTION__, ext, e.what())); \
+} \
+catch (...) \
+{ \
+    LOGWARN((module, "%s, %s, unknown exception", __PRETTY_FUNCTION__, ext)); \
+}
+
 }
 
 }

@@ -10,7 +10,7 @@ int main(int argc_, char* argv_[])
     NEW_SERVICE();
 
     application_tool_t::block_all_signal();
-    log_tool_t::start_log_service("echoserver.log", 6, 1, 1);
+    log_tool_t::start_log_service("test_task_service.log", 6, 1, 1);
     TS().start(1);
 
     test_task_service_performance();

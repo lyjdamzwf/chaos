@@ -109,7 +109,7 @@ void msg_buffer_t::adjust_space_for_tail_i(uint32_t size_)
         {
             if (expand_i(size_ + m_heap_size))
             {
-                //! yunjie: expand failed
+                //! yunjie: 内存扩张失败，所有数据对齐到头, 尽可能让尾部留有空余
                 if (remain_head_capacity())
                 {
                     marshal_i();
@@ -131,9 +131,10 @@ void msg_buffer_t::adjust_space_for_head_i(uint32_t size_)
         }
         else
         {
+            //! yunjie: 扩张内存块, 并对齐数据起始地址到size_
             if (expand_i(size_ + m_heap_size, size_))
             {
-                //! yunjie: expand failed
+                //! yunjie: 内存扩张失败，所有数据对齐到头, 尽可能让头部留有空余
                 if (remain_tail_capacity())
                 {
                     marshal_i(remain_head_capacity() + remain_tail_capacity());
@@ -167,7 +168,6 @@ uint32_t msg_buffer_t::append(uint32_t size_, char val_)
 
     return append_size;
 }
-
 
 
 uint32_t msg_buffer_t::prepend(const void* data_, uint32_t size_)
@@ -276,9 +276,10 @@ uint32_t msg_buffer_t::drain_size(uint32_t size_)
     return ret;
 }
 
-uint32_t msg_buffer_t::calc_move_bytes(uint32_t size_)
+uint32_t msg_buffer_t::calc_append_move_bytes(uint32_t size_)
 {
-    if (NULL != m_heap_buffer && size_ > remain_tail_capacity())      //! yunjie: 尾部剩余的堆空间不足
+    //! yunjie: 尾部剩余的堆空间不足
+    if (NULL != m_heap_buffer && size_ > remain_tail_capacity())
     {
         if (remain_head_capacity() +  remain_tail_capacity() >= size_)
         {
@@ -288,7 +289,7 @@ uint32_t msg_buffer_t::calc_move_bytes(uint32_t size_)
         else
         {
             //! yunjie: 将会拷贝整个内存块
-            return m_heap_size;
+            return m_data_size;
         }
     }
 
@@ -394,6 +395,7 @@ int msg_buffer_t::expand_i(uint32_t size_, uint32_t copy_offset_)
         return 1;
     }
 
+    //! yunjie: 对齐到jemalloc的内存大小
     uint32_t alloc_size = align_to_jesize(size_);
 
     if (m_is_limit && alloc_size > m_buffer_max_limit)

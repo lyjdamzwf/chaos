@@ -38,9 +38,10 @@ namespace network
 
 using namespace chaos::utility;
 
+//! yunjie: 头部预留内存块大小
 #define HEAD_SIZE           12
 
-class serialize_t : public memory_holder_t
+class serialize_t : public msg_buffer_t
 {
 public:
 	serialize_t()
@@ -61,14 +62,15 @@ public:
     }
 
     serialize_t(const serialize_t& rhs_)
+        :
+            msg_buffer_t(rhs_)
     {
-        m_buffer = rhs_.m_buffer;
         m_reserved_head_bytes = rhs_.m_reserved_head_bytes;
     }
 
     const serialize_t& operator=(const serialize_t& rhs_)
     {
-        m_buffer = rhs_.m_buffer;
+        msg_buffer_t::operator= (rhs_);
         m_reserved_head_bytes = rhs_.m_reserved_head_bytes;
 
         return *this;
@@ -76,19 +78,19 @@ public:
 
     void clone(serialize_t& obj_)
     {
-        m_buffer.clone(obj_.m_buffer);
+        msg_buffer_t::clone(obj_);
         obj_.m_reserved_head_bytes = m_reserved_head_bytes;
     }
 
-	uint32_t size() const { return m_buffer.size() - m_reserved_head_bytes; }
-	const char* data() const { return m_buffer.data() + m_reserved_head_bytes; }
+	uint32_t size() const { return msg_buffer_t::size() - m_reserved_head_bytes; }
+	const char* data() const { return msg_buffer_t::data() + m_reserved_head_bytes; }
 
-    void reserve(uint32_t size_) { if (size_ > m_buffer.capacity()) m_buffer.reserve(size_); }
+    void reserve(uint32_t size_) { if (size_ > msg_buffer_t::capacity()) msg_buffer_t::reserve(size_); }
 
     //! yunjie: 重置数据变量并释放内存块
 	void release()
     {
-        m_buffer.release();
+        msg_buffer_t::release();
         m_reserved_head_bytes = 0;
     }
 
@@ -96,45 +98,47 @@ public:
     //          多线程buffer swap时需要该功能
     void reset()
     {
-        m_buffer.reset();
+        msg_buffer_t::reset();
         m_reserved_head_bytes = 0;
     }
 
 	uint32_t append(const char* buf_, uint32_t len_)
 	{
-        if (NULL == m_buffer.space())
+        if (NULL == msg_buffer_t::space())
         {
-            m_reserved_head_bytes = m_buffer.append(HEAD_SIZE, 0);
+            m_reserved_head_bytes = msg_buffer_t::append(HEAD_SIZE, 0);
         }
 
-		return m_buffer.append(buf_, len_);
+		return msg_buffer_t::append(buf_, len_);
 	}
 
     uint32_t append(uint32_t size_, char val_)
     {
-        if (NULL == m_buffer.space())
+        if (NULL == msg_buffer_t::space())
         {
-            m_reserved_head_bytes = m_buffer.append(HEAD_SIZE, 0);
+            m_reserved_head_bytes = msg_buffer_t::append(HEAD_SIZE, 0);
         }
 
-        return m_buffer.append(size_, val_);
+        return msg_buffer_t::append(size_, val_);
     }
 
 	uint32_t prepend(const char* buf_, uint32_t len_)
 	{
         if (!m_reserved_head_bytes)
         {
-            return m_buffer.prepend(buf_, len_);
+            //! yunjie: 没有为头部预留的内存块, 这时prepend有可能会移动数据内存块
+            return msg_buffer_t::prepend(buf_, len_);
         }
 
-        m_buffer.drain_size(m_reserved_head_bytes);
-        uint32_t prepend_ret = m_buffer.prepend(buf_, len_);
+        //! yunjie: 头部预留内存块有剩余
+        msg_buffer_t::drain_size(m_reserved_head_bytes);
+        uint32_t prepend_ret = msg_buffer_t::prepend(buf_, len_);
 
         m_reserved_head_bytes = (m_reserved_head_bytes > len_) ? m_reserved_head_bytes - len_ : 0;
 
         if (m_reserved_head_bytes)
         {
-            m_buffer.prepend(m_reserved_head_bytes, 0);
+            msg_buffer_t::prepend(m_reserved_head_bytes, 0);
         }
 
         return prepend_ret;
@@ -144,17 +148,19 @@ public:
 	{
         if (!m_reserved_head_bytes)
         {
-            return m_buffer.prepend(size_, val_);
+            //! yunjie: 没有为头部预留的内存块, 这时prepend有可能会移动数据内存块
+            return msg_buffer_t::prepend(size_, val_);
         }
 
-        m_buffer.drain_size(m_reserved_head_bytes);
-        uint32_t prepend_ret = m_buffer.prepend(size_, val_);
+        //! yunjie: 头部预留内存块有剩余
+        msg_buffer_t::drain_size(m_reserved_head_bytes);
+        uint32_t prepend_ret = msg_buffer_t::prepend(size_, val_);
 
         m_reserved_head_bytes = (m_reserved_head_bytes > size_) ? m_reserved_head_bytes - size_: 0;
 
         if (m_reserved_head_bytes)
         {
-            m_buffer.prepend(m_reserved_head_bytes, 0);
+            msg_buffer_t::prepend(m_reserved_head_bytes, 0);
         }
 
         return prepend_ret;
@@ -209,7 +215,6 @@ public:
     }
 
 private:
-    msg_buffer_t                    m_buffer;
     uint32_t                        m_reserved_head_bytes;
 };
 
