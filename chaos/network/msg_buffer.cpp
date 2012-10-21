@@ -65,7 +65,7 @@ const msg_buffer_t& msg_buffer_t::operator=(const msg_buffer_t& rhs_)
 
 void msg_buffer_t::clone(msg_buffer_t& obj_)
 {
-    obj_.release();
+    obj_.reset();
     obj_.append(data(), size());
     obj_.m_data_size = size();
     obj_.m_is_limit = m_is_limit;

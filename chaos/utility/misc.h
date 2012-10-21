@@ -35,34 +35,90 @@ namespace utility
 class memory_holder_t
 {
 public:
+    memory_holder_t()
+        :
+            m_rel_flag(true)
+    {
+    }
+
     virtual ~memory_holder_t() {}
     virtual void release() = 0;
+
+    bool get_rel_flag() const { return m_rel_flag; }
+    void set_rel_flag(bool flag_) { m_rel_flag = flag_; }
+
+private:
+    bool            m_rel_flag;
 };
 
 class memory_holder_safe_free_t
 {
 public:
-    memory_holder_safe_free_t(bool is_rel_, memory_holder_t* t_)
+    memory_holder_safe_free_t(memory_holder_t* t_)
         :
-            m_is_release(is_rel_),
-            m_t(t_)
+            m_t(t_),
+            m_rel_flag(true)
+    {
+    }
+
+    memory_holder_safe_free_t(memory_holder_t* t_, bool rel_flag_)
+        :
+            m_t(t_),
+            m_rel_flag(rel_flag_)
     {
     }
 
     ~memory_holder_safe_free_t()
     {
-        if (m_is_release && NULL != m_t)
+        if (m_rel_flag && NULL != m_t && m_t->get_rel_flag())
         {
             m_t->release();
         }
     }
 
-    bool                                m_is_release;
     memory_holder_t*                    m_t;
+    bool                                m_rel_flag;
 };
 
-#define SAFE_FREE_HOLDER(is_rel, x) \
-memory_holder_safe_free_t __##1104##x##1121##__(is_rel, &x);
+template <typename T>
+class memory_holder_safe_free_container_t
+{
+public:
+    memory_holder_safe_free_container_t(T* container_, bool rel_flag_)
+        :
+            m_container(container_),
+            m_rel_flag(rel_flag_)
+    {
+    }
+
+    ~memory_holder_safe_free_container_t()
+    {
+        if (m_rel_flag && NULL != m_container)
+        {
+            for (
+                    typename T::iterator it = m_container->begin();
+                    it != m_container->end();
+                    ++it
+                )
+            {
+                if (it->get_rel_flag())
+                {
+                    it->release();
+                }
+            }
+        }
+    }
+
+private:
+    T*                  m_container;
+    bool                m_rel_flag;
+};
+
+#define MH_SAFE_FREE(x, rel_flag) \
+memory_holder_safe_free_t __##1104##x##1121##__(&x, rel_flag);
+
+#define MH_SAFE_FREE_CTN(ctn_t, x, rel_flag) \
+memory_holder_safe_free_container_t<ctn_t> __##1104##x##1121##__(&x, rel_flag);
 
 #define EXCEPTION_BEGIN \
 try \

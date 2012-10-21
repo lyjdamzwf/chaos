@@ -347,7 +347,7 @@ int work_service_t::sync_broadcast_packet_wrapper_i(
         broadcast_filter_t          filter_
         )
 {
-    SAFE_FREE_HOLDER(auto_clear_, msg_);
+    MH_SAFE_FREE(msg_, auto_clear_);
 
     for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {

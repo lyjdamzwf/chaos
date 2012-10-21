@@ -78,7 +78,7 @@ public:
                 const char* data_,
                 uint32_t size_
                 );
-    int recv_to_buffer(fd_t fd_, int&recv_ret_);
+    int recv_to_buffer(fd_t fd_, int& recv_ret_);
     void set_max_move_bytes(uint32_t bytes_);
     uint32_t drain_size(uint32_t size_);
     void clear();

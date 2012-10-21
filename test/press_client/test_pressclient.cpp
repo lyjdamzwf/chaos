@@ -97,6 +97,7 @@ void entity_t::handle_message(
                     packet.append((char*)&packet_header_, sizeof(packet_header_));
                     packet.append((char*)data_ptr_, data_size_);
 
+                    m_last_packet.release();
                     packet.clone(m_last_packet);
 
                     LOGINFO((TEST_MODULE,
@@ -131,6 +132,7 @@ void entity_t::handle_message(
                         packet.append(body_size, 'a');
                     }
 
+                    m_last_packet.release();
                     packet.clone(m_last_packet);
 
                     LOGINFO((TEST_MODULE,
@@ -166,6 +168,7 @@ void entity_t::handle_message(
                     packet.append((char*)&header, sizeof(packet_header_t));
                     packet.append(content_buffer, header.data_len);
 
+                    m_last_packet.release();
                     packet.clone(m_last_packet);
 
                     LOGINFO((TEST_MODULE,

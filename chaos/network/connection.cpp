@@ -210,7 +210,7 @@ int connection_t::sync_send_wrapper_i(
 {
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i args-[fd:%d] begin", conn_id_.socket));
 
-    SAFE_FREE_HOLDER(auto_clear_, msg_);
+    MH_SAFE_FREE(msg_, auto_clear_);
 
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)

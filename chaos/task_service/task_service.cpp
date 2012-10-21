@@ -203,6 +203,7 @@ void task_service_t::exec_task(thread_t* thd_)
         {
             struct timeval cached_now;
             //! yunjie: prepare the task buffer
+            MH_SAFE_FREE_CTN(task_queue_t::container_t, tasks, true);
             tasks.clear();
 
             while (1)
@@ -249,9 +250,9 @@ void task_service_t::exec_task(thread_t* thd_)
             //! yunjie: 处理异步请求
             for (deque<async_method_t>::iterator it = tasks.begin(); it != tasks.end(); ++it)
             {
-                async_method_t task = (*it);
-                SAFE_FREE_HOLDER(true, task);
-                task();
+                EXCEPTION_BEGIN
+                    (*it)();
+                EXCEPTION_END(TASK_SERVICE_MODULE, "exec task")
             }
         }
         catch (const std::exception& ex)
@@ -296,8 +297,8 @@ int task_service_t::post(
     if (exec_local_ && is_run_on_service())
     {
         async_method_t& exec_local_method = const_cast<async_method_t&>(async_method_);
+        MH_SAFE_FREE(exec_local_method, true);
         exec_local_method();
-        exec_local_method.release();
 
         return 0;
     }

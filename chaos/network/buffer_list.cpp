@@ -131,7 +131,7 @@ int buffer_list_t::append(
     return 0;
 }
 
-int buffer_list_t::recv_to_buffer(fd_t fd_, int&recv_ret_)
+int buffer_list_t::recv_to_buffer(fd_t fd_, int& recv_ret_)
 {
     int ret = 0;
     if (-1 == (ret = m_write_it->recv_to_buffer(fd_, recv_ret_)))

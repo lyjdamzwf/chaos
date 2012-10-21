@@ -85,7 +85,7 @@ int work_service_group_t::async_broadcast(
                                             broadcast_filter_t          filter_
                                          )
 {
-    SAFE_FREE_HOLDER(auto_clear_, msg_);
+    MH_SAFE_FREE(msg_, auto_clear_);
 
     for (
             task_service_container_t::iterator it = m_task_service_group.begin();
