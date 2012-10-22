@@ -7,7 +7,8 @@ using namespace std;
 
 int main(int argc_, char* argv_[])
 {
-    test_async_method();
+    //! test_async_method();
+    check_memory_leak();
 
     return 0;
 }

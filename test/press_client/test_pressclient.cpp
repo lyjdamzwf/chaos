@@ -105,7 +105,17 @@ void entity_t::handle_message(
                                 service_name_.c_str(), conn_id_.socket, packet.size()
                            ));
 
-                    connection_t::async_send(conn_id_, packet, true);
+
+                    if (rand_gen_t::calc_probability(50))
+                    {
+                        connection_t::async_send(conn_id_, packet, true);
+                    }
+                    else
+                    {
+                        MH_SAFE_FREE(packet, true);
+                        connection_t::async_send(conn_id_, packet.data(), packet.size());
+                    }
+
                     done = true;
                 }
                 break;
@@ -140,7 +150,16 @@ void entity_t::handle_message(
                                 service_name_.c_str(), conn_id_.socket, packet.size()
                            ));
 
-                    connection_t::async_send(conn_id_, packet, true);
+                    if (rand_gen_t::calc_probability(50))
+                    {
+                        connection_t::async_send(conn_id_, packet, true);
+                    }
+                    else
+                    {
+                        MH_SAFE_FREE(packet, true);
+                        connection_t::async_send(conn_id_, packet.data(), packet.size());
+                    }
+
                     done = true;
                 }
                 break;
@@ -176,7 +195,16 @@ void entity_t::handle_message(
                                 service_name_.c_str(), conn_id_.socket, packet.size()
                            ));
 
-                    g_connector_service_ptr->async_broadcast(packet, true, broadcast_filter);
+                    if (rand_gen_t::calc_probability(50))
+                    {
+                        g_connector_service_ptr->async_broadcast(packet, true, broadcast_filter);
+                    }
+                    else
+                    {
+                        MH_SAFE_FREE(packet, true);
+                        g_connector_service_ptr->async_broadcast(packet.data(), packet.size(), broadcast_filter);
+                    }
+
                     done = true;
                 }
                 break;
@@ -279,7 +307,15 @@ void press_client_t::tcp_press_conn_event(
                 packet.append(body_size, 'a');
             }
 
-            connection_t::async_send(conn_id_, packet, true);
+            if (rand_gen_t::calc_probability(50))
+            {
+                connection_t::async_send(conn_id_, packet, true);
+            }
+            else
+            {
+                MH_SAFE_FREE(packet, true);
+                connection_t::async_send(conn_id_, packet.data(), packet.size());
+            }
         }
         break;
 

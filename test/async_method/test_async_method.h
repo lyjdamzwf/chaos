@@ -85,5 +85,16 @@ void test_async_method()
     }
 }
 
+void check_memory_leak()
+{
+    string str = "123abc";
+
+    for (;;)
+    {
+        async_method_t m = bindfunc(&foo_t::test_static_func, str);
+        m.release();
+    }
+}
+
 
 #endif //! _CHAOS_TEST_ASYNC_METHOD_H_

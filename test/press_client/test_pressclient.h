@@ -9,7 +9,7 @@
 #define MIN_PACKET_SIZE (sizeof(packet_header_t))
 #define MAX_PACKET_SIZE (sizeof(packet_header_t) + 4096)
 
-#define BROADCAST_PACKET_SIZE           4096
+#define BROADCAST_PACKET_SIZE           (32 * 1024)
 
 #define CHECK_SUM 1
 
@@ -29,8 +29,8 @@ enum press_conn_action_e
 
 #define CROSS_THREAD    100
 
-#define REPEAT_PRO  70
-#define RESEND_PRO  70
+#define REPEAT_PRO  50
+#define RESEND_PRO  50
 #define BC_PRO      50
 #define CLOSE_PRO   20
 #define HB_PRO      20

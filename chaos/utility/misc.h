@@ -114,11 +114,45 @@ private:
     bool                m_rel_flag;
 };
 
+template <typename T>
+class pointer_safe_free_container_t
+{
+public:
+    pointer_safe_free_container_t(T* container_, bool rel_flag_)
+        :
+            m_container(container_),
+            m_rel_flag(rel_flag_)
+    {
+    }
+
+    ~pointer_safe_free_container_t()
+    {
+        if (m_rel_flag && NULL != m_container)
+        {
+            for (
+                    typename T::iterator it = m_container->begin();
+                    it != m_container->end();
+                    ++it
+                )
+            {
+                chaos_delete(*it);
+            }
+        }
+    }
+
+private:
+    T*                  m_container;
+    bool                m_rel_flag;
+};
+
 #define MH_SAFE_FREE(x, rel_flag) \
 memory_holder_safe_free_t __##1104##x##1121##__(&x, rel_flag);
 
 #define MH_SAFE_FREE_CTN(ctn_t, x, rel_flag) \
 memory_holder_safe_free_container_t<ctn_t> __##1104##x##1121##__(&x, rel_flag);
+
+#define PTR_SAFE_FREE_CTN(ctn_t, x, rel_flag) \
+pointer_safe_free_container_t<ctn_t> __##1104##x##1121##__(&x, rel_flag);
 
 #define EXCEPTION_BEGIN \
 try \
