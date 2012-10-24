@@ -33,8 +33,10 @@ fi
 
 if [ "$build_part" = "all" ] || [ "$build_part" = "reconf" ] || [ "$build_part" = "chaos" ]; then
 make -C chaos
-ar -q ./chaos/utility/libchaos_utility.a chaos/deps/jemalloc/src/*.o
-ar -q ./chaos/libchaos.a chaos/deps/jemalloc/src/*.o
+cp ./chaos/utility/libchaos_utility.a ./chaos/utility/libchaos_utility_je.a 
+cp ./chaos/libchaos.a ./chaos/libchaos_je.a 
+ar -q ./chaos/utility/libchaos_utility_je.a chaos/deps/jemalloc/src/*.o
+ar -q ./chaos/libchaos_je.a chaos/deps/jemalloc/src/*.o
 fi
 
 

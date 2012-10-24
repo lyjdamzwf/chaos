@@ -135,7 +135,7 @@ public:
                     ++it
                 )
             {
-                chaos_delete(*it);
+                destroy(*it);
             }
         }
     }

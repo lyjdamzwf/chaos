@@ -47,7 +47,7 @@ async_method_t bindfunc(R (*f_)(BIND_NAME_LIST_##num(B)) BIND_ARG_LIST_##num) \
 { \
     typedef R (*F)(BIND_NAME_LIST_##num(B)); \
     async_method_base_t* async_method_ptr = \
-    chaos_new< async_method_bind_func_##num##_t<F COMMA_##num BIND_NAME_LIST_##num(A)> >( \
+    construct< async_method_bind_func_##num##_t<F COMMA_##num BIND_NAME_LIST_##num(A)> >( \
                                 f_ BIND_NEW_CTOR_LIST_##num \
                                                                    ); \
     async_method_t async_method(async_method_ptr); \
@@ -60,7 +60,7 @@ async_method_t bindfunc(CLS_TYPE* obj_, R (CLS_TYPE::*f_)(BIND_NAME_LIST_##num(B
 { \
     typedef R (CLS_TYPE::*F)(BIND_NAME_LIST_##num(B)); \
     async_method_base_t* async_method_ptr = \
-    chaos_new< async_method_bind_obj_##num##_t<CLS_TYPE, F COMMA_##num BIND_NAME_LIST_##num(A)> >( \
+    construct< async_method_bind_obj_##num##_t<CLS_TYPE, F COMMA_##num BIND_NAME_LIST_##num(A)> >( \
                                 obj_, f_ BIND_NEW_CTOR_LIST_##num \
                                                                             ); \
     async_method_t async_method(async_method_ptr); \
@@ -102,7 +102,7 @@ public:
     {
         if (NULL != m_async_method_base_ptr)
         {
-            chaos_delete<async_method_base_t>(m_async_method_base_ptr);
+            destroy<async_method_base_t>(m_async_method_base_ptr);
         }
     }
 

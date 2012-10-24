@@ -233,4 +233,42 @@ void test_serialize()
     ser.dump();
 }
 
+class base_t
+{
+private:
+    int     b_a;
+};
+
+class foo_t : public base_t
+{
+public:
+    foo_t(int a_, int b_, char c_, string& d_, const char* e_)
+        :
+            a(a_),
+            b(b_),
+            c(c_),
+            d(d_),
+            e(e_)
+    {
+    }
+
+private:
+    int                     a;
+    int                     b;
+    char                    c;
+    string&                 d;
+    const char*             e;
+};
+
+void test_chaos_new()
+{
+    string s = "str";
+
+    for (int i = 0; i < 100000000; ++i)
+    {
+        base_t* b_ptr = construct<foo_t>(1,2,'a',s,"xyz");
+        chaos::utility::destroy(b_ptr);
+    }
+}
+
 #endif //! _CHAOS_TEST_MSG_BUFFER_H_

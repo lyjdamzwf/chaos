@@ -84,7 +84,7 @@ int active_connection_t::sync_connect(
 
     struct timeval now;
     gettimeofday(&now, NULL);
-    conn_ptr_t conn_ptr = new CONN_TYPE;
+    conn_ptr_t conn_ptr = construct<CONN_TYPE>();
     if (NULL == conn_ptr)
     {
         LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect conn_ptr is NULL, return."));

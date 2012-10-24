@@ -6,5 +6,5 @@ chaos_tpclient_SOURCES = chaos.cpp \
 						 ../misc_impl.cpp
 
 chaos_tpclient_LDADD = \
-			  $(top_srcdir)/chaos/libchaos.a \
+			  $(top_srcdir)/chaos/libchaos_je.a \
 			  -lpthread

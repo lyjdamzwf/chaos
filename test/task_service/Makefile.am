@@ -10,7 +10,7 @@ chaos_task_service_SOURCES = chaos.cpp \
 chaos_task_service_LDFLAGS =  -L/opt/local/boost/lib/boost-1_44
 
 chaos_task_service_LDADD = \
-			  $(top_srcdir)/chaos/libchaos.a \
+			  $(top_srcdir)/chaos/libchaos_je.a \
 			  -lboost_system -lboost_thread -lboost_regex	\
 			  -lpthread
 

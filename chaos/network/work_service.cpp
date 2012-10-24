@@ -260,7 +260,8 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
                ));
 
         //! yunjie: 不需要在这里close socket, 析构时保证
-        SAFE_DELETE(conn_ptr);
+        destroy(conn_ptr);
+        conn_ptr = NULL;
     }
     conn_ptr = conn_ptr_;
 
@@ -332,7 +333,8 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
     }
 
     //! yunjie: 将conn_ptr置为NULL
-    SAFE_DELETE(conn_ptr);
+    destroy(conn_ptr);
+    conn_ptr = NULL;
 
     LOGTRACE((WORK_SERVICE_MODULE,
                 "work_service_t::sync_del_connection_i arg-[fd:%d] end",

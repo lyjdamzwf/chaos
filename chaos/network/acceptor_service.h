@@ -376,7 +376,7 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
 
     struct timeval now = as_ptr->m_timer_manager.get_cached_time();
 
-    conn_ptr_t conn_ptr = new CONN_TYPE;
+    conn_ptr_t conn_ptr = construct<CONN_TYPE>();
     if (NULL == conn_ptr)
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE,

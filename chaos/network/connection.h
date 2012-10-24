@@ -196,7 +196,7 @@ protected:
 
     //! ------------------------------------ member function begin ------------------------------------
 
-protected:
+public:
     connection_t();
     virtual ~connection_t();
 

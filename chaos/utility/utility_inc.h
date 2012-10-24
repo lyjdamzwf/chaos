@@ -19,6 +19,6 @@
 #include <chaos/utility/singleton.h>
 #include <chaos/utility/time_util.h>
 #include <chaos/utility/arg_helper.h>
-#include <chaos/utility/chaos_malloc.h>
+#include <chaos/utility/memory.h>
 
 #endif //! _CHAOS_UTILITY_INC_H_
