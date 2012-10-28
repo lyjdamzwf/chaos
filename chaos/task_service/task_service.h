@@ -23,6 +23,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <exception>
+
 #include <chaos/utility/utility_inc.h>
 #include <chaos/async_method/async_method_inc.h>
 #include <chaos/thread/thread_inc.h>
@@ -90,6 +92,32 @@ using namespace chaos::log;
 #define DEFAULT_SERVICE_NAME                "default_service_name"
 #endif
 
+class post_failed_exception_t : public std::exception
+{
+public:
+    post_failed_exception_t()
+        :
+            m_what("task_service_t post failed exception occurred")
+    {
+    }
+
+    post_failed_exception_t(const char* what_)
+        :
+            m_what(what_)
+    {
+    }
+
+    virtual ~post_failed_exception_t() throw() {}
+
+    const char *what() const throw()
+    {
+        return m_what.c_str();
+    }
+
+private:
+    string                          m_what;
+};
+
 class task_service_t : private noncopyable_t
 {
 public:
@@ -150,7 +178,7 @@ public:
     //! ext_data_ -使用者可以借助ext_data来改变投递规则
     //! is_allow_exec_local_ - 如果当前线程属于task_service的线程组, 就立即执行
     virtual int post(
-                        const async_method_t&   async_method_,
+                        async_method_t          async_method_,
                         void*                   ext_data_               = NULL,
                         task_prior_e            prior_                  = TASK_PRIOR_NORMAL,
                         bool                    is_allow_exec_local_    = true

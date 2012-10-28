@@ -386,7 +386,14 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
         return;
     }
 
-    conn_ptr->initialize(accepted_fd, now, work_ptr, T_PASSIVE, as_ptr->m_event_func, &as_ptr->m_network_config, work_ptr->is_enable_hb());
+    if (-1 == conn_ptr->initialize(accepted_fd, now, work_ptr, T_PASSIVE, as_ptr->m_event_func, &as_ptr->m_network_config, work_ptr->is_enable_hb()))
+    {
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "acceptor_service_t::on_listen_callback"
+                    " conn_ptr initialize failed, destroy it"
+               ));
+        destroy<CONN_TYPE>((CONN_TYPE*)conn_ptr);
+    }
 
     LOGTRACE((ACCEPTOR_SERVICE_MODULE,
                 "acceptor_service_t::on_listen_callback args-[fd:%d, event_type:%d] end",

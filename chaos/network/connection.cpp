@@ -308,13 +308,10 @@ connection_t::~connection_t()
 
 int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, network_config_t* config_, bool enable_hb_)
 {
-    int ret = 0;
-
-    //! yunjie: 设置描述符为nonblock
     if (-1 == network_tool_t::make_socket_nonblocking(socket_))
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::initialize make_socket_nonblocking failed"));
-        ret = -1;
+        return -1;
     }
 
     //! yunjie: 初始化成员
@@ -351,7 +348,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
         {
             LOGWARN((CONNECTION_MODULE, "connection_t::initialize set socket option size of sndbuf failed."));
             TEMP_FAILURE_RETRY(::close(m_socket));
-            ret = -1;
+            return -1;
         }
 
         int rcvbuf_size = (*m_config_holder).tcp_rcvbuf_size;
@@ -359,7 +356,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
         {
             LOGWARN((CONNECTION_MODULE, "connection_t::initialize set socket option size of rcvbuf failed."));
             TEMP_FAILURE_RETRY(::close(m_socket));
-            ret = -1;
+            return -1;
         }
     }
 
@@ -370,7 +367,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
         if(::setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void*)&nodelay, sizeof(nodelay)))
         {
             LOGWARN((CONNECTION_MODULE, "connection_t::initialize set nodelay failed socket:[%u]", m_socket));
-            ret = -1;
+            return -1;
         }
     }
 
@@ -380,12 +377,29 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
         m_conn_event_callback(EV_INIT_COMPLETE, m_conn_status, m_conn_id, m_user_data);
     }
 
-    //! yunjie: 注册到event loop中
-    work_service_->async_add_connection(this);
+    try
+    {
+        //! yunjie: 注册到event loop中
+        work_service_->async_add_connection(this);
+    }
+    catch (const post_failed_exception_t& exception_)
+    {
+        LOGWARN((CONNECTION_MODULE, "connection_t::initialize async_add_connection post_failed_exception occurred"));
+        return -1;
+    }
 
     if (m_enable_hb)
     {
-        m_service_ptr->async_add_hb_element(m_conn_id);
+        try
+        {
+            m_service_ptr->async_add_hb_element(m_conn_id);
+        }
+        catch (const post_failed_exception_t& exception_)
+        {
+            LOGWARN((CONNECTION_MODULE, "connection_t::initialize async_hb_element post_failed_exception occurred"));
+            work_service_->async_del_connection(m_conn_id);
+            return -1;
+        }
     }
 
     //! yunjie: connection已加入到event loop中, 回调通知上层
@@ -408,7 +422,7 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
         m_conn_event_callback(conn_ev, m_conn_status, m_conn_id, m_user_data);
     }
 
-    return ret;
+    return 0;
 }
 
 int connection_t::on_recv_data()

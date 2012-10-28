@@ -110,7 +110,7 @@ l1:
         else
         {
             change_ = cur_v[index_].inc();
-            
+
             if (!change_)
             {
                 return;
@@ -118,7 +118,7 @@ l1:
         }
     }
     while (
-            0 != index_ 
+            0 != index_
             || (0 == index_ && 0 != cur_v[0].embellish)
           );
 }

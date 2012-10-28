@@ -91,7 +91,14 @@ int active_connection_t::sync_connect(
         return -1;
     }
 
-    conn_ptr->initialize(sockfd, now, service_ptr_, T_ACTIVE, event_func_, config_ptr_, is_add_to_hb_);
+    if (-1 == conn_ptr->initialize(sockfd, now, service_ptr_, T_ACTIVE, event_func_, config_ptr_, is_add_to_hb_))
+    {
+        LOGWARN((ACCEPTOR_SERVICE_MODULE,
+                    "active_connection_t::sync_connect"
+                    " conn_ptr initialize failed, destroy it"
+               ));
+        destroy<CONN_TYPE>((CONN_TYPE*)conn_ptr);
+    }
 
     out_.socket = sockfd;
     out_.timestamp = now;

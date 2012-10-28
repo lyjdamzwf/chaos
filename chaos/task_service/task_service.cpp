@@ -287,34 +287,44 @@ void task_service_t::set_stop_signal(bool signal_)
 }
 
 int task_service_t::post(
-                            const async_method_t&   async_method_,
+                            async_method_t          async_method_,
                             void*                   ext_data_,
                             task_prior_e            prior_,
                             bool                    exec_local_
                         )
 {
+    /* yunjie: post函数内不能进行LOGXXXX,会引起递归溢出(因为LOGXXXX内也会post到日志线程) */
+
+
     //! yunjie: 如果投递消息的是本线程组中的线程, 那么就直接执行, 不进行多余的入队列操作.
     if (exec_local_ && is_run_on_service())
     {
-        async_method_t& exec_local_method = const_cast<async_method_t&>(async_method_);
-        MH_SAFE_FREE(exec_local_method, true);
-        exec_local_method();
+        MH_SAFE_FREE(async_method_, true);
+        async_method_();
 
         return 0;
     }
 
-    m_task_queue.push(async_method_);
+    try
+    {
+        m_task_queue.push(async_method_);
+    }
+    catch (...)
+    {
+        async_method_.release();
+        throw post_failed_exception_t();
+    }
 
 #if COMMUNICATION_MODE == PTHREAD_COND_VAR
-    send_cond_signal_t send_cond_signal;
-    m_thread_group.exec_all(send_cond_signal);
+        send_cond_signal_t send_cond_signal;
+        m_thread_group.exec_all(send_cond_signal);
 #elif COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
-    char byte;
-    int ret = 0;
-    if ((ret = ::write(m_comm_fds[1], &byte, sizeof(char))) != sizeof(char))
-    {
-        //! yunjie: post函数内不能进行LOGXXXX,会引起递归溢出(因为LOGXXXX内也会post到日志线程)
-    }
+        char byte;
+        int ret = 0;
+        if ((ret = ::write(m_comm_fds[1], &byte, sizeof(char))) != sizeof(char))
+        {
+            //! yunjie: post函数内不能进行LOGXXXX,会引起递归溢出(因为LOGXXXX内也会post到日志线程)
+        }
 #endif
 
     return 0;
