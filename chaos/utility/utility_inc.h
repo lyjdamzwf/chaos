@@ -20,5 +20,6 @@
 #include <chaos/utility/time_util.h>
 #include <chaos/utility/arg_helper.h>
 #include <chaos/utility/memory.h>
+#include <chaos/utility/shared_ptr.h>
 
 #endif //! _CHAOS_UTILITY_INC_H_
