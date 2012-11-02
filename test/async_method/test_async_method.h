@@ -81,7 +81,6 @@ void test_async_method()
     for (vector<async_method_t>::iterator it = task_queue.begin(); it != task_queue.end(); ++it)
     {
         (*it)();
-        it->release();
     }
 }
 
@@ -92,7 +91,6 @@ void check_memory_leak()
     for (;;)
     {
         async_method_t m = bindfunc(&foo_t::test_static_func, str);
-        m.release();
     }
 }
 

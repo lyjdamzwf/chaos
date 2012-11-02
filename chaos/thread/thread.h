@@ -60,7 +60,6 @@ public:
 
     virtual ~thread_t()
     {
-        m_thread_func.release();
     }
 
     /* 获取当前线程编号 */

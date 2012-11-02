@@ -20,6 +20,8 @@
  *
  */
 
+#include <chaos/utility/utility_inc.h>
+
 #include <chaos/async_method/async_method_base.h>
 
 namespace chaos
@@ -27,6 +29,8 @@ namespace chaos
 
 namespace async_method
 {
+
+using namespace chaos::utility;
 
 #define BIND_OBJ_IMPL(num) \
 template <typename CLS_TYPE, typename F COMMA_##num BIND_NAME_LIST_##num(typename A)> \
@@ -42,6 +46,10 @@ public: \
         { \
             (m_obj_ptr->*m_func)(BIND_INVOKE_LIST_##num); \
         } \
+    } \
+    async_method_base_t* clone() \
+    { \
+        return chaos::utility::construct<async_method_bind_obj_##num##_t>(m_obj_ptr, m_func COMMA_##num BIND_INVOKE_LIST_##num); \
     } \
 private: \
     CLS_TYPE* m_obj_ptr; \

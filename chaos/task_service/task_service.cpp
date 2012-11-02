@@ -203,7 +203,6 @@ void task_service_t::exec_task(thread_t* thd_)
         {
             struct timeval cached_now;
             //! yunjie: prepare the task buffer
-            MH_SAFE_FREE_CTN(task_queue_t::container_t, tasks, true);
             tasks.clear();
 
             while (1)
@@ -287,7 +286,7 @@ void task_service_t::set_stop_signal(bool signal_)
 }
 
 int task_service_t::post(
-                            async_method_t          async_method_,
+                            const async_method_t&   async_method_,
                             void*                   ext_data_,
                             task_prior_e            prior_,
                             bool                    exec_local_
@@ -299,21 +298,12 @@ int task_service_t::post(
     //! yunjie: 如果投递消息的是本线程组中的线程, 那么就直接执行, 不进行多余的入队列操作.
     if (exec_local_ && is_run_on_service())
     {
-        MH_SAFE_FREE(async_method_, true);
-        async_method_();
+        const_cast<async_method_t&>(async_method_)();
 
         return 0;
     }
 
-    try
-    {
-        m_task_queue.push(async_method_);
-    }
-    catch (...)
-    {
-        async_method_.release();
-        throw post_failed_exception_t();
-    }
+    m_task_queue.push(async_method_);
 
 #if COMMUNICATION_MODE == PTHREAD_COND_VAR
         send_cond_signal_t send_cond_signal;

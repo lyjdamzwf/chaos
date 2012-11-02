@@ -57,6 +57,11 @@
 #include <sys/eventfd.h>
 #endif
 
+/**
+#undef COMMUNICATION_MODE
+#define COMMUNICATION_MODE  2
+*/
+
 namespace chaos
 {
 
@@ -178,7 +183,7 @@ public:
     //! ext_data_ -使用者可以借助ext_data来改变投递规则
     //! is_allow_exec_local_ - 如果当前线程属于task_service的线程组, 就立即执行
     virtual int post(
-                        async_method_t          async_method_,
+                        const async_method_t&   async_method_,
                         void*                   ext_data_               = NULL,
                         task_prior_e            prior_                  = TASK_PRIOR_NORMAL,
                         bool                    is_allow_exec_local_    = true

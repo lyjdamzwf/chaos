@@ -304,6 +304,7 @@ public:
     async_method_base_t() {}
     virtual ~async_method_base_t() {}
     virtual void exec() = 0;
+    virtual async_method_base_t* clone() = 0;
 };
 
 }

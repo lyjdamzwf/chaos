@@ -70,7 +70,6 @@ struct time_event_t
 
     void release()
     {
-        callback.release();
     }
 
     bool operator<(const time_event_t& event_) const

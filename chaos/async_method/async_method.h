@@ -67,7 +67,7 @@ async_method_t bindfunc(CLS_TYPE* obj_, R (CLS_TYPE::*f_)(BIND_NAME_LIST_##num(B
     return async_method; \
 }
 
-class async_method_t : public memory_holder_t
+class async_method_t
 {
 public:
     async_method_t()
@@ -80,14 +80,31 @@ public:
     {
     }
 
-    async_method_t(const async_method_t& rhs_)
+    ~async_method_t()
     {
-        m_async_method_base_ptr = rhs_.m_async_method_base_ptr;
+        release();
     }
 
-    void operator=(const async_method_t& method_)
+    async_method_t(const async_method_t& rhs_)
+        :
+            m_async_method_base_ptr(NULL)
     {
-        m_async_method_base_ptr = method_.m_async_method_base_ptr;
+        release();
+
+        if (NULL != rhs_.m_async_method_base_ptr)
+        {
+            m_async_method_base_ptr = rhs_.m_async_method_base_ptr->clone();
+        }
+    }
+
+    void operator=(const async_method_t& rhs_)
+    {
+        release();
+
+        if (NULL != rhs_.m_async_method_base_ptr)
+        {
+            m_async_method_base_ptr = rhs_.m_async_method_base_ptr->clone();
+        }
     }
 
     void operator()()
@@ -98,11 +115,13 @@ public:
         }
     }
 
+private:
     void release()
     {
         if (NULL != m_async_method_base_ptr)
         {
             destroy<async_method_base_t>(m_async_method_base_ptr);
+            m_async_method_base_ptr = NULL;
         }
     }
 
