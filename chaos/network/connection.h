@@ -150,6 +150,15 @@ class connection_t
 
 public:
     typedef connection_t*                           inner_conn_ptr_t;
+
+    //! yunjie: connection_t对象在单线程上操作
+    //          使用非原子引用技术提高性能
+    typedef shared_ptr_t<
+                connection_t,
+                ref_counter_t,
+                destroy_policy_t<connection_t>
+                        >
+            inner_conn_sptr_t;
     typedef                                     void (*on_conn_event_t)(
                                                         conn_event_e    conn_event_,
                                                         conn_status_e   conn_status_,
@@ -170,9 +179,8 @@ public:
                           );
 
     static int async_send(
-                            const struct conn_id_t& conn_id_,
-                            packet_wrapper_t&       msg_,
-                            bool                    auto_clear_
+                            const struct conn_id_t&         conn_id_,
+                            const packet_wrapper_t&         msg_
                          );
     static int async_send(const struct conn_id_t& conn_id_, const char* msg_, uint32_t size_);
 
@@ -180,9 +188,8 @@ protected:
     static int sync_close_i(const struct conn_id_t& conn_id_, bool is_del_from_hb_, conn_event_e close_type_);
 
     static int sync_send_wrapper_i(
-                                    const struct conn_id_t& conn_id_,
-                                    packet_wrapper_t&       msg_,
-                                    bool                    auto_clear_
+                                    const struct conn_id_t&         conn_id_,
+                                    const packet_wrapper_t&         msg_
                                  );
     static int sync_send_i(
                             const struct conn_id_t& conn_id_,
@@ -201,13 +208,14 @@ public:
     virtual ~connection_t();
 
     virtual int initialize(
-                            fd_t                socket_,
-                            struct timeval      timestamp_,
-                            work_service_t*     work_service_,
-                            conn_type_e         conn_type_,
-                            on_conn_event_t     event_func_,
-                            network_config_t*   config_ = NULL,
-                            bool                enable_hb_ = false
+                            fd_t                        socket_,
+                            const timeval&              timestamp_,
+                            work_service_t*             work_service_,
+                            conn_type_e                 conn_type_,
+                            on_conn_event_t             event_func_,
+                            const inner_conn_sptr_t&    self_sptr_,
+                            network_config_t*           config_ = NULL,
+                            bool                        enable_hb_ = false
                           );
 
     conn_status_e get_status() const
@@ -289,9 +297,13 @@ private:
 
     //! yunjie: 业务层注入的数据
     void*                                           m_user_data;
+
+    //! yunjie: share from this
+    inner_conn_sptr_t                               m_self_sptr;
 };
 
 typedef connection_t::inner_conn_ptr_t              conn_ptr_t;
+typedef connection_t::inner_conn_sptr_t             conn_sptr_t;
 
 }
 

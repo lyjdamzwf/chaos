@@ -100,7 +100,7 @@ protected:
         packet.append((char*)&packet_header_, sizeof(packet_header_));
         packet.append((char*)data_ptr_, data_size_);
 
-        connection_t::async_send(this->get_conn_id(), packet, true);
+        connection_t::async_send(this->get_conn_id(), packet);
     }
 };
 

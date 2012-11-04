@@ -73,7 +73,7 @@ public:
 private:
     /** yunjie: 私有方法都不会涉及到锁竞争 */
 
-    void register_timer_i(time_event_t* event_);
+    void register_timer_i(const time_event_sptr_t& event_);
 
     void clear_i();
 

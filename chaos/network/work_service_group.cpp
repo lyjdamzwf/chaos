@@ -80,13 +80,10 @@ task_service_t* work_service_group_t::new_service()
 }
 
 int work_service_group_t::async_broadcast(
-                                            packet_wrapper_t&           msg_,
-                                            bool                        auto_clear_,
+                                            const packet_wrapper_t&     msg_,
                                             broadcast_filter_t          filter_
                                          )
 {
-    MH_SAFE_FREE(msg_, auto_clear_);
-
     for (
             task_service_container_t::iterator it = m_task_service_group.begin();
             it != m_task_service_group.end();
@@ -94,12 +91,10 @@ int work_service_group_t::async_broadcast(
         )
     {
         work_service_t* work_ptr = (work_service_t*)(*it);
-        packet_wrapper_t tmp_packet;
-        msg_.clone(tmp_packet);
 
         if (NULL != work_ptr)
         {
-            work_ptr->async_broadcast(tmp_packet, true, filter_);
+            work_ptr->async_broadcast(msg_, filter_);
         }
     }
 

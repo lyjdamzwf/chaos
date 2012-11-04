@@ -25,7 +25,7 @@ namespace chaos
 namespace task_service
 {
 
-static bool time_event_fetch_condition(time_event_t* const & event_, void* ext_data_)
+static bool time_event_fetch_condition(const time_event_sptr_t& event_, void* ext_data_)
 {
     if (NULL == ext_data_)
     {
@@ -93,7 +93,7 @@ void timer_manager_t::register_timer(
         local_start_time = get_cached_time_i().tv_sec;
     }
 
-    time_event_t* time_event = new time_event_t(
+    time_event_sptr_t time_event_sptr = chaos::utility::construct<time_event_t>(
                                                         local_start_time,
                                                         interval_,
                                                         0,
@@ -101,14 +101,14 @@ void timer_manager_t::register_timer(
                                                         callback_,
                                                         persist_
                                                     );
-    if (NULL == time_event)
+    if (time_event_sptr.is_null())
     {
         LOGWARN((TIMER_MANAGER_MODULE, "timer_manager_t::register_timer new time_event_t failed"));
         return;
     }
 
     //! yunjie: 这里不需要加锁, m_time_heap被初始化为线程安全的
-    register_timer_i(time_event);
+    register_timer_i(time_event_sptr);
 
     LOGTRACE((TIMER_MANAGER_MODULE, "timer_manager_t::register_timer end"));
 }
@@ -136,8 +136,11 @@ void timer_manager_t::exec()
 
     while (!tasks.empty())
     {
-        struct time_event_t* event = tasks.top();
-        event->exec();
+        time_event_sptr_t event = tasks.top();
+
+        EXCEPTION_BEGIN
+            event->exec();
+        EXCEPTION_END(TIMER_MANAGER_MODULE, "exec timer task")
 
         if (event->persist)
         {
@@ -146,12 +149,6 @@ void timer_manager_t::exec()
 
             //! yunjie: 这时注册的event在该loop中将不会被检测.
             register_timer_i(event);
-        }
-        else
-        {
-            //! yunjie: release会对内部的async_method_t进行内存释放, 不是persist事件才能调用
-            event->release();
-            SAFE_DELETE(event);
         }
 
         tasks.pop();
@@ -189,7 +186,7 @@ uint32_t timer_manager_t::size()
     return m_time_heap.size();
 }
 
-void timer_manager_t::register_timer_i(time_event_t* event_)
+void timer_manager_t::register_timer_i(const time_event_sptr_t& event_)
 {
     m_time_heap.push(event_);
 }

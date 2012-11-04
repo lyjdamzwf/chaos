@@ -97,32 +97,6 @@ using namespace chaos::log;
 #define DEFAULT_SERVICE_NAME                "default_service_name"
 #endif
 
-class post_failed_exception_t : public std::exception
-{
-public:
-    post_failed_exception_t()
-        :
-            m_what("task_service_t post failed exception occurred")
-    {
-    }
-
-    post_failed_exception_t(const char* what_)
-        :
-            m_what(what_)
-    {
-    }
-
-    virtual ~post_failed_exception_t() throw() {}
-
-    const char *what() const throw()
-    {
-        return m_what.c_str();
-    }
-
-private:
-    string                          m_what;
-};
-
 class task_service_t : private noncopyable_t
 {
 public:

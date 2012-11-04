@@ -34,14 +34,14 @@ void connection_t::on_peer_event(fd_t fd_, int event_type_, void* arg_)
 {
     LOGTRACE((CONNECTION_MODULE, "connection_t::on_peer_event args-[fd:%d, event_type:%d] begin", fd_, event_type_));
 
-    conn_ptr_t conn = (conn_ptr_t)arg_;
-    if (NULL == conn)
+    conn_ptr_t conn_ptr = (conn_ptr_t)arg_;
+    if (NULL == conn_ptr)
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::on_peer_event arg_ is NULL, return. args-[fd:%d, event_type:%d]", fd_, event_type_));
         return;
     }
 
-    task_service_t* service_ptr = conn->get_service_ptr();
+    task_service_t* service_ptr = conn_ptr->get_service_ptr();
     if (NULL == service_ptr)
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::on_peer_event service_ptr is NULL, return. args-[fd:%d, event_type:%d]", fd_, event_type_));
@@ -52,17 +52,17 @@ void connection_t::on_peer_event(fd_t fd_, int event_type_, void* arg_)
     {
         case IO_READ_EVENT:
         {
-            conn->on_recv_data();
+            conn_ptr->on_recv_data();
         }
         break;
         case IO_WRITE_EVENT:
         {
-            conn->on_send_data();
+            conn_ptr->on_send_data();
         }
         break;
         case IO_ERROR_EVENT:
         {
-            conn->on_error_occur();
+            conn_ptr->on_error_occur();
         }
         break;
         default:
@@ -92,7 +92,7 @@ int connection_t::async_close(const struct conn_id_t& conn_id_, bool is_del_from
     return 0;
 }
 
-int connection_t::async_send(const struct conn_id_t& conn_id_, packet_wrapper_t& msg_, bool auto_clear_)
+int connection_t::async_send(const struct conn_id_t& conn_id_, const packet_wrapper_t& msg_)
 {
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send begin"));
 
@@ -103,12 +103,7 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, packet_wrapper_t&
         return -1;
     }
 
-    service_ptr->post(bindfunc(&connection_t::sync_send_wrapper_i, conn_id_, msg_, auto_clear_));
-
-    if (auto_clear_)
-    {
-        msg_.reset();
-    }
+    service_ptr->post(bindfunc(&connection_t::sync_send_wrapper_i, conn_id_, msg_));
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
     return 0;
@@ -134,7 +129,7 @@ int connection_t::async_send(const struct conn_id_t& conn_id_, const char* msg_,
     {
         //! yunjie: 为保证数据跨线程安全性, 包装成packet_wrapper_t, post异步消息
         packet_wrapper_t msg_wrapper(msg_, size_);
-        service_ptr->post(bindfunc(&connection_t::sync_send_wrapper_i, conn_id_, msg_wrapper, true));
+        service_ptr->post(bindfunc(&connection_t::sync_send_wrapper_i, conn_id_, msg_wrapper));
     }
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::async_send end"));
@@ -152,34 +147,34 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
         return -1;
     }
 
-    conn_ptr_t conn_ptr = service_ptr->get_conn(conn_id_);
-    if (NULL == conn_ptr)
+    conn_sptr_t conn_sptr = service_ptr->get_conn(conn_id_);
+    if (NULL == conn_sptr)
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::sync_close_i connection not found, it maybe closed, return. args-[fd:%d]", conn_id_.socket));
         return -1;
     }
 
-    if (ST_CLOSED == conn_ptr->get_status())
+    if (ST_CLOSED == conn_sptr->get_status())
     {
         LOGTRACE((CONNECTION_MODULE, "connection_t::sync_close_i connection has closed, return. args-[fd:%d]", conn_id_.socket));
         return 0;
     }
 
     //! yunjie: 关闭connection的socket fd, 从epoll中移除
-    conn_ptr->close_i();
+    conn_sptr->close_i();
 
-    if (is_del_from_hb_ && conn_ptr->is_enable_hb())
+    if (is_del_from_hb_ && conn_sptr->is_enable_hb())
     {
         //! yunjie: 从heart_beart中删除connection
-        service_ptr->async_del_hb_element(conn_ptr->m_conn_id);
+        service_ptr->async_del_hb_element(conn_sptr->m_conn_id);
     }
 
     //! yunjie: connection的一些数据要先拷贝出来,
     //!         因为之后的async_del_connection会
     //!         delete connection对象
-    conn_status_e conn_status = conn_ptr->get_status();
-    on_conn_event_t event_callback = conn_ptr->m_conn_event_callback;
-    void* user_data = conn_ptr->m_user_data;
+    conn_status_e conn_status = conn_sptr->get_status();
+    on_conn_event_t event_callback = conn_sptr->m_conn_event_callback;
+    void* user_data = conn_sptr->m_user_data;
 
     //! yunjie: 释放操作有可能是在本线程直接执行, 所以必须放最后
     if (EV_DECONSTRUCT != close_type_)
@@ -203,14 +198,11 @@ int connection_t::sync_close_i(const struct conn_id_t& conn_id_, bool is_del_fro
 }
 
 int connection_t::sync_send_wrapper_i(
-                                        const struct conn_id_t& conn_id_,
-                                        packet_wrapper_t&       msg_,
-                                        bool                    auto_clear_
+                                        const struct conn_id_t&         conn_id_,
+                                        const packet_wrapper_t&         msg_
                                      )
 {
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i args-[fd:%d] begin", conn_id_.socket));
-
-    MH_SAFE_FREE(msg_, auto_clear_);
 
     work_service_t* service_ptr = conn_id_.service_ptr;
     if (NULL == service_ptr)
@@ -219,21 +211,21 @@ int connection_t::sync_send_wrapper_i(
         return -1;
     }
 
-    conn_ptr_t conn_ptr = service_ptr->get_conn(conn_id_);
-    if (NULL == conn_ptr)
+    conn_sptr_t conn_sptr = service_ptr->get_conn(conn_id_);
+    if (NULL == conn_sptr)
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i close failed, because connection not found, return. args-[fd:%d]", conn_id_.socket));
         return -1;
     }
 
-    if (ST_CLOSED == conn_ptr->get_status())
+    if (ST_CLOSED == conn_sptr->get_status())
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i connection has closed, return. args-[fd:%d]", conn_id_.socket));
         return 0;
     }
 
-    conn_ptr->m_write_buffer.append(msg_.data(), msg_.size());
-    conn_ptr->start_drive_send_i();
+    conn_sptr->m_write_buffer.append(msg_.data(), msg_.size());
+    conn_sptr->start_drive_send_i();
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::sync_send_wrapper_i args-[fd:%d] end", conn_id_.socket));
     return 0;
@@ -252,21 +244,21 @@ int connection_t::sync_send_i(
         return -1;
     }
 
-    conn_ptr_t conn_ptr = service_ptr->get_conn(conn_id_);
-    if (NULL == conn_ptr)
+    conn_sptr_t conn_sptr = service_ptr->get_conn(conn_id_);
+    if (NULL == conn_sptr)
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_i close failed, because connection not found, return. args-[fd:%d]", conn_id_.socket));
         return -1;
     }
 
-    if (ST_CLOSED == conn_ptr->get_status())
+    if (ST_CLOSED == conn_sptr->get_status())
     {
         LOGWARN((CONNECTION_MODULE, "connection_t::sync_send_i connection has closed, return. args-[fd:%d]", conn_id_.socket));
         return 0;
     }
 
-    conn_ptr->m_write_buffer.append(msg_, size_);
-    conn_ptr->start_drive_send_i();
+    conn_sptr->m_write_buffer.append(msg_, size_);
+    conn_sptr->start_drive_send_i();
 
     return 0;
 }
@@ -306,7 +298,16 @@ connection_t::~connection_t()
 }
 
 
-int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_service_t* work_service_, conn_type_e conn_type_, on_conn_event_t event_func_, network_config_t* config_, bool enable_hb_)
+int connection_t::initialize(
+                            fd_t                        socket_,
+                            const timeval&              timestamp_,
+                            work_service_t*             work_service_,
+                            conn_type_e                 conn_type_,
+                            on_conn_event_t             event_func_,
+                            const inner_conn_sptr_t&    self_sptr_,
+                            network_config_t*           config_,
+                            bool                        enable_hb_
+                            )
 {
     if (-1 == network_tool_t::make_socket_nonblocking(socket_))
     {
@@ -330,6 +331,8 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
     m_conn_status = ST_ESTABLISHED;
 
     m_conn_event_callback = event_func_;
+
+    m_self_sptr = self_sptr_;
 
     m_config_holder.set_config(config_);
 
@@ -377,29 +380,12 @@ int connection_t::initialize(fd_t socket_, struct timeval timestamp_, work_servi
         m_conn_event_callback(EV_INIT_COMPLETE, m_conn_status, m_conn_id, m_user_data);
     }
 
-    try
-    {
-        //! yunjie: 注册到event loop中
-        work_service_->async_add_connection(this);
-    }
-    catch (const post_failed_exception_t& exception_)
-    {
-        LOGWARN((CONNECTION_MODULE, "connection_t::initialize async_add_connection post_failed_exception occurred"));
-        return -1;
-    }
-
+    //! yunjie: 注册到event loop中
+    work_service_->async_add_connection(m_self_sptr);
+    
     if (m_enable_hb)
     {
-        try
-        {
-            m_service_ptr->async_add_hb_element(m_conn_id);
-        }
-        catch (const post_failed_exception_t& exception_)
-        {
-            LOGWARN((CONNECTION_MODULE, "connection_t::initialize async_hb_element post_failed_exception occurred"));
-            work_service_->async_del_connection(m_conn_id);
-            return -1;
-        }
+        m_service_ptr->async_add_hb_element(m_conn_id);
     }
 
     //! yunjie: connection已加入到event loop中, 回调通知上层
@@ -622,6 +608,8 @@ int connection_t::close_i()
     m_conn_status = ST_CLOSED;
     m_read_buffer.clear();
     m_write_buffer.clear();
+
+    m_self_sptr.reset();
 
     LOGTRACE((CONNECTION_MODULE, "connection_t::close_i end"));
     return 0;

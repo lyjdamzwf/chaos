@@ -86,9 +86,9 @@ int work_service_t::stop()
 }
 
 
-int work_service_t::async_add_connection(conn_ptr_t conn_ptr_)
+int work_service_t::async_add_connection(const conn_sptr_t& conn_sptr_)
 {
-    this->post(bindfunc(this, &work_service_t::sync_add_connection_i, conn_ptr_));
+    this->post(bindfunc(this, &work_service_t::sync_add_connection_i, conn_sptr_));
 
     return 0;
 }
@@ -102,8 +102,7 @@ int work_service_t::async_del_connection(const conn_id_t& conn_id_)
 }
 
 int work_service_t::async_broadcast(
-                                    packet_wrapper_t&           msg_,
-                                    bool                        auto_clear_,
+                                    const packet_wrapper_t&     msg_,
                                     broadcast_filter_t          filter_
                                    )
 {
@@ -112,7 +111,6 @@ int work_service_t::async_broadcast(
                 this,
                 &work_service_t::sync_broadcast_packet_wrapper_i,
                 msg_,
-                auto_clear_,
                 filter_
                 )
             );
@@ -140,7 +138,6 @@ int work_service_t::async_broadcast(
                     this,
                     &work_service_t::sync_broadcast_packet_wrapper_i,
                     msg_wrapper,
-                    true,
                     filter_
                     )
                 );
@@ -164,7 +161,7 @@ void work_service_t::async_del_hb_element(conn_id_t& conn_id_)
     m_conn_heart_beat.async_del_element(conn_id_);
 }
 
-conn_ptr_t work_service_t::get_conn(const conn_id_t& conn_id_)
+conn_sptr_t work_service_t::get_conn(const conn_id_t& conn_id_)
 {
     LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::get_conn  begin"));
 
@@ -175,16 +172,16 @@ conn_ptr_t work_service_t::get_conn(const conn_id_t& conn_id_)
         return NULL;
     }
 
-    conn_ptr_t& conn_ptr = m_conn_vct[peer_socket];
+    conn_sptr_t& conn_sptr = m_conn_vct[peer_socket];
 
-    if (NULL != conn_ptr)
+    if (NULL != conn_sptr)
     {
         //! yunjie: 防止fd回绕, 根据时间戳判断是否的确是同一个connection,
         //          有可能这个connection是新生成的"替身"连接
         if (
-                conn_id_.timestamp.tv_sec != conn_ptr->get_timestamp().tv_sec
+                conn_id_.timestamp.tv_sec != conn_sptr->get_timestamp().tv_sec
                 ||
-                conn_id_.timestamp.tv_usec != conn_ptr->get_timestamp().tv_usec
+                conn_id_.timestamp.tv_usec != conn_sptr->get_timestamp().tv_usec
            )
         {
             LOGWARN((WORK_SERVICE_MODULE,
@@ -197,7 +194,7 @@ conn_ptr_t work_service_t::get_conn(const conn_id_t& conn_id_)
 
 
     LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::get_conn  end"));
-    return conn_ptr;
+    return conn_sptr;
 }
 
 
@@ -205,15 +202,15 @@ int work_service_t::sync_close_all_conn_i()
 {
     LOGTRACE((WORK_SERVICE_MODULE, "work_service_t::sync_close_all_conn_i begin"));
 
-    for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
+    for (vector<conn_sptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
-        conn_ptr_t conn_ptr = *it;
-        if (NULL != conn_ptr)
+        conn_sptr_t conn_sptr = *it;
+        if (NULL != conn_sptr)
         {
             //! yunjie: 参数false - 由于是进程关闭时才会sync_close_all_conn_i
             //          所以不需要在关闭connection时从heart beat中删除. 否则
             //          会有大量"heart beat element not found"的警告日志
-            connection_t::async_close(conn_ptr->get_conn_id(), false);
+            connection_t::async_close(conn_sptr->get_conn_id(), false);
         }
     }
 
@@ -221,11 +218,11 @@ int work_service_t::sync_close_all_conn_i()
     return 0;
 }
 
-int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
+int work_service_t::sync_add_connection_i(const conn_sptr_t& conn_sptr_)
 {
     LOGTRACE((WORK_SERVICE_MODULE,
                 "work_service_t::sync_add_connection_i arg-[fd:%d] begin",
-                conn_ptr_->native_socket()
+                conn_sptr_->native_socket()
             ));
 
     if (is_recv_stop_signal())
@@ -235,8 +232,8 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
         return -1;
     }
 
-    task_service_t* service_ptr = conn_ptr_->get_service_ptr();
-    fd_t peer_socket = conn_ptr_->native_socket();
+    task_service_t* service_ptr = conn_sptr_->get_service_ptr();
+    fd_t peer_socket = conn_sptr_->native_socket();
 
     if (peer_socket >= m_conn_vct.size())
     {
@@ -251,8 +248,8 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
         }
     }
 
-    conn_ptr_t& conn_ptr = m_conn_vct[peer_socket];
-    if (NULL != conn_ptr)
+    conn_sptr_t& conn_sptr = m_conn_vct[peer_socket];
+    if (NULL != conn_sptr)
     {
         LOGWARN((WORK_SERVICE_MODULE,
                     "work_service_t::sync_add_connection_i fd conflict arg-[fd:%d] return.",
@@ -260,17 +257,16 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
                ));
 
         //! yunjie: 不需要在这里close socket, 析构时保证
-        destroy(conn_ptr);
-        conn_ptr = NULL;
+        conn_sptr.reset();
     }
-    conn_ptr = conn_ptr_;
+    conn_sptr = conn_sptr_;
 
     //! yunjie: 注册读事件, 为persist
     service_ptr->register_io_event(
                                     peer_socket,
                                     READ_EVENT_FLAG,
                                     &connection_t::on_peer_event,
-                                    (void*)conn_ptr_,
+                                    (void*)conn_sptr_.get(),
                                     true
                                 );
 
@@ -279,12 +275,12 @@ int work_service_t::sync_add_connection_i(conn_ptr_t conn_ptr_)
                                     peer_socket,
                                     ERROR_EVENT_FLAG,
                                     &connection_t::on_peer_event,
-                                    (void*)conn_ptr_
+                                    (void*)conn_sptr_.get()
                                 );
 
     LOGTRACE((WORK_SERVICE_MODULE,
                 "work_service_t::sync_add_connection_i arg-[fd:%d] end",
-                conn_ptr_->native_socket()
+                conn_sptr_->native_socket()
             ));
     return 0;
 }
@@ -306,9 +302,9 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
         return -1;
     }
 
-    conn_ptr_t& conn_ptr = m_conn_vct[peer_socket];
+    conn_sptr_t& conn_sptr = m_conn_vct[peer_socket];
 
-    if (NULL == conn_ptr)
+    if (NULL == conn_sptr)
     {
         LOGWARN((WORK_SERVICE_MODULE,
                     "work_service_t::sync_del_connection_i the connection not found, return. arg-[fd:%d]",
@@ -320,9 +316,9 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
     //! yunjie: 防止fd回绕, 根据时间戳判断是否的确是同一个connection,
     //          有可能这个connection是新生成的"替身"连接
     if (
-        conn_id_.timestamp.tv_sec != conn_ptr->get_timestamp().tv_sec
+        conn_id_.timestamp.tv_sec != conn_sptr->get_timestamp().tv_sec
         ||
-        conn_id_.timestamp.tv_usec != conn_ptr->get_timestamp().tv_usec
+        conn_id_.timestamp.tv_usec != conn_sptr->get_timestamp().tv_usec
        )
     {
         LOGWARN((WORK_SERVICE_MODULE,
@@ -332,9 +328,8 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
         return -1;
     }
 
-    //! yunjie: 将conn_ptr置为NULL
-    destroy(conn_ptr);
-    conn_ptr = NULL;
+    //! yunjie: 将conn_sptr置为NULL
+    conn_sptr.reset();
 
     LOGTRACE((WORK_SERVICE_MODULE,
                 "work_service_t::sync_del_connection_i arg-[fd:%d] end",
@@ -344,30 +339,26 @@ int work_service_t::sync_del_connection_i(const conn_id_t& conn_id_)
 }
 
 int work_service_t::sync_broadcast_packet_wrapper_i(
-        packet_wrapper_t&           msg_,
-        bool                        auto_clear_,
+        const packet_wrapper_t&     msg_,
         broadcast_filter_t          filter_
         )
 {
-    MH_SAFE_FREE(msg_, auto_clear_);
-
-    for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
+    for (vector<conn_sptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
-        conn_ptr_t conn_ptr = *it;
+        conn_sptr_t conn_sptr = *it;
 
-        if (NULL != conn_ptr)
+        if (NULL != conn_sptr)
         {
-            const conn_id_t& conn_id = conn_ptr->get_conn_id();
+            const conn_id_t& conn_id = conn_sptr->get_conn_id();
             if (filter_)
             {
-                if (!filter_(conn_id, conn_ptr->get_userdata()))
+                if (!filter_(conn_id, conn_sptr->get_userdata()))
                     continue;
             }
 
             connection_t::sync_send_wrapper_i(
                         conn_id,
-                        msg_,
-                        false
+                        msg_
                     );
         }
     }
@@ -381,16 +372,16 @@ int work_service_t::sync_broadcast_data_i(
         broadcast_filter_t          filter_
         )
 {
-    for (vector<conn_ptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
+    for (vector<conn_sptr_t>::iterator it = m_conn_vct.begin(); it != m_conn_vct.end(); ++it)
     {
-        conn_ptr_t conn_ptr = *it;
+        conn_sptr_t conn_sptr = *it;
 
-        if (NULL != conn_ptr)
+        if (NULL != conn_sptr)
         {
-            const conn_id_t& conn_id = conn_ptr->get_conn_id();
+            const conn_id_t& conn_id = conn_sptr->get_conn_id();
             if (filter_)
             {
-                if (!filter_(conn_id, conn_ptr->get_userdata()))
+                if (!filter_(conn_id, conn_sptr->get_userdata()))
                     continue;
             }
 

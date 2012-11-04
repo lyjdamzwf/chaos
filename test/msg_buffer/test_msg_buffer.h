@@ -271,4 +271,14 @@ void test_chaos_new()
     }
 }
 
+void test_serialize_copy()
+{
+    serialize_t s1;
+    s1.append(255, 'a');
+    s1.dump();
+
+    serialize_t s2 = s1;
+    s2.dump();
+}
+
 #endif //! _CHAOS_TEST_MSG_BUFFER_H_

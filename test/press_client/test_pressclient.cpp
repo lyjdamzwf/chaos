@@ -15,7 +15,6 @@ static bool broadcast_filter(const conn_id_t& conn_id_, void* user_data_)
 
 entity_t::~entity_t()
 {
-    m_last_packet.release();
 }
 
 void entity_t::handle_wrapper_message(
@@ -26,7 +25,6 @@ void entity_t::handle_wrapper_message(
                                      )
 {
     handle_message(packet_header_, message_.data(), message_.size(), conn_id_, service_name_);
-    message_.release();
 }
 
 
@@ -97,8 +95,7 @@ void entity_t::handle_message(
                     packet.append((char*)&packet_header_, sizeof(packet_header_));
                     packet.append((char*)data_ptr_, data_size_);
 
-                    m_last_packet.release();
-                    packet.clone(m_last_packet);
+                    m_last_packet = packet;
 
                     LOGINFO((TEST_MODULE,
                                 "entity_t::handle_message PCA_REPEAT service:[%s] fd:[%d] packet size:[%u]",
@@ -108,11 +105,10 @@ void entity_t::handle_message(
 
                     if (rand_gen_t::calc_probability(50))
                     {
-                        connection_t::async_send(conn_id_, packet, true);
+                        connection_t::async_send(conn_id_, packet);
                     }
                     else
                     {
-                        MH_SAFE_FREE(packet, true);
                         connection_t::async_send(conn_id_, packet.data(), packet.size());
                     }
 
@@ -142,8 +138,7 @@ void entity_t::handle_message(
                         packet.append(body_size, 'a');
                     }
 
-                    m_last_packet.release();
-                    packet.clone(m_last_packet);
+                    m_last_packet = packet;
 
                     LOGINFO((TEST_MODULE,
                                 "entity_t::handle_message PCA_RESEND service:[%s] fd:[%d] packet size:[%u]",
@@ -152,11 +147,10 @@ void entity_t::handle_message(
 
                     if (rand_gen_t::calc_probability(50))
                     {
-                        connection_t::async_send(conn_id_, packet, true);
+                        connection_t::async_send(conn_id_, packet);
                     }
                     else
                     {
-                        MH_SAFE_FREE(packet, true);
                         connection_t::async_send(conn_id_, packet.data(), packet.size());
                     }
 
@@ -187,8 +181,7 @@ void entity_t::handle_message(
                     packet.append((char*)&header, sizeof(packet_header_t));
                     packet.append(content_buffer, header.data_len);
 
-                    m_last_packet.release();
-                    packet.clone(m_last_packet);
+                    m_last_packet = packet;
 
                     LOGINFO((TEST_MODULE,
                                 "entity_t::handle_message PCA_BROADCAST service:[%s] fd:[%d] packet size:[%lu]",
@@ -197,11 +190,10 @@ void entity_t::handle_message(
 
                     if (rand_gen_t::calc_probability(50))
                     {
-                        g_connector_service_ptr->async_broadcast(packet, true, broadcast_filter);
+                        g_connector_service_ptr->async_broadcast(packet, broadcast_filter);
                     }
                     else
                     {
-                        MH_SAFE_FREE(packet, true);
                         g_connector_service_ptr->async_broadcast(packet.data(), packet.size(), broadcast_filter);
                     }
 
@@ -309,11 +301,10 @@ void press_client_t::tcp_press_conn_event(
 
             if (rand_gen_t::calc_probability(50))
             {
-                connection_t::async_send(conn_id_, packet, true);
+                connection_t::async_send(conn_id_, packet);
             }
             else
             {
-                MH_SAFE_FREE(packet, true);
                 connection_t::async_send(conn_id_, packet.data(), packet.size());
             }
         }

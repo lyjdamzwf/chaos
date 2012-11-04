@@ -84,20 +84,29 @@ int active_connection_t::sync_connect(
 
     struct timeval now;
     gettimeofday(&now, NULL);
-    conn_ptr_t conn_ptr = construct<CONN_TYPE>();
-    if (NULL == conn_ptr)
+    conn_sptr_t conn_sptr = conn_sptr_t(construct<CONN_TYPE>());
+    if (NULL == conn_sptr)
     {
-        LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect conn_ptr is NULL, return."));
+        LOGWARN((CONNECTION_MODULE, "active_connection_t::sync_connect conn_sptr is NULL, return."));
         return -1;
     }
 
-    if (-1 == conn_ptr->initialize(sockfd, now, service_ptr_, T_ACTIVE, event_func_, config_ptr_, is_add_to_hb_))
+    if (-1 == conn_sptr->initialize(
+                                    sockfd,
+                                    now,
+                                    service_ptr_,
+                                    T_ACTIVE,
+                                    event_func_,
+                                    conn_sptr,
+                                    config_ptr_,
+                                    is_add_to_hb_
+                                    )
+       )
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE,
                     "active_connection_t::sync_connect"
-                    " conn_ptr initialize failed, destroy it"
+                    " conn_sptr initialize failed"
                ));
-        destroy<CONN_TYPE>((CONN_TYPE*)conn_ptr);
     }
 
     out_.socket = sockfd;

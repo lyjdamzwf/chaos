@@ -25,6 +25,7 @@
 #include <string>
 
 #include <chaos/utility/utility_inc.h>
+
 #include <chaos/task_service/task_service_inc.h>
 
 #include <chaos/network/network_tool.h>
@@ -38,6 +39,8 @@ namespace network
 using namespace utility;
 using namespace task_service;
 
+#define MAX_COPY_SIZE   255
+
 #define MIN_MSG_BUFFER_SIZE     1024
 #define DEFAULT_MAX_MSG_BUFFER_SIZE     (16*1024)
 //! #define MIN_MSG_BUFFER_SIZE     8
@@ -45,7 +48,7 @@ using namespace task_service;
 
 using namespace std;
 
-class msg_buffer_t : public memory_holder_t
+class msg_buffer_t
 {
 public:
     msg_buffer_t();
@@ -53,9 +56,6 @@ public:
 
     msg_buffer_t(const msg_buffer_t& rhs_);
     const msg_buffer_t& operator=(const msg_buffer_t& rhs_);
-
-    //! yunjie: 将数据深拷贝一份到obj_
-    void clone(msg_buffer_t& obj_);
 
     //! yunjie: 返回有效数据块的指针
     inline const char* data() const
@@ -139,13 +139,6 @@ public:
     //! yunjie: 计算append指定大小数据需要移动的数据字节数
     uint32_t calc_append_move_bytes(uint32_t size_);
 
-    //! yunjie: 重置数据变量并释放内存块
-    void release();
-
-    //! yunjie: 危险操作, 会重置指针, 但不会释放
-    //          多线程buffer swap时需要该功能
-    void reset();
-
     //! yunjie: 测试接口, 查看内部数据用
     void loop_2_printf_all();
     void loop_2_printf_data();
@@ -177,13 +170,22 @@ private:
 
     void marshal_i(uint32_t offset_ = 0);
 
+    //! yunjie: 重置数据变量并释放内存块
+    void release_i();
+
+    void check_buffer_sptr_i();
+
 private:
-    char*                       m_heap_buffer;
-    uint32_t                    m_heap_size;
-	uint32_t                    m_data_offset;      //! yunjie: 数据的初始地址偏移
-	uint32_t                    m_data_size;        //! yunjie: 数据的大小
-    bool                        m_is_limit;         //! yunjie: 是否限制内存块最大长度
-    uint32_t                    m_buffer_max_limit;
+    char*                           m_heap_buffer;
+    shared_ptr_t<char,
+        atomic_ref_counter_t,
+        chaos_free_policy_t<char>
+                >                   m_buffer_sptr;
+    uint32_t                        m_heap_size;
+	uint32_t                        m_data_offset;      //! yunjie: 数据的初始地址偏移
+	uint32_t                        m_data_size;        //! yunjie: 数据的大小
+    bool                            m_is_limit;         //! yunjie: 是否限制内存块最大长度
+    uint32_t                        m_buffer_max_limit;
 };
 
 }

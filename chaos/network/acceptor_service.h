@@ -376,23 +376,32 @@ void acceptor_service_t<CONN_TYPE>::on_listen_callback(fd_t fd_, int event_type_
 
     struct timeval now = as_ptr->m_timer_manager.get_cached_time();
 
-    conn_ptr_t conn_ptr = construct<CONN_TYPE>();
-    if (NULL == conn_ptr)
+    conn_sptr_t conn_sptr = conn_sptr_t(construct<CONN_TYPE>());
+    if (NULL == conn_sptr)
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE,
-                    "acceptor_service_t::on_listen_callback new conn_ptr failed, args-[fd:%d, event_type:%d], return",
+                    "acceptor_service_t::on_listen_callback new conn_sptr failed, args-[fd:%d, event_type:%d], return",
                     fd_, event_type_
                ));
         return;
     }
 
-    if (-1 == conn_ptr->initialize(accepted_fd, now, work_ptr, T_PASSIVE, as_ptr->m_event_func, &as_ptr->m_network_config, work_ptr->is_enable_hb()))
+    if (-1 == conn_sptr->initialize(
+                                    accepted_fd,
+                                    now,
+                                    work_ptr,
+                                    T_PASSIVE,
+                                    as_ptr->m_event_func,
+                                    conn_sptr,
+                                    &as_ptr->m_network_config,
+                                    work_ptr->is_enable_hb()
+                                    )
+       )
     {
         LOGWARN((ACCEPTOR_SERVICE_MODULE,
                     "acceptor_service_t::on_listen_callback"
-                    " conn_ptr initialize failed, destroy it"
+                    " conn_sptr initialize failed"
                ));
-        destroy<CONN_TYPE>((CONN_TYPE*)conn_ptr);
     }
 
     LOGTRACE((ACCEPTOR_SERVICE_MODULE,

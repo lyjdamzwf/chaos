@@ -4,14 +4,18 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <assert.h>
 
 #include <chaos/utility/memory.h>
+#include <chaos/utility/atomic_val.h>
 
 namespace chaos
 {
 
 namespace utility
 {
+
+using namespace std;
 
 class ref_counter_t
 {
@@ -39,6 +43,32 @@ private:
 	uint32_t            m_cnt;
 };
 
+class atomic_ref_counter_t
+{
+public:
+	atomic_ref_counter_t(): m_cnt(1)
+	{
+	}
+
+	void duplicate()
+	{
+		++m_cnt;
+	}
+
+	int release()
+	{
+		return --m_cnt;
+	}
+	
+	int ref_count() const
+	{
+		return m_cnt.value();
+	}
+
+private:
+	atomic_val_t<uint32_t>            m_cnt;
+};
+
 template <class C>
 class destroy_policy_t
 {
@@ -46,6 +76,16 @@ public:
 	static void release(C* obj_)
 	{
         chaos::utility::destroy(obj_);
+	}
+};
+
+template <class C>
+class chaos_free_policy_t
+{
+public:
+	static void release(C* obj_)
+	{
+        chaos_free(obj_);
 	}
 };
 
@@ -69,7 +109,7 @@ public:
 	}
 };
 
-template <class C, class RC = ref_counter_t, class RP = delete_policy_t<C> >
+template <class C, class RC = atomic_ref_counter_t, class RP = delete_policy_t<C> >
 class shared_ptr_t
 {
 public:
@@ -84,12 +124,14 @@ public:
 	template <class Other, class OtherRP> 
 	shared_ptr_t(const shared_ptr_t<Other, RC, OtherRP>& ptr_): m_counter_ptr(ptr_.m_counter_ptr), m_ptr(const_cast<Other*>(ptr_.get()))
 	{
-		m_counter_ptr->duplicate();
+        if (m_counter_ptr)
+            m_counter_ptr->duplicate();
 	}
 
 	shared_ptr_t(const shared_ptr_t& ptr_): m_counter_ptr(ptr_.m_counter_ptr), m_ptr(ptr_.m_ptr)
 	{
-		m_counter_ptr->duplicate();
+        if (m_counter_ptr)
+            m_counter_ptr->duplicate();
 	}
 
 	~shared_ptr_t()
@@ -168,7 +210,7 @@ public:
 	}
 
 	template <class Other> 
-	shared_ptr_t<Other, RC, RP> unsafeCast() const
+	shared_ptr_t<Other, RC, RP> unsafe_cast() const
 		/// Casts the shared_ptr_t via a static cast to the given type.
 		/// Example: (assume class Sub: public Super)
 		///    shared_ptr_t<Super> super(new Sub());
@@ -224,7 +266,7 @@ public:
 		return m_ptr == 0;
 	}
 
-	bool isNull() const
+	bool is_null() const
 	{
 		return m_ptr == 0;
 	}
@@ -321,8 +363,25 @@ public:
 	
 	int ref_count() const
 	{
+        if (!m_counter_ptr || !m_ptr)
+            return 0;
+
 		return m_counter_ptr->ref_count();
 	}
+
+    void reset()
+    {
+        release();
+        m_counter_ptr = 0;
+        m_ptr = 0;
+    }
+
+    void dump()
+    {
+        printf("---------- shared_ptr_t::dump ----------\nthis:[%p] counter_ptr:[%p] data ptr:[%p] ref count:[%d]\n\n",
+                this, m_counter_ptr, m_ptr, ref_count()
+              );
+    }
 
 private:
 	C* deref() const
@@ -332,11 +391,17 @@ private:
 
 	void release()
 	{
+        if (!m_counter_ptr)
+            return;
+
 		int i = m_counter_ptr->release();
 		if (i == 0)
 		{
-			RP::release(m_ptr);
-			m_ptr = 0;
+            if (m_ptr)
+            {
+                RP::release(m_ptr);
+                m_ptr = 0;
+            }
 
 			chaos::utility::destroy(m_counter_ptr);
 			m_counter_ptr = 0;

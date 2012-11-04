@@ -56,8 +56,7 @@ public:
                     );
 
     int async_broadcast(
-                        packet_wrapper_t&           msg_,
-                        bool                        auto_clear_,
+                        const packet_wrapper_t&     msg_,
                         broadcast_filter_t          filter_ = NULL
                        );
     int async_broadcast(
@@ -88,10 +87,7 @@ private:
 
     int get_service_index_i()
     {
-        m_service_index = (++m_service_index >= m_work_service_group.size()
-                            ? 0 : m_service_index);
-
-        return m_service_index;
+        return m_service_index++ % m_work_service_group.size();
     }
 
 private:
@@ -263,12 +259,11 @@ int connector_service_t<CONN_TYPE>::sync_connect_i(
 
 template<typename CONN_TYPE>
 int connector_service_t<CONN_TYPE>::async_broadcast(
-                                                packet_wrapper_t&           msg_,
-                                                bool                        auto_clear_,
+                                                const packet_wrapper_t&     msg_,
                                                 broadcast_filter_t          filter_
                                               )
 {
-    m_work_service_group.async_broadcast(msg_, auto_clear_, filter_);
+    m_work_service_group.async_broadcast(msg_, filter_);
 
     return 0;
 }

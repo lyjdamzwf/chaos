@@ -76,31 +76,10 @@ public:
         return *this;
     }
 
-    void clone(serialize_t& obj_)
-    {
-        msg_buffer_t::clone(obj_);
-        obj_.m_reserved_head_bytes = m_reserved_head_bytes;
-    }
-
 	uint32_t size() const { return msg_buffer_t::size() - m_reserved_head_bytes; }
 	const char* data() const { return msg_buffer_t::data() + m_reserved_head_bytes; }
 
     void reserve(uint32_t size_) { if (size_ > msg_buffer_t::capacity()) msg_buffer_t::reserve(size_); }
-
-    //! yunjie: 重置数据变量并释放内存块
-	void release()
-    {
-        msg_buffer_t::release();
-        m_reserved_head_bytes = 0;
-    }
-
-    //! yunjie: 危险操作, 会重置指针, 但不会释放
-    //          多线程buffer swap时需要该功能
-    void reset()
-    {
-        msg_buffer_t::reset();
-        m_reserved_head_bytes = 0;
-    }
 
 	uint32_t append(const char* buf_, uint32_t len_)
 	{

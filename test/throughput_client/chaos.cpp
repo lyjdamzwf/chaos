@@ -230,8 +230,6 @@ int main(int argc_, char* argv_[])
 
     application_tool_t::wait_signal();
 
-    g_send_data.release();
-
     connector_service_ptr->stop();
     delete connector_service_ptr;
 

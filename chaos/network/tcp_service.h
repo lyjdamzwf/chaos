@@ -60,7 +60,7 @@ public:
     }
 
     int async_broadcast(
-                        packet_wrapper_t&           msg_,
+                        const packet_wrapper_t&     msg_,
                         broadcast_filter_t          filter_ = NULL
                        );
     int async_broadcast(
@@ -142,7 +142,7 @@ void tcp_service_t<CONN_TYPE>::enable_conn_heart_beat(const conn_heart_beat_para
 
 template<typename CONN_TYPE>
 int tcp_service_t<CONN_TYPE>::async_broadcast(
-                                                packet_wrapper_t&           msg_,
+                                                const packet_wrapper_t&     msg_,
                                                 broadcast_filter_t          filter_
                                               )
 {

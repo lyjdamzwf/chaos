@@ -22,6 +22,8 @@
 
 #include <queue>
 
+#include <chaos/utility/utility_inc.h>
+
 #include <chaos/task_service/task_service_define.h>
 #include <chaos/task_service/base_container.h>
 
@@ -32,6 +34,8 @@ namespace task_service
 {
 
 using namespace std;
+
+using namespace chaos::utility;
 
 struct time_event_t
 {
@@ -68,10 +72,6 @@ struct time_event_t
         callback();
     }
 
-    void release()
-    {
-    }
-
     bool operator<(const time_event_t& event_) const
     {
         //! yunjie: 由于stl的priority_queue默认是最大堆, 所以这里要取反
@@ -93,13 +93,22 @@ struct time_event_t
     bool                                persist;                    //! yunjie: true - 执行callback后不会从minheap中删除timeevent, false - 执行callback后会删除timeevent, 需要重新注册.
 };
 
+//! yunjie: time_event_t只可能单线程操作，引用技术使用
+//          非原子的来提高性能
+typedef shared_ptr_t<
+            time_event_t,
+            ref_counter_t,
+            destroy_policy_t<time_event_t>
+                    >
+        time_event_sptr_t;
+
 //! yunjie: 为了适配高版本g++对嵌套模板参数的类型检查更为严格
 template<typename T>
 class __heap_t__ : public std::priority_queue<T>
 {
 };
 
-class timer_container_t : public base_container_t<time_event_t*, __heap_t__>
+class timer_container_t : public base_container_t<time_event_sptr_t, __heap_t__>
 {
 public:
     timer_container_t()
@@ -146,7 +155,7 @@ public:
 
         while (!m_container_arr[prior_].empty())
         {
-            time_event_t* recent_event = m_container_arr[prior_].top();
+            time_event_sptr_t recent_event = m_container_arr[prior_].top();
 
             if (cond_func != NULL)
             {
@@ -180,7 +189,7 @@ BREAK_FLAG:
         return fetched_count;
     }
 
-    void push(time_event_t* event_)
+    void push(time_event_sptr_t event_)
     {
         CHECK_LOCK(m_is_lock, m_mutex);
 
@@ -193,10 +202,7 @@ BREAK_FLAG:
 
         while (!m_container_arr[prior_].empty())
         {
-            time_event_t* event = m_container_arr[prior_].top();
-            event->release();
             m_container_arr[prior_].pop();
-            SAFE_DELETE(event);
         }
     }
 

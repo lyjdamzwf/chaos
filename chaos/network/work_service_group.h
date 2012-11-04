@@ -43,8 +43,7 @@ public:
              );
 
     int async_broadcast(
-                        packet_wrapper_t&           msg_,
-                        bool                        auto_clear_,
+                        const packet_wrapper_t&     msg_,
                         broadcast_filter_t          filter_ = NULL
                        );
     int async_broadcast(

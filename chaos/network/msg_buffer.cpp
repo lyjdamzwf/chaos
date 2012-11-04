@@ -39,37 +39,74 @@ msg_buffer_t::msg_buffer_t()
 
 msg_buffer_t::~msg_buffer_t()
 {
+    release_i();
 }
 
 msg_buffer_t::msg_buffer_t(const msg_buffer_t& rhs_)
+    :
+        m_heap_buffer(NULL),
+        m_heap_size(0),
+        m_data_offset(0),
+        m_data_size(0),
+        m_is_limit(false),
+        m_buffer_max_limit(DEFAULT_MAX_MSG_BUFFER_SIZE)
 {
-    m_heap_buffer = rhs_.m_heap_buffer;
-    m_heap_size = rhs_.m_heap_size;
-    m_data_offset = rhs_.m_data_offset;
-    m_data_size = rhs_.m_data_size;
+    release_i();
+
+    if (rhs_.m_buffer_sptr.is_null() && rhs_.size())
+    {
+        m_heap_buffer = (char*)chaos_malloc(rhs_.size());
+
+        if (NULL == m_heap_buffer)
+            return;
+
+        memcpy(m_heap_buffer, rhs_.data(), rhs_.size());
+        m_heap_size = rhs_.size();
+        m_data_offset = 0;
+        m_data_size = rhs_.size();
+    }
+    else
+    {
+        m_heap_buffer = rhs_.m_heap_buffer;
+        m_buffer_sptr = rhs_.m_buffer_sptr;
+        m_heap_size = rhs_.m_heap_size;
+        m_data_offset = rhs_.m_data_offset;
+        m_data_size = rhs_.m_data_size;
+    }
+
     m_is_limit = rhs_.m_is_limit;
     m_buffer_max_limit = rhs_.m_buffer_max_limit;
 }
 
 const msg_buffer_t& msg_buffer_t::operator=(const msg_buffer_t& rhs_)
 {
-    m_heap_buffer = rhs_.m_heap_buffer;
-    m_heap_size = rhs_.m_heap_size;
-    m_data_offset = rhs_.m_data_offset;
-    m_data_size = rhs_.m_data_size;
+    release_i();
+
+    if (rhs_.m_buffer_sptr.is_null() && rhs_.size())
+    {
+        m_heap_buffer = (char*)chaos_malloc(rhs_.size());
+
+        if (NULL == m_heap_buffer)
+            return *this;
+
+        memcpy(m_heap_buffer, rhs_.data(), rhs_.size());
+        m_heap_size = rhs_.size();
+        m_data_offset = 0;
+        m_data_size = rhs_.size();
+    }
+    else
+    {
+        m_heap_buffer = rhs_.m_heap_buffer;
+        m_buffer_sptr = rhs_.m_buffer_sptr;
+        m_heap_size = rhs_.m_heap_size;
+        m_data_offset = rhs_.m_data_offset;
+        m_data_size = rhs_.m_data_size;
+    }
+
     m_is_limit = rhs_.m_is_limit;
     m_buffer_max_limit = rhs_.m_buffer_max_limit;
 
     return *this;
-}
-
-void msg_buffer_t::clone(msg_buffer_t& obj_)
-{
-    obj_.reset();
-    obj_.append(data(), size());
-    obj_.m_data_size = size();
-    obj_.m_is_limit = m_is_limit;
-    obj_.m_buffer_max_limit = m_buffer_max_limit;
 }
 
 int msg_buffer_t::reserve(uint32_t size_)
@@ -153,6 +190,8 @@ uint32_t msg_buffer_t::append(const void* data_, uint32_t size_)
 
     append_i((char*)data_, append_size);
 
+    check_buffer_sptr_i();
+
     return append_size;
 }
 
@@ -165,6 +204,8 @@ uint32_t msg_buffer_t::append(uint32_t size_, char val_)
 
     memset(write_ptr_i(), val_, append_size);
     m_data_size += append_size;
+
+    check_buffer_sptr_i();
 
     return append_size;
 }
@@ -187,6 +228,8 @@ uint32_t msg_buffer_t::prepend(const void* data_, uint32_t size_)
 
     prepend_i((char*)data_, prepend_size);
 
+    check_buffer_sptr_i();
+
     return prepend_size;
 }
 
@@ -207,6 +250,8 @@ uint32_t msg_buffer_t::prepend(uint32_t size_, char val_)
     m_data_offset -= prepend_size;
     memset(m_heap_buffer + m_data_offset, val_, prepend_size);
     m_data_size += prepend_size;
+
+    check_buffer_sptr_i();
 
     return prepend_size;
 }
@@ -253,6 +298,8 @@ int msg_buffer_t::recv_to_buffer(fd_t fd_, int& recv_ret_)
         }
     }
 
+    check_buffer_sptr_i();
+
     return 0;
 }
 
@@ -296,22 +343,22 @@ uint32_t msg_buffer_t::calc_append_move_bytes(uint32_t size_)
     return 0;
 }
 
-void msg_buffer_t::release()
+void msg_buffer_t::release_i()
 {
-    if (NULL != m_heap_buffer)
+    if (m_buffer_sptr.is_null())
     {
-        chaos_free(m_heap_buffer);
+        if (NULL != m_heap_buffer)
+        {
+            chaos_free(m_heap_buffer);
+            m_heap_buffer = NULL;
+        }
+    }
+    else
+    {
+        m_buffer_sptr.reset();
         m_heap_buffer = NULL;
     }
 
-    m_heap_size = 0;
-    m_data_offset = 0;
-    m_data_size = 0;
-}
-
-void msg_buffer_t::reset()
-{
-    m_heap_buffer = NULL;
     m_heap_size = 0;
     m_data_offset = 0;
     m_data_size = 0;
@@ -423,7 +470,10 @@ int msg_buffer_t::expand_i(uint32_t size_, uint32_t copy_offset_)
 
     memcpy(new_addr + copy_offset_, data(), size());
 
-    chaos_free(m_heap_buffer);
+    if (m_buffer_sptr.is_null())
+    {
+        chaos_free(m_heap_buffer);
+    }
 
     m_heap_buffer = new_addr;
     m_heap_size = alloc_size;
@@ -451,6 +501,14 @@ void msg_buffer_t::marshal_i(uint32_t offset_)
 
     memmove(m_heap_buffer + offset_, data(), size());
     m_data_offset = offset_;
+}
+
+void msg_buffer_t::check_buffer_sptr_i()
+{
+    if (size() >= MAX_COPY_SIZE)
+    {
+        m_buffer_sptr = m_heap_buffer;
+    }
 }
 
 }

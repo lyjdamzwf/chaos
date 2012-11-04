@@ -57,7 +57,7 @@ public:
     }
 };
 
-typedef         void(*conn_timedout_callback_t)(conn_ptr_t&);
+typedef         void(*conn_timedout_callback_t)(conn_sptr_t&);
 
 class work_service_t;
 struct conn_heart_beat_param_t
@@ -92,12 +92,11 @@ public:
     int start(int32_t thread_num_ = DEFAULT_TASK_SERVICE_THREAD_NUM);
     int stop();
 
-    int async_add_connection(conn_ptr_t conn_ptr_);
+    int async_add_connection(const conn_sptr_t& conn_ptr_);
     int async_del_connection(const conn_id_t& conn_id_);
 
     int async_broadcast(
-                        packet_wrapper_t&           msg_,
-                        bool                        auto_clear_,
+                        const packet_wrapper_t&     msg_,
                         broadcast_filter_t          filter_ = NULL
                        );
     int async_broadcast(
@@ -110,7 +109,7 @@ public:
     void async_update_hb_element(conn_id_t& conn_id_);
     void async_del_hb_element(conn_id_t& conn_id_);
 
-    conn_ptr_t get_conn(const conn_id_t& conn_id_);
+    conn_sptr_t get_conn(const conn_id_t& conn_id_);
 
     bool is_enable_hb() const
     {
@@ -120,12 +119,11 @@ public:
 private:
     int sync_close_all_conn_i();
 
-    int sync_add_connection_i(conn_ptr_t conn_ptr_);
+    int sync_add_connection_i(const conn_sptr_t& conn_ptr_);
     int sync_del_connection_i(const conn_id_t& conn_id_);
 
     int sync_broadcast_packet_wrapper_i(
-                                        packet_wrapper_t&           msg_,
-                                        bool                        auto_clear_,
+                                        const packet_wrapper_t&     msg_,
                                         broadcast_filter_t          filter_ = NULL
                                         );
     int sync_broadcast_data_i(
@@ -136,7 +134,7 @@ private:
 
 
 private:
-    vector<conn_ptr_t>                                                  m_conn_vct;
+    vector<conn_sptr_t>                                                 m_conn_vct;
     bool                                                                m_enable_conn_heart_beat;
     heart_beat_service_t<conn_id_t, hash_conn_id_t>                     m_conn_heart_beat;
 };
