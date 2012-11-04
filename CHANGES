@@ -81,3 +81,30 @@ Chaos 0.5.30-beta                                               2012.9.10
     *) 修复test_pressclient checksum的bug
 
 
+Chaos 0.5.30-beta                                               2012.11.4
+    *) 增加序列化类
+    *) 修复发送缓冲崩溃的BUG
+    *) 修复在一个io_callback中无法再次正确注册io event的bug
+    *) 修复某些边界下on_write_complete没有被正确调用的BUG
+    *) 解决pressclient发送的消息包过大导致栈溢出
+    *) 统一bind_func和bind_memfunc为bindfunc
+    *) bindfunc支持不同参数个数的函数重载
+    *) 引入jemalloc
+    *) 优化msg_buffer
+    *) test目录增加Makefile层级
+    *) build.sh模块编译
+    *) 优化对send时EINTR情况的处理
+    *) 增加基于jemalloc的chaos_new/chaos_delete
+    *) test_pressclient增加对不同函数重载的测试
+    *) 生成的静态库区分为包含jemalloc二进制与不包含的
+    *) 增加基于jemalloc的construct/destroy
+    *) 增加用于生成construct.h的construct.gen.cpp文件
+    *) async_method内存分配使用construct/destroy
+    *) connection的分配使用construct/destroy
+    *) 加入共享指针类
+    *) 使用非原子引用技术的shared ptr来包装connection,timer event保证数据安全性
+    *) msg_buffer的拷贝策略进行修改, 255以下使用数据拷贝的方式, 255及255以上使用引用计数防止拷贝
+    *) async_method使用值拷贝
+    *) 修复connector_service在多线程并发下，m_service_index会被连续++导致溢出崩溃的问题
+
+
