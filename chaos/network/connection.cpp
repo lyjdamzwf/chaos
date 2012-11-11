@@ -382,7 +382,7 @@ int connection_t::initialize(
 
     //! yunjie: 注册到event loop中
     work_service_->async_add_connection(m_self_sptr);
-    
+
     if (m_enable_hb)
     {
         m_service_ptr->async_add_hb_element(m_conn_id);

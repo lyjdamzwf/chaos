@@ -33,7 +33,7 @@ public:
 	{
 		return --m_cnt;
 	}
-	
+
 	int ref_count() const
 	{
 		return m_cnt;
@@ -59,7 +59,7 @@ public:
 	{
 		return --m_cnt;
 	}
-	
+
 	int ref_count() const
 	{
 		return m_cnt.value();
@@ -121,7 +121,7 @@ public:
 	{
 	}
 
-	template <class Other, class OtherRP> 
+	template <class Other, class OtherRP>
 	shared_ptr_t(const shared_ptr_t<Other, RC, OtherRP>& ptr_): m_counter_ptr(ptr_.m_counter_ptr), m_ptr(const_cast<Other*>(ptr_.get()))
 	{
         if (m_counter_ptr)
@@ -150,7 +150,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	shared_ptr_t& assign(const shared_ptr_t& ptr_)
 	{
 		if (&ptr_ != this)
@@ -160,7 +160,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	template <class Other, class OtherRP>
 	shared_ptr_t& assign(const shared_ptr_t<Other, RC, OtherRP>& ptr_)
 	{
@@ -194,7 +194,7 @@ public:
 		std::swap(m_counter_ptr, ptr_.m_counter_ptr);
 	}
 
-	template <class Other> 
+	template <class Other>
 	shared_ptr_t<Other, RC, RP> cast() const
 		/// Casts the shared_ptr_t via a dynamic cast to the given type.
 		/// Returns an shared_ptr_t containing NULL if the cast fails.
@@ -209,7 +209,7 @@ public:
 		return shared_ptr_t<Other, RC, RP>();
 	}
 
-	template <class Other> 
+	template <class Other>
 	shared_ptr_t<Other, RC, RP> unsafe_cast() const
 		/// Casts the shared_ptr_t via a static cast to the given type.
 		/// Example: (assume class Sub: public Super)
@@ -255,7 +255,7 @@ public:
 	{
 		return m_ptr;
 	}
-	
+
 	operator const C* () const
 	{
 		return m_ptr;
@@ -360,7 +360,7 @@ public:
 	{
 		return get() >= ptr_;
 	}
-	
+
 	int ref_count() const
 	{
         if (!m_counter_ptr || !m_ptr)
