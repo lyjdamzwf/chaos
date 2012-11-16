@@ -59,6 +59,7 @@ AC_CONFIG_FILES([Makefile
 		test/timer/Makefile
 		test/msg_buffer/Makefile
 		test/utility/Makefile
+		test/perf/Makefile
                 ])
 
 # yunjie: 获取内核信息

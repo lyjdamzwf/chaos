@@ -57,10 +57,10 @@
 #include <sys/eventfd.h>
 #endif
 
-/**
+#if 0
 #undef COMMUNICATION_MODE
-#define COMMUNICATION_MODE  2
-*/
+#define COMMUNICATION_MODE  5
+#endif
 
 namespace chaos
 {
