@@ -1,8 +1,8 @@
 #ifndef _CHAOS_TEST_PERF_H_
 #define _CHAOS_TEST_PERF_H_
 
-#define WS_THREAD_NUM   8
-#define USE_ATOMIC 1
+#define WSG_THREAD_NUM   1
+#define USE_ATOMIC 0
 #define VAL_PER_THREAD 1
 
 //! yunjie: 这里不能用数组, 性能会被cache line影响

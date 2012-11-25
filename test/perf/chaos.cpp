@@ -9,12 +9,15 @@ int main(int argc_, char* argv_[])
 {
     NEW_SERVICE();
 
-    WS().start(WS_THREAD_NUM);
+    application_tool_t::block_all_signal();
+    log_tool_t::start_log_service("test_perf.log", 6, 1, 0);
+    WSG().start(WSG_THREAD_NUM);
 
     test_atomic_perf();
 
     application_tool_t::wait_signal();
-    WS().stop();
+    WSG().stop();
+    log_tool_t::stop_log_service();
 
     DEL_SERVICE();
 
