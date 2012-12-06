@@ -20,6 +20,8 @@ statisticdir=$(includedir)/statistic
 task_servicedir=$(includedir)/task_service
 threaddir=$(includedir)/thread
 utilitydir=$(includedir)/utility
+jemallocdir=$(includedir)/deps/jemalloc
+jeinterdir=$(includedir)/deps/jemalloc/internal
 
 include_HEADERS= *.h
 async_method_HEADERS=async_method/*.h
@@ -30,6 +32,8 @@ statistic_HEADERS=statistic/*.h
 task_service_HEADERS=task_service/*.h
 thread_HEADERS=thread/*.h
 utility_HEADERS=utility/*.h
+jemalloc_HEADERS=deps/jemalloc/include/jemalloc/*.h
+jeinter_HEADERS=deps/jemalloc/include/jemalloc/internal/*.h
 
 libchaos_a_LIBFLAGS =
 libchaos_a_LIBADD =
