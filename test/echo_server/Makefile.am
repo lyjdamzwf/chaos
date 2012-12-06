@@ -6,6 +6,6 @@ chaos_echo_server_SOURCES = chaos.cpp \
 							../misc_impl.cpp
 
 chaos_echo_server_LDADD = \
-			  $(top_srcdir)/chaos/libchaos_je.a \
+			  $(top_srcdir)/chaos/libchaos.a \
 			  -lpthread
 

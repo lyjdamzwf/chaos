@@ -5,5 +5,5 @@ noinst_PROGRAMS = chaos_async_method
 chaos_async_method_SOURCES = chaos.cpp
 
 chaos_async_method_LDADD = \
-			  $(top_srcdir)/chaos/libchaos_je.a \
+			  $(top_srcdir)/chaos/libchaos.a \
 			  -lpthread

@@ -7,6 +7,6 @@ chaos_pressclient_SOURCES = chaos.cpp \
 							test_pressclient.cpp
 
 chaos_pressclient_LDADD = \
-			  $(top_srcdir)/chaos/libchaos_je.a \
+			  $(top_srcdir)/chaos/libchaos.a \
 			  -lpthread
 

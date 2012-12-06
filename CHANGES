@@ -81,7 +81,7 @@ Chaos 0.5.30-beta                                               2012.9.10
     *) 修复test_pressclient checksum的bug
 
 
-Chaos 0.5.30-beta                                               2012.11.4
+Chaos 0.6.30-beta                                               2012.11.4
     *) 增加序列化类
     *) 修复发送缓冲崩溃的BUG
     *) 修复在一个io_callback中无法再次正确注册io event的bug
