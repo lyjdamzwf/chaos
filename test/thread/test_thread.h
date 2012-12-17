@@ -19,6 +19,32 @@ void test_thread()
     printf("thread join finish\n");
 }
 
+void dead_loop()
+{
+    while(1)
+    {
+        //! do nothing
+    }
+}
+
+void test_thread_state()
+{
+    for (int i = 0 ; i < 50; ++i)
+    {
+        thread_t thd;
+        thd.start(bindfunc(dead_loop));
+        //! sleep(1);
+        if (thd.is_alive())
+        {
+            printf("[%d] thread state alive\n", i);
+        }
+        else
+        {
+            printf("[%d] thread state not alive\n", i);
+            break;
+        }
+    }
+}
 
 
 #endif //! _CHAOS_TEST_THREAD_H_

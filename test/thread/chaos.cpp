@@ -7,7 +7,8 @@ using namespace std;
 
 int main(int argc_, char* argv_[])
 {
-    test_thread();
+    //! test_thread();
+    test_thread_state();
 
     return 0;
 }
