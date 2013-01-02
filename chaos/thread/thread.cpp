@@ -40,7 +40,6 @@ void thread_t::join()
 
 		m_thread = 0;
 		m_lock.lock();
-
 		while(m_alive) m_cond.wait(m_lock);
 		m_lock.unlock();
 	}
@@ -110,6 +109,10 @@ bool thread_t::start(async_method_t method_)
 	}
 
 	pthread_attr_destroy(&attr);
+
+	m_lock.lock();
+	while(!m_alive) m_cond.wait(m_lock);
+	m_lock.unlock();
 
     LOGTRACE((THREAD_MODULE, "thread_t::start end"));
 	return true;
