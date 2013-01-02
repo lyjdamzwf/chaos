@@ -1,6 +1,8 @@
 #ifndef _CHAOS_MISC_DEF_H_
 #define _CHAOS_MISC_DEF_H_
 
+#include <algorithm>
+
 #ifdef HAVE_CONFIG_H
 #include <chaos/conf.h>
 #endif
@@ -13,6 +15,7 @@
 #include <chaos/statistic/statistic_inc.h>
 #include <chaos/heart_beat/heart_beat_inc.h>
 #include <chaos/network/network_inc.h>
+#include <chaos/mylua/mylua_inc.h>
 
 using namespace chaos::utility;
 using namespace chaos::async_method;
@@ -22,6 +25,7 @@ using namespace chaos::task_service;
 using namespace chaos::statistic;
 using namespace chaos::heart_beat;
 using namespace chaos::network;
+using namespace chaos::mylua;
 
 
 //! yunjie: 日志模块定义
@@ -84,7 +88,7 @@ public:
         }
     }
 
-    static int start_log_service(const char* log_path_, int log_level_, int screen_, int file_)
+    static int start_log_service(const char* log_path_, int log_level_, int file_, int screen_)
     {
         string log_path = log_path_;
         string log_name = "log";
@@ -153,7 +157,36 @@ public:
     }
 };
 
+class lua_config_t
+{
+public:
+    lua_config_t();
 
+    int load_from_lua(const string& lua_path_);
 
+    //! yunjie: 该方法不适合频繁调用, 会存在较高的拷贝
+    string operator[](const string& key_) const
+    {
+        return get(key_);
+    }
+
+    string get(const string& key_) const;
+
+    //! yunjie: 该方法不适合频繁调用, 会存在较高的拷贝
+    vector<string> get_multi(const string& key_) const;
+    
+    //! yunjie: 被lua调用, 参数不能为引用
+    void add_cpp_config(string key_, string val_);
+    
+private:
+    typedef map<string, vector<string> >::const_iterator            map_const_it_t;
+    typedef map<string, vector<string> >::iterator                  map_it_t;
+    typedef vector<string>::const_iterator                          val_const_it_t;
+    typedef vector<string>::iterator                                val_it_t;
+
+private:
+    map<string, vector<string> >                m_config_map;
+    mylua_t*                                    m_mylua_ptr;
+};
 
 #endif //! _CHAOS_MISC_DEF_H_

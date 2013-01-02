@@ -140,13 +140,13 @@ int main(int argc_, char* argv_[])
 
             case 10:
             {
-                network_config.max_read_buffer_size = atoi(pair_arr[i].arg_val);
+                network_config.max_recv_buffer_size = atoi(pair_arr[i].arg_val);
             }
             break;
 
             case 11:
             {
-                network_config.is_enable_tcp_nodelay = true;
+                network_config.tcp_nodelay = true;
             }
             break;
 

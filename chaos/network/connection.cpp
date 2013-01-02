@@ -340,7 +340,7 @@ int connection_t::initialize(
 
     //! yunjie: 设置I/O缓冲区的最大字节数
     m_write_buffer.set_buffer_max_limit((*m_config_holder).max_send_buffer_size);
-    m_read_buffer.set_buffer_max_limit((*m_config_holder).max_read_buffer_size);
+    m_read_buffer.set_buffer_max_limit((*m_config_holder).max_recv_buffer_size);
 
     //! yunjie: 初始化套接字选项
     if (T_ACTIVE == conn_type_)
@@ -364,7 +364,7 @@ int connection_t::initialize(
     }
 
     //! yunjie: 屏蔽nagling算法,防止数据量小的指令被打包发送
-    if ((*m_config_holder).is_enable_tcp_nodelay)
+    if ((*m_config_holder).tcp_nodelay)
     {
         int nodelay = 1;
         if(::setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (void*)&nodelay, sizeof(nodelay)))

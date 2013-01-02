@@ -47,6 +47,7 @@ AC_CONFIG_FILES([Makefile
 		chaos/log/Makefile
 		chaos/network/Makefile
 		chaos/statistic/Makefile
+        chaos/mylua/Makefile
         test/Makefile
 		test/arg_helper/Makefile
 		test/async_method/Makefile
@@ -60,6 +61,7 @@ AC_CONFIG_FILES([Makefile
 		test/msg_buffer/Makefile
 		test/utility/Makefile
 		test/perf/Makefile
+		test/mylua/Makefile
                 ])
 
 # yunjie: 获取内核信息
