@@ -1,6 +1,4 @@
-SUBDIRS= thread utility task_service log network statistic mylua
-
-CXXFLAGS = -Wall -g -O2 -fPIC
+SUBDIRS= thread utility task_service log network statistic
 
 lib_LIBRARIES = libchaos.a
 
@@ -60,41 +58,38 @@ libchaos_a_SOURCES = \
 					 utility/processor_helper.cpp \
 					 utility/random.cpp \
 					 utility/signal_handler.cpp \
-					 mylua/lua-5.1.4/src/ldo.c \
-					 mylua/lua-5.1.4/src/lcode.c \
-					 mylua/lua-5.1.4/src/lauxlib.c \
-					 mylua/lua-5.1.4/src/lstrlib.c \
-					 mylua/lua-5.1.4/src/ldblib.c \
-					 mylua/lua-5.1.4/src/lundump.c \
-					 mylua/lua-5.1.4/src/lopcodes.c \
-					 mylua/lua-5.1.4/src/lbaselib.c \
-					 mylua/lua-5.1.4/src/lapi.c \
-					 mylua/lua-5.1.4/src/lua.c \
-					 mylua/lua-5.1.4/src/lmathlib.c \
-					 mylua/lua-5.1.4/src/lmem.c \
-					 mylua/lua-5.1.4/src/lparser.c \
-					 mylua/lua-5.1.4/src/lvm.c \
-					 mylua/lua-5.1.4/src/ltable.c \
-					 mylua/lua-5.1.4/src/lfunc.c \
-					 mylua/lua-5.1.4/src/llex.c \
-					 mylua/lua-5.1.4/src/ldump.c \
-					 mylua/lua-5.1.4/src/lobject.c \
-					 mylua/lua-5.1.4/src/loadlib.c \
-					 mylua/lua-5.1.4/src/liolib.c \
-					 mylua/lua-5.1.4/src/lgc.c \
-					 mylua/lua-5.1.4/src/lzio.c \
-					 mylua/lua-5.1.4/src/ltablib.c \
-					 mylua/lua-5.1.4/src/ltm.c \
-					 mylua/lua-5.1.4/src/lstring.c \
-					 mylua/lua-5.1.4/src/linit.c \
-					 mylua/lua-5.1.4/src/loslib.c \
-					 mylua/lua-5.1.4/src/luac.c \
-					 mylua/lua-5.1.4/src/print.c \
-					 mylua/lua-5.1.4/src/ldebug.c \
-					 mylua/lua-5.1.4/src/lstate.c \
-					 mylua/mylua.cpp \
-					 mylua/lua_table.cpp \
-					 mylua/lua_type.cpp \
-					 mylua/lua_object.cpp
+					 deps/lua-5.1.4/src/ldo.c \
+					 deps/lua-5.1.4/src/lcode.c \
+					 deps/lua-5.1.4/src/lauxlib.c \
+					 deps/lua-5.1.4/src/lstrlib.c \
+					 deps/lua-5.1.4/src/ldblib.c \
+					 deps/lua-5.1.4/src/lundump.c \
+					 deps/lua-5.1.4/src/lopcodes.c \
+					 deps/lua-5.1.4/src/lbaselib.c \
+					 deps/lua-5.1.4/src/lapi.c \
+					 deps/lua-5.1.4/src/lua.c \
+					 deps/lua-5.1.4/src/lmathlib.c \
+					 deps/lua-5.1.4/src/lmem.c \
+					 deps/lua-5.1.4/src/lparser.c \
+					 deps/lua-5.1.4/src/lvm.c \
+					 deps/lua-5.1.4/src/ltable.c \
+					 deps/lua-5.1.4/src/lfunc.c \
+					 deps/lua-5.1.4/src/llex.c \
+					 deps/lua-5.1.4/src/ldump.c \
+					 deps/lua-5.1.4/src/lobject.c \
+					 deps/lua-5.1.4/src/loadlib.c \
+					 deps/lua-5.1.4/src/liolib.c \
+					 deps/lua-5.1.4/src/lgc.c \
+					 deps/lua-5.1.4/src/lzio.c \
+					 deps/lua-5.1.4/src/ltablib.c \
+					 deps/lua-5.1.4/src/ltm.c \
+					 deps/lua-5.1.4/src/lstring.c \
+					 deps/lua-5.1.4/src/linit.c \
+					 deps/lua-5.1.4/src/loslib.c \
+					 deps/lua-5.1.4/src/luac.c \
+					 deps/lua-5.1.4/src/print.c \
+					 deps/lua-5.1.4/src/ldebug.c \
+					 deps/lua-5.1.4/src/lstate.c \
+					 deps/lua_tinker/lua_tinker.cpp
 
 

@@ -8,63 +8,109 @@ statistic_service_t*        stat_service_1104;
 
 volatile bool log_tool_t::is_started = false;
 
-LUA_REGISTER_BEGIN(lua_config_register)
-REGISTER_CLASS_BASE("string_t", string, void (void))
-REGISTER_CLASS_BASE("lua_config_t", lua_config_t, void (void))
-REGISTER_CLASS_METHOD("lua_config_t", "add_cpp_config", lua_config_t, &lua_config_t::add_cpp_config)
-LUA_REGISTER_END
 
 lua_config_t::lua_config_t()
-    :
-        m_mylua_ptr(NULL)
+        :
+        m_lua_state(NULL)
 {
+    m_lua_state = lua_open();
+    luaL_openlibs(m_lua_state);
 }
 
-int lua_config_t::load_from_lua(const string& lua_path_)
+lua_config_t::~lua_config_t()
 {
-    SAFE_DELETE(m_mylua_ptr);
-    m_mylua_ptr = new mylua_t;
-    if (NULL == m_mylua_ptr)
-    {
-        return -1;
-    }
+    lua_close(m_lua_state);
+}
 
-    m_mylua_ptr->multi_register(lua_config_register);
-    m_mylua_ptr->load_file(lua_path_);
-    m_mylua_ptr->call("read_config", this);
+int lua_config_t::init(const string& lua_path_)
+{
+    regist_to_lua();
+    load_from_lua(lua_path_);
 
     return 0;
 }
 
-string lua_config_t::get(const string& key_) const
+int lua_config_t::regist_to_lua()
 {
-    vector<string> result = get_multi(key_);
+    // lua_tinker::class_add<lua_config_t>(m_lua_state, "lua_config_t");
+
+    return 0;
+}
+
+int lua_config_t::load_from_lua(const string& lua_path_)
+{
+    if (!m_lua_state)
+        return -1;
+
+    lua_tinker::dofile(m_lua_state, lua_path_.c_str());
+
+    lua_getglobal(m_lua_state, "echo_server_config");
+    lua_pushnil(m_lua_state);
+
+    char key_buf[50];
+    char val_buf[50];
+
+    const char *key, *val;
+    
+    while(lua_next(m_lua_state,-2))
+    {
+        if(lua_isnumber(m_lua_state,-2))
+        {
+            sprintf(key_buf, "%" PRId64, lua_tonumber(m_lua_state,-2));
+            key = key_buf;
+        }
+        else if(lua_isstring(m_lua_state,-2))
+        {
+            key = lua_tostring(m_lua_state,-2);
+        }
+        if(lua_isnumber(m_lua_state,-1))
+        {
+            sprintf(val_buf, "%" PRId64, lua_tonumber(m_lua_state,-1));
+            val = val_buf;
+        }
+        else if(lua_isstring(m_lua_state,-1))
+        {
+            val = lua_tostring(m_lua_state,-1);
+        }
+
+        printf("%s : %s\n", key, val);
+        add_cpp_config(key, val);
+        
+        lua_pop(m_lua_state,1);
+    }
+    
+    lua_pop(m_lua_state,1);
+
+    return 0;
+}
+
+const string& lua_config_t::get(const string& key_) const
+{
+    const vector<string>& result = get_multi(key_);
     if (result.size())
     {
         return result[0];
     }
 
-    return "";
+    static string empty;
+    
+    return empty;
 }
 
-vector<string> lua_config_t::get_multi(const string& key_) const
+const vector<string>& lua_config_t::get_multi(const string& key_) const
 {
-    vector<string> ret;
     map_const_it_t found_it = m_config_map.find(key_);
     if (m_config_map.end() != found_it)
     {
-        const vector<string>& found_vt = found_it->second;
-        if (found_vt.size())
-        {
-            ret.resize(found_vt.size());
-            std::copy(found_vt.begin(), found_vt.end(), ret.begin());
-        }
+        return found_it->second;
     }
 
-    return ret;
+    static vector<string> empty;
+    
+    return empty;
 }
 
-void lua_config_t::add_cpp_config(string key_, string val_)
+void lua_config_t::add_cpp_config(const char *key_, const char *val_)
 {
     map_it_t found_it = m_config_map.find(key_);
     if (m_config_map.end() == found_it)

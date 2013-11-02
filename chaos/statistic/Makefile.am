@@ -1,5 +1,3 @@
-CXXFLAGS = -Wall -g -O2 -fPIC
-
 chaosdir=$(prefix)/chaos-@chaos_ver@
 libdir=$(chaosdir)/lib
 

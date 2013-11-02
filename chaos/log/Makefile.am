@@ -1,5 +1,3 @@
-CXXFLAGS = -Wall -g -O2 -fPIC
-
 ## 安装根目录
 chaosdir=$(prefix)/chaos-@chaos_ver@
 

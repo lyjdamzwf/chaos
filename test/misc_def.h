@@ -1,11 +1,15 @@
 #ifndef _CHAOS_MISC_DEF_H_
 #define _CHAOS_MISC_DEF_H_
 
+#include <inttypes.h>
+
 #include <algorithm>
 
 #ifdef HAVE_CONFIG_H
 #include <chaos/conf.h>
 #endif
+
+#include <chaos/deps/lua_tinker/lua_tinker.h>
 
 #include <chaos/utility/utility_inc.h>
 #include <chaos/async_method/async_method_inc.h>
@@ -15,7 +19,6 @@
 #include <chaos/statistic/statistic_inc.h>
 #include <chaos/heart_beat/heart_beat_inc.h>
 #include <chaos/network/network_inc.h>
-#include <chaos/mylua/mylua_inc.h>
 
 using namespace chaos::utility;
 using namespace chaos::async_method;
@@ -25,7 +28,6 @@ using namespace chaos::task_service;
 using namespace chaos::statistic;
 using namespace chaos::heart_beat;
 using namespace chaos::network;
-using namespace chaos::mylua;
 
 
 //! yunjie: 日志模块定义
@@ -39,26 +41,26 @@ using namespace chaos::mylua;
 //  因为static变量析构顺序的不确定性和依赖性, 会导致关
 //  闭进程时crash
 
-#define EXTERN_SERVICE_DECL \
-extern task_service_t*             task_service_1104; \
-extern work_service_t*             work_service_1104; \
-extern work_service_group_t*       work_service_group_1104; \
-extern task_service_t*             log_service_1104; \
-extern statistic_service_t*        stat_service_1104; \
+#define EXTERN_SERVICE_DECL                                     \
+    extern task_service_t*             task_service_1104;       \
+    extern work_service_t*             work_service_1104;       \
+    extern work_service_group_t*       work_service_group_1104; \
+    extern task_service_t*             log_service_1104;        \
+    extern statistic_service_t*        stat_service_1104;       \
 
-#define NEW_SERVICE() \
-    task_service_1104 = new task_service_t("global task service"); \
-    work_service_1104 = new work_service_t("global work service"); \
-    work_service_group_1104 = new work_service_group_t(); \
-    log_service_1104 = new task_service_t("log service"); \
-    stat_service_1104 = new statistic_service_t(); \
+#define NEW_SERVICE()                                               \
+    task_service_1104 = new task_service_t("global task service");  \
+    work_service_1104 = new work_service_t("global work service");  \
+    work_service_group_1104 = new work_service_group_t();           \
+    log_service_1104 = new task_service_t("log service");           \
+    stat_service_1104 = new statistic_service_t();                  \
 
-#define DEL_SERVICE() \
-    SAFE_DELETE(task_service_1104); \
-    SAFE_DELETE(work_service_1104); \
-    SAFE_DELETE(work_service_group_1104); \
-    SAFE_DELETE(log_service_1104); \
-    SAFE_DELETE(stat_service_1104); \
+#define DEL_SERVICE()                           \
+    SAFE_DELETE(task_service_1104);             \
+    SAFE_DELETE(work_service_1104);             \
+    SAFE_DELETE(work_service_group_1104);       \
+    SAFE_DELETE(log_service_1104);              \
+    SAFE_DELETE(stat_service_1104);             \
 
 #define TS()    (*task_service_1104)
 #define WS()    (*work_service_1104)
@@ -71,7 +73,7 @@ EXTERN_SERVICE_DECL
 //! yunjie: 日志模块封装
 class log_tool_t
 {
-public:
+  public:
     static void print_screen_callback(const std::string& msg_)
     {
         if (is_started)
@@ -106,14 +108,14 @@ public:
         modules.push_back(CONNECTOR_SERVICE);
 
         init_log(log_path,
-                log_name,
-                file_,                              //! yunjie: 是否打印到文件
-                screen_,                            //! yunjie: 是否输出到屏幕
-                log_level_,                         //! yunjie: log level
-                modules,
-                print_screen_callback,
-                print_file_callback
-                );
+                 log_name,
+                 file_,                              //! yunjie: 是否打印到文件
+                 screen_,                            //! yunjie: 是否输出到屏幕
+                 log_level_,                         //! yunjie: log level
+                 modules,
+                 print_screen_callback,
+                 print_file_callback
+                 );
 
         LOGS().start(1);
         is_started = true;
@@ -129,13 +131,13 @@ public:
         return 0;
     }
 
-private:
+  private:
     volatile static bool             is_started;
 };
 
 class application_tool_t
 {
-public:
+  public:
 
     static int block_all_signal()
     {
@@ -157,12 +159,14 @@ public:
     }
 };
 
-class lua_config_t
+class lua_config_t : private noncopyable_t
 {
-public:
+  public:
     lua_config_t();
+    ~lua_config_t();
 
-    int load_from_lua(const string& lua_path_);
+    int init(const string& lua_path_);
+
 
     //! yunjie: 该方法不适合频繁调用, 会存在较高的拷贝
     string operator[](const string& key_) const
@@ -170,23 +174,24 @@ public:
         return get(key_);
     }
 
-    string get(const string& key_) const;
+    const string& get(const string& key_) const;
+    const vector<string>& get_multi(const string& key_) const;
 
-    //! yunjie: 该方法不适合频繁调用, 会存在较高的拷贝
-    vector<string> get_multi(const string& key_) const;
+  private:
+    int regist_to_lua();
+    int load_from_lua(const string& lua_path_);
+    void add_cpp_config(const char *key_, const char *val_);
     
-    //! yunjie: 被lua调用, 参数不能为引用
-    void add_cpp_config(string key_, string val_);
-    
-private:
+  private:
     typedef map<string, vector<string> >::const_iterator            map_const_it_t;
     typedef map<string, vector<string> >::iterator                  map_it_t;
     typedef vector<string>::const_iterator                          val_const_it_t;
     typedef vector<string>::iterator                                val_it_t;
 
-private:
+  private:
     map<string, vector<string> >                m_config_map;
-    mylua_t*                                    m_mylua_ptr;
+    // mylua_t*                                    m_mylua_ptr;
+    lua_State                                   *m_lua_state;
 };
 
 #endif //! _CHAOS_MISC_DEF_H_

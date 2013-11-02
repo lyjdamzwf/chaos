@@ -127,7 +127,7 @@ struct io_event_t
     void*                       error_cb_arg;
 };
 
-class io_multiplex_handler_t : public noncopyable_t
+class io_multiplex_handler_t : private noncopyable_t
 {
 public:
     io_multiplex_handler_t();

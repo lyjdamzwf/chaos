@@ -15,7 +15,8 @@ AC_PROG_LIBTOOL
 AC_CONFIG_HEADERS([conf.h])
 
 # Add a line like "export ENV_MAKE=-D_DEBUG_NYS" in ~/.bash_rc to cutomize make process
-CXXFLAGS="$CXXFLAGS ${ENV_MAKE}"
+CXXFLAGS="-D__STDC_FORMAT_MACROS -Wall -static -g -O0 -fPIC"
+AC_SUBST(CXXFLAGS)
 
 # Checks for libraries.
 
@@ -47,7 +48,6 @@ AC_CONFIG_FILES([Makefile
 		chaos/log/Makefile
 		chaos/network/Makefile
 		chaos/statistic/Makefile
-        chaos/mylua/Makefile
         test/Makefile
 		test/arg_helper/Makefile
 		test/async_method/Makefile
@@ -61,7 +61,6 @@ AC_CONFIG_FILES([Makefile
 		test/msg_buffer/Makefile
 		test/utility/Makefile
 		test/perf/Makefile
-		test/mylua/Makefile
                 ])
 
 # yunjie: 获取内核信息

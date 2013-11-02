@@ -21,7 +21,6 @@
  */
 
 #include <string>
-using namespace std;
 
 namespace chaos
 {

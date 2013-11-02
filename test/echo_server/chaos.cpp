@@ -148,7 +148,7 @@ void parse_cmdarg(int argc_, char* argv_[])
 
             case 3:
                 {
-                    g_lua_config.load_from_lua(pair_arr[i].arg_val);
+                    g_lua_config.init(pair_arr[i].arg_val);
                     lua_config_to_server_config(g_lua_config, g_server_config);
                     printf("%s",g_server_config.dump().c_str());
                 }

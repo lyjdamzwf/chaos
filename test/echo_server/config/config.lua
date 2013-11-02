@@ -2,7 +2,7 @@ echo_server_config =
 {
     -- yunjie: 进程相关选项配置
     daemon                  = 0,
-    log_level               = 5,
+    log_level               = 4,
     log_print_to_file       = 1,
     log_print_to_screen     = 1,
 
@@ -20,8 +20,3 @@ echo_server_config =
     work_thread_num         = 2,
 }
 
-function read_config(cpp_lua_config)
-    for k,v in pairs(echo_server_config) do
-        cpp_lua_config:add_cpp_config(k, v)
-    end
-end
