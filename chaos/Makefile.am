@@ -18,8 +18,12 @@ statisticdir=$(includedir)/statistic
 task_servicedir=$(includedir)/task_service
 threaddir=$(includedir)/thread
 utilitydir=$(includedir)/utility
+
+# deps
 jemallocdir=$(includedir)/deps/jemalloc
 jeinterdir=$(includedir)/deps/jemalloc/internal
+luadir=$(includedir)/deps/lua-5.1.4/src
+luatinkerdir=$(includedir)/deps/lua_tinker
 
 include_HEADERS= *.h
 async_method_HEADERS=async_method/*.h
@@ -30,8 +34,12 @@ statistic_HEADERS=statistic/*.h
 task_service_HEADERS=task_service/*.h
 thread_HEADERS=thread/*.h
 utility_HEADERS=utility/*.h
+
+# deps
 jemalloc_HEADERS=deps/jemalloc/include/jemalloc/*.h
 jeinter_HEADERS=deps/jemalloc/include/jemalloc/internal/*.h
+lua_HEADERS=deps/lua-5.1.4/src/*.h
+luatinker_HEADERS=deps/lua_tinker/*.h
 
 libchaos_a_LIBFLAGS =
 libchaos_a_LIBADD =
