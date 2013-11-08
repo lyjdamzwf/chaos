@@ -2,7 +2,7 @@ echo_server_config =
 {
     -- yunjie: 进程相关选项配置
     daemon                  = 0,
-    log_level               = 4,
+    log_level               = 6,
     log_print_to_file       = 1,
     log_print_to_screen     = 1,
 

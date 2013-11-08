@@ -1,5 +1,6 @@
 def_dir=/usr/local
 build_part="all"
+make_jobs=2
 
 if [ -e "chaos/deps/jemalloc/lib/libjemalloc.a" ]; then
     build_part="chaos"
@@ -18,7 +19,7 @@ echo "install directory:"$def_dir
 if [ "$build_part" = "all" ]; then
 cd chaos/deps/jemalloc
 sh autogen.sh --with-jemalloc-prefix=je_
-make
+make -j${make_jobs}
 cd ../../../
 fi
 
@@ -32,7 +33,7 @@ automake --add-missing
 fi
 
 if [ "$build_part" = "all" ] || [ "$build_part" = "reconf" ] || [ "$build_part" = "chaos" ]; then
-make -C chaos
+make -C chaos -j${make_jobs}
 #cp ./chaos/utility/libchaos_utility.a ./chaos/utility/libchaos_utility_je.a 
 #cp ./chaos/libchaos.a ./chaos/libchaos_je.a 
 ar -q ./chaos/utility/libchaos_utility.a chaos/deps/jemalloc/src/*.o
@@ -41,5 +42,5 @@ fi
 
 
 if [ "$build_part" = "all" ] || [ "$build_part" = "reconf" ] || [ "$build_part" = "chaos" ] || [ "$build_part" = "test" ]; then
-make -C test
+make -C test -j${make_jobs}
 fi

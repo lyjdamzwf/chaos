@@ -73,17 +73,9 @@ public:
 
         all_task_num_ = task_queue.size();
 
-        if (task_num_ > task_queue.size())
+        if (task_num_ >= task_queue.size())
         {
-            for (
-                    deque<async_method_t>::iterator it = task_queue.begin();
-                    it < task_queue.end();
-                    ++it
-                )
-            {
-                out_task_.push_back(*it);
-            }
-
+            out_task_ = task_queue;
             task_queue.clear();
         }
         else

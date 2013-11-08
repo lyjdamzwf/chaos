@@ -118,48 +118,6 @@ bool thread_t::start(async_method_t method_)
 	return true;
 }
 
-void thread_t::cond_wait()
-{
-    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() begin"));
-
-    m_lock.lock();
-    if (m_alive)
-    {
-        m_cond.wait(m_lock);
-    }
-    m_lock.unlock();
-
-    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() end"));
-}
-
-void thread_t::cond_wait(
-                            struct timeval&     now_,
-                            uint64_t            timeout_second_,
-                            uint64_t            timeout_microsecond_
-                        )
-{
-    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() args-[timeout_sec:%lu, timeout_usec:%lu] begin", timeout_second_, timeout_microsecond_));
-
-    m_lock.lock();
-    if (m_alive)
-    {
-        m_cond.wait(m_lock, now_, timeout_second_, timeout_microsecond_);
-    }
-    m_lock.unlock();
-
-    LOGTRACE((THREAD_MODULE, "thread_t::cond_wait() end"));
-}
-
-void thread_t::cond_signal()
-{
-    m_lock.lock();
-    if (m_alive)
-    {
-        m_cond.signal();
-    }
-    m_lock.unlock();
-}
-
 }
 
 }

@@ -85,14 +85,6 @@ public:
     void join();
     bool start(async_method_t func_);
 
-    void cond_wait();
-    void cond_wait(
-                    struct timeval&     now_,
-                    uint64_t            timeout_second_,
-                    uint64_t            timeout_microsecond_
-                  );
-    void cond_signal();
-
 
     static void *thread_func(void *arg);
 

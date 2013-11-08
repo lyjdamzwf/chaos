@@ -35,7 +35,9 @@ task_service_t::task_service_t(const string& service_name_)
         m_service_name(service_name_),
         m_stop_signal(false),
         m_thread_num(0),
-        m_fetch_num_per_loop(0xffffffff)
+        m_fetch_num_per_loop(0xffffffff),
+        m_async_event_trigger(false),
+        m_cur_lock_thread(0)
 {
 #if COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
     memset(&m_comm_fds, 0 , sizeof(m_comm_fds));
@@ -85,8 +87,7 @@ int task_service_t::start(int32_t thread_num_)
     }
 
     //! yunjie: 任务队列必须加锁保护
-    m_task_queue.initialize(true);
-
+    m_task_queue.initialize(false);
     //! yunjie: 如果是单线程驱动task_service的话, timer内部就不需要进行加锁
     bool lock_flag = (m_thread_num <= 1) ? false : true;
     m_timer_manager.initialize(lock_flag);
@@ -197,61 +198,65 @@ void task_service_t::exec_task(thread_t* thd_)
         return;
     }
 
-    while (!m_stop_signal || !m_task_queue.empty())
+    while (1)
     {
         try
         {
             struct timeval cached_now;
-            //! yunjie: prepare the task buffer
-            tasks.clear();
 
-            while (1)
+            m_timer_manager.flush_time();
+            cached_now = m_timer_manager.get_cached_time();
+
+            //! yunjie: 处理定时事件
+            m_timer_manager.exec();
+
+            //! yunjie: 进行网络IO检测, 并会调用相应 读/写 回调
+            int wake_num = m_io_handler.wait_io_notification();
+
+            
+            //! yunjie: lock begin
             {
-                //! yunjie: 处理定时事件
-                m_timer_manager.flush_time();
-                cached_now = m_timer_manager.get_cached_time();
+                scope_mutex_lock_t lock(m_mutex);
+                m_cur_lock_thread = thd_->get_thread_id();
 
-                //! yunjie: 进行网络IO检测, 并会调用相应 读/写 回调
-                int wake_num = m_io_handler.wait_io_notification();
-
-                //! yunjie: 如果有timer时间超时, 将会在函数内部执行callback
-                m_timer_manager.exec();
-
-                //! yunjie: 本来是采用动态调整m_fetch_num_per_loop来平衡每个线程的任务抓取量, 发现并没有太大意义, 改为一次性全部获取所有任务
-                m_task_queue.fetch_task(tasks, all_task_num, m_fetch_num_per_loop);
-                if (wake_num || tasks.size() || m_stop_signal)      //! yunjie: 需要判断m_stop_signal, 否则外部投递stop信号号会发生join永远阻塞
+                if (m_stop_signal && m_task_queue.empty())
                 {
-                    break;
+                    goto OUT;
                 }
 
+                // yunjie: 没有异步事件 且 I/O不繁忙，进入cond_wait
+                if (!m_async_event_trigger && !wake_num)
+                {
 #if COMMUNICATION_MODE == PTHREAD_COND_VAR
-                thd_->cond_wait(cached_now, 0, TIMEDOUT_US);
+                    m_cond.wait(m_mutex, cached_now, 0, TIMEDOUT_US);
 #elif COMMUNICATION_MODE == SLEEP
-                thread_t::usleep(TIMEDOUT_US);
+                    thread_t::usleep(TIMEDOUT_US);
 #endif
-            }
-
-            //! yunjie: calc the fetch_num_per_loop
-            if (thread_num != 1)
-            {
-                m_fetch_num_per_loop = all_task_num / thread_num;
-                if (!m_fetch_num_per_loop)
-                {
-                    m_fetch_num_per_loop = MIN_TASK_FETCH_NUM;
                 }
 
-                if (m_fetch_num_per_loop > MAX_TASK_FETCH_NUM)
+                if (m_async_event_trigger)
                 {
-                    m_fetch_num_per_loop = MAX_TASK_FETCH_NUM;
+                    //! yunjie: 本来是采用动态调整m_fetch_num_per_loop来平衡每个线程的任务抓取量
+                    //          发现并没有太大意义, 改为一次性全部获取所有任务
+                    m_task_queue.fetch_task(tasks, all_task_num, m_fetch_num_per_loop);
+
+                    m_async_event_trigger = false;
                 }
             }
-
+            //! yunjie: lock end
+            
+            
             //! yunjie: 处理异步请求
-            for (deque<async_method_t>::iterator it = tasks.begin(); it != tasks.end(); ++it)
+            if (!tasks.empty())
             {
-                EXCEPTION_BEGIN
-                    (*it)();
-                EXCEPTION_END(TASK_SERVICE_MODULE, "exec task")
+                for (deque<async_method_t>::iterator it = tasks.begin(); it != tasks.end(); ++it)
+                {
+                    EXCEPTION_BEGIN
+                            (*it)();
+                    EXCEPTION_END(TASK_SERVICE_MODULE, "exec task")
+                }
+
+                tasks.clear();
             }
         }
         catch (const std::exception& ex)
@@ -270,6 +275,8 @@ void task_service_t::exec_task(thread_t* thd_)
             //! abort();
         }
     }
+
+OUT:
 
     m_timer_manager.clear();
 
@@ -303,11 +310,13 @@ int task_service_t::post(
         return 0;
     }
 
+    scope_mutex_lock_t lock(m_mutex);
+    
     m_task_queue.push(async_method_);
+    m_async_event_trigger = true;
 
 #if COMMUNICATION_MODE == PTHREAD_COND_VAR
-        send_cond_signal_t send_cond_signal;
-        m_thread_group.exec_all(send_cond_signal);
+    m_cond.broadcast();
 #elif COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
         char byte;
         int ret = 0;
@@ -322,6 +331,7 @@ int task_service_t::post(
 
 int task_service_t::clear_all_task()
 {
+    scope_mutex_lock_t lock(m_mutex);
     m_task_queue.clear_all_queue();
 
     return 0;

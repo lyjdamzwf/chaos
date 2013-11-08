@@ -59,7 +59,7 @@
 
 #if 0
 #undef COMMUNICATION_MODE
-#define COMMUNICATION_MODE  5
+#define COMMUNICATION_MODE  1
 #endif
 
 namespace chaos
@@ -75,18 +75,6 @@ using namespace chaos::log;
 
 #ifndef DEFAULT_TASK_SERVICE_THREAD_NUM
 #define DEFAULT_TASK_SERVICE_THREAD_NUM     1
-#endif
-
-#ifndef ALL_THREAD_MASK
-#define ALL_THREAD_MASK                     0xffffffff
-#endif
-
-#ifndef MIN_TASK_FETCH_NUM
-#define MIN_TASK_FETCH_NUM                  32
-#endif
-
-#ifndef MAX_TASK_FETCH_NUM
-#define MAX_TASK_FETCH_NUM                  65535
 #endif
 
 #ifndef TIMEDOUT_US
@@ -122,30 +110,6 @@ public:
         task_service_t&                  m_task_service;
     };
 
-    struct send_cond_signal_t : public thread_group_t::callback_t
-    {
-        send_cond_signal_t(pthread_t pid_ = ALL_THREAD_MASK)
-            : pid(pid_)
-        {
-        }
-
-        virtual void exec(thread_t* thd_)
-        {
-            if (NULL != thd_)
-            {
-                LOGTRACE(("task_service_t", "send_cond_signal_t::exec() begin"));
-
-                if (ALL_THREAD_MASK == pid || thd_->get_thread_id() == pid)
-                {
-                    thd_->cond_signal();
-                }
-
-                LOGTRACE(("task_service_t", "send_cond_signal_t::exec() end"));
-            }
-        }
-
-        pthread_t   pid;
-    };
 
 public:
     virtual int start(int32_t thread_num_ = DEFAULT_TASK_SERVICE_THREAD_NUM);
@@ -209,6 +173,11 @@ protected:
     atomic_val_t<uint32_t>                  m_fetch_num_per_loop;
     timer_manager_t                         m_timer_manager;
     io_multiplex_handler_t                  m_io_handler;
+
+    mutex_t                                 m_mutex;
+    condition_t                             m_cond;
+    bool                                    m_async_event_trigger;
+    pthread_t                               m_cur_lock_thread;
 
 #if COMMUNICATION_MODE == PIPE || COMMUNICATION_MODE == SOCKET_PAIR || COMMUNICATION_MODE == EVENTFD
     //! yunjie: 用于IPC通信的fd

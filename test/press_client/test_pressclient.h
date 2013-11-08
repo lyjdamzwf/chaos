@@ -5,7 +5,7 @@
 
 //! yunjie: test press begin
 
-#define PRESS_CONN_NUM  100
+#define PRESS_CONN_NUM  10
 #define MIN_PACKET_SIZE (sizeof(packet_header_t))
 #define MAX_PACKET_SIZE (sizeof(packet_header_t) + 4096)
 

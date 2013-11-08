@@ -24,13 +24,13 @@ void task_service_productor(string str_, int index_)
 {
     if ("task_service_press" == str_)
     {
-        LOGDEBUG((TEST_MODULE, "press index:%d", index_));
+        LOGTRACE((TEST_MODULE, "press index:%d", index_));
         return;
     }
-
+ 
     if (TASK_SERVICE_PERFORMANCE_COUNT - 1 == index_)
     {
-        LOGDEBUG((TEST_MODULE, "%s done", str_.c_str()));
+        LOGTRACE((TEST_MODULE, "%s done", str_.c_str()));
         gettimeofday(&fin_tv, NULL);
         uint64_t cost_us = (fin_tv.tv_sec - begin_tv.tv_sec) * 1000 * 1000 + (fin_tv.tv_usec - begin_tv.tv_usec);
         printf("task exec cost:[%lu us]\n", cost_us);
@@ -54,7 +54,7 @@ void test_task_service_press()
 
 void test_task_service_performance()
 {
-    LOGDEBUG((TEST_MODULE, "test_task_service_performance begin"));
+    LOGTRACE((TEST_MODULE, "test_task_service_performance begin"));
 
     int index = 0;
     gettimeofday(&begin_tv, NULL);
@@ -68,25 +68,25 @@ void test_task_service_performance()
     {
         isptr->post(boost::bind(&task_service_productor, string("asio_service"), index++));
     }
-    LOGDEBUG((TEST_MODULE, "boost post end"));
+    LOGTRACE((TEST_MODULE, "boost post end"));
     gwp.reset();
 
-    LOGDEBUG((TEST_MODULE, "boost thread join start"));
+    LOGTRACE((TEST_MODULE, "boost thread join start"));
     thread->join();
-    LOGDEBUG((TEST_MODULE, "boost thread join end"));
+    LOGTRACE((TEST_MODULE, "boost thread join end"));
 #else
     while (index <= TASK_SERVICE_PERFORMANCE_COUNT)
     {
         TS().post(bindfunc(&task_service_productor, string("task_service"), index++));
     }
-    LOGDEBUG((TEST_MODULE, "chaos post end"));
+    LOGTRACE((TEST_MODULE, "chaos post end"));
 #endif
 
     gettimeofday(&post_end_tv, NULL);
     uint64_t cost_us = (post_end_tv.tv_sec - begin_tv.tv_sec) * 1000 * 1000 + (post_end_tv.tv_usec - begin_tv.tv_usec);
     printf("post cost:[%lu us]\n", cost_us);
 
-    LOGDEBUG((TEST_MODULE, "test_task_service_performance end"));
+    LOGTRACE((TEST_MODULE, "test_task_service_performance end"));
 }
 
 void test_ring_buffer()
@@ -108,16 +108,16 @@ void test_ring_buffer()
 
 void task_service_timer_event_persist()
 {
-    LOGDEBUG((TEST_MODULE, "task_service_timer_event_persist called!!!!!"));
+    LOGTRACE((TEST_MODULE, "task_service_timer_event_persist called!!!!!"));
 }
 
 void test_task_service_timer_persist()
 {
-    LOGDEBUG((TEST_MODULE, "test_task_service_timer_persist begin"));
+    LOGTRACE((TEST_MODULE, "test_task_service_timer_persist begin"));
 
     TS().register_timer(1, bindfunc(task_service_timer_event_persist), true);
 
-    LOGDEBUG((TEST_MODULE, "test_task_service_timer_persist end"));
+    LOGTRACE((TEST_MODULE, "test_task_service_timer_persist end"));
 }
 
 //! yunjie: task_service_t 是 noncopyable的, 所以只能传指针
