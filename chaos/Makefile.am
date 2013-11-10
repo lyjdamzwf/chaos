@@ -66,6 +66,7 @@ libchaos_a_SOURCES = \
 					 utility/processor_helper.cpp \
 					 utility/random.cpp \
 					 utility/signal_handler.cpp \
+                     utility/script.cpp \
 					 deps/lua-5.1.4/src/ldo.c \
 					 deps/lua-5.1.4/src/lcode.c \
 					 deps/lua-5.1.4/src/lauxlib.c \
@@ -99,5 +100,4 @@ libchaos_a_SOURCES = \
 					 deps/lua-5.1.4/src/ldebug.c \
 					 deps/lua-5.1.4/src/lstate.c \
 					 deps/lua_tinker/lua_tinker.cpp
-
 

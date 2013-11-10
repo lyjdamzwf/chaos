@@ -12,4 +12,5 @@ libchaos_utility_a_SOURCES = \
 						processor_helper.cpp \
 						random.cpp \
 						signal_handler.cpp \
-						arg_helper.cpp
+						arg_helper.cpp \
+						script.cpp
