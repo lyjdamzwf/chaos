@@ -33,7 +33,6 @@ namespace chaos
 namespace heart_beat
 {
 
-using namespace __gnu_cxx;
 using namespace chaos::utility;
 using namespace chaos::log;
 
@@ -59,7 +58,7 @@ public:
     typedef heart_beat_list_t<element_data_type> list_type;
     typedef typename heart_beat_list_t<element_data_type>::node_type list_node_type;
 
-    typedef hash_map<element_type, list_node_type*, element_hash> element_map;
+    typedef __gnu_cxx::hash_map<element_type, list_node_type*, element_hash> element_map;
 
     typedef typename element_map::iterator element_map_iterator;
 

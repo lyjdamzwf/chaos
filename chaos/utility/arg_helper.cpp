@@ -125,7 +125,7 @@ void arg_helper_t::show_args(
     for (int j = 0 ; j < option_count_; ++j)
     {
         arg_option_t cur_option = options_[j];
-        printf("-%s         %s\n", cur_option.name, cur_option.description);
+        printf("-%-10s         %s\n", cur_option.name, cur_option.description);
     }
 
     printf("---------------- show args end ----------------\n\n");

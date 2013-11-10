@@ -210,11 +210,13 @@ void parse_cmdarg(int argc_, char* argv_[])
 
             case 13:
                 {
+                    g_server_config.address = pair_arr[i].arg_val;
                 }
                 break;
 
             case 14:
                 {
+                    g_server_config.port = atoi(pair_arr[i].arg_val);
                 }
                 break;
 

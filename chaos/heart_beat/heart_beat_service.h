@@ -36,7 +36,7 @@ using namespace chaos::task_service;
 #define HEART_BEAT_MOUDLE_TICKS 8
 #endif
 
-template<typename element_type, typename element_hash = hash<element_type> >
+template<typename element_type, typename element_hash = __gnu_cxx::hash<element_type> >
 class heart_beat_service_t : private noncopyable_t
 {
 public:
