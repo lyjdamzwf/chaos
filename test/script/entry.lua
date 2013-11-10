@@ -7,3 +7,7 @@ afun1()
 afun2()
 bfun1()
 bfun2()
+
+function callback(p)
+   p:func1(123)
+end
