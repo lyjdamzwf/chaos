@@ -1,7 +1,7 @@
 noinst_PROGRAMS = chaos_perf
 
 chaos_perf_SOURCES = chaos.cpp \
-					   ../misc_impl.cpp
+					   ../misc.cpp
 
 chaos_perf_LDADD = \
 			  $(top_srcdir)/chaos/libchaos.a \

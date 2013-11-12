@@ -1,7 +1,7 @@
 #ifndef _CHAOS_MISC_DEF_H_
 #define _CHAOS_MISC_DEF_H_
 
-#include <inttypes.h>
+
 
 #include <algorithm>
 
@@ -73,7 +73,7 @@ EXTERN_SERVICE_DECL
 //! yunjie: 日志模块封装
 class log_tool_t
 {
-  public:
+public:
     static void print_screen_callback(const std::string& msg_)
     {
         if (is_started)
@@ -115,7 +115,7 @@ class log_tool_t
                  modules,
                  print_screen_callback,
                  print_file_callback
-                 );
+            );
 
         LOGS().start(1);
         is_started = true;
@@ -131,13 +131,13 @@ class log_tool_t
         return 0;
     }
 
-  private:
+private:
     volatile static bool             is_started;
 };
 
 class application_tool_t
 {
-  public:
+public:
 
     static int block_all_signal()
     {
@@ -157,41 +157,6 @@ class application_tool_t
 
         return 0;
     }
-};
-
-class lua_config_t : private noncopyable_t
-{
-  public:
-    lua_config_t();
-    ~lua_config_t();
-
-    int init(const string& lua_path_);
-
-
-    //! yunjie: 该方法不适合频繁调用, 会存在较高的拷贝
-    string operator[](const string& key_) const
-    {
-        return get(key_);
-    }
-
-    const string& get(const string& key_) const;
-    const vector<string>& get_multi(const string& key_) const;
-
-  private:
-    int regist_to_lua();
-    int load_from_lua(const string& lua_path_);
-    void add_cpp_config(const char *key_, const char *val_);
-    
-  private:
-    typedef map<string, vector<string> >::const_iterator            map_const_it_t;
-    typedef map<string, vector<string> >::iterator                  map_it_t;
-    typedef vector<string>::const_iterator                          val_const_it_t;
-    typedef vector<string>::iterator                                val_it_t;
-
-  private:
-    map<string, vector<string> >                m_config_map;
-    // mylua_t*                                    m_mylua_ptr;
-    lua_State                                   *m_lua_state;
 };
 
 #endif //! _CHAOS_MISC_DEF_H_

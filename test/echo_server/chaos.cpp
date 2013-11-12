@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../misc_def.h"
+#include "../misc.h"
 #include "server_config.h"
 #include "test_tcp_server.h"
 
@@ -148,7 +148,7 @@ void parse_cmdarg(int argc_, char* argv_[])
 
             case 3:
                 {
-                    g_lua_config.init(pair_arr[i].arg_val);
+                    g_lua_config.init(pair_arr[i].arg_val, "echo_server_config");
                     lua_config_to_server_config(g_lua_config, g_server_config);
                     printf("%s",g_server_config.dump().c_str());
                 }

@@ -1,7 +1,7 @@
 #ifndef _CHAOS_TEST_TCP_SERVER_H_
 #define _CHAOS_TEST_TCP_SERVER_H_
 
-#include "../misc_def.h"
+#include "../misc.h"
 
 //! yunjie: test press begin
 
