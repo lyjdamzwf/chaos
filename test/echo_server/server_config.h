@@ -55,7 +55,7 @@ struct server_config_t
 
     string dump()
     {
-        char buf[1024] = {0}; 
+        char buf[1024] = {0};
         snprintf(buf, sizeof(buf), "------- server config dump ------\n"
                 " daemon:[%d]\n"
                 " log_level:[%d]\n"

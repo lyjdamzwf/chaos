@@ -57,7 +57,7 @@ int main(int argc_, char* argv_[])
 
     parse_cmdarg(argc_, argv_);
     init_config(network_config, hb_param);
-    
+
     //! yunjie: 对于先创建的所有线程阻塞所有信号
     application_tool_t::block_all_signal();
     log_tool_t::start_log_service(

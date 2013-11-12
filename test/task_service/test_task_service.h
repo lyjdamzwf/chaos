@@ -27,7 +27,7 @@ void task_service_productor(string str_, int index_)
         LOGTRACE((TEST_MODULE, "press index:%d", index_));
         return;
     }
- 
+
     if (TASK_SERVICE_PERFORMANCE_COUNT - 1 == index_)
     {
         LOGTRACE((TEST_MODULE, "%s done", str_.c_str()));

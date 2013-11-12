@@ -60,7 +60,7 @@ void script::reload()
 
 void script::register_lua_interface()
 {
-    
+
 }
 
 void script::add_package_path(const string& path_)
@@ -105,7 +105,7 @@ int lua_config_t::init(const string& lua_path_, const string& table_)
     char val_buf[50];
 
     const char *key, *val;
-    
+
     while(lua_next(m_lua_state,-2))
     {
         if(lua_isnumber(m_lua_state,-2))
@@ -128,10 +128,10 @@ int lua_config_t::init(const string& lua_path_, const string& table_)
         }
 
         m_config_map[key].push_back(val);
-        
+
         lua_pop(m_lua_state,1);
     }
-    
+
     lua_pop(m_lua_state,1);
 
     return 0;
@@ -146,7 +146,7 @@ const string& lua_config_t::get(const string& key_) const
     }
 
     static string empty;
-    
+
     return empty;
 }
 
@@ -159,7 +159,7 @@ const vector<string>& lua_config_t::get_multi(const string& key_) const
     }
 
     static vector<string> empty;
-    
+
     return empty;
 }
 
