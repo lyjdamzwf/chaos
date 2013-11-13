@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../misc_def.h"
+#include "../misc.h"
 #include "test_pressclient.h"
 
 extern uint32_t g_press_conn_num;

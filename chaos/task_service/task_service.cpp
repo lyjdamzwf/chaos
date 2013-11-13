@@ -213,7 +213,7 @@ void task_service_t::exec_task(thread_t* thd_)
             //! yunjie: 进行网络IO检测, 并会调用相应 读/写 回调
             int wake_num = m_io_handler.wait_io_notification();
 
-            
+
             //! yunjie: lock begin
             {
                 scope_mutex_lock_t lock(m_mutex);
@@ -244,8 +244,8 @@ void task_service_t::exec_task(thread_t* thd_)
                 }
             }
             //! yunjie: lock end
-            
-            
+
+
             //! yunjie: 处理异步请求
             if (!tasks.empty())
             {
@@ -311,7 +311,7 @@ int task_service_t::post(
     }
 
     scope_mutex_lock_t lock(m_mutex);
-    
+
     m_task_queue.push(async_method_);
     m_async_event_trigger = true;
 

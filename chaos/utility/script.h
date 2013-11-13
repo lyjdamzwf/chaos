@@ -21,6 +21,8 @@
  */
 
 #include <string>
+#include <vector>
+#include <map>
 
 #include <chaos/utility/noncopyable.h>
 #include <chaos/deps/lua_tinker/lua_tinker.h>
@@ -185,6 +187,34 @@ void script::class_mem( const char* name, VAR BASE::*val )
 {
 	lua_tinker::class_mem<T>(_L, name, val);
 }
+
+
+class lua_config_t : private noncopyable_t
+{
+public:
+    lua_config_t();
+    ~lua_config_t();
+
+    int init(const string& lua_path_, const string& table_);
+
+    const string& operator[](const string& key_) const
+    {
+        return get(key_);
+    }
+
+    const string& get(const string& key_) const;
+    const vector<string>& get_multi(const string& key_) const;
+
+private:
+    typedef map<string, vector<string> >::const_iterator            map_const_it_t;
+    typedef map<string, vector<string> >::iterator                  map_it_t;
+    typedef vector<string>::const_iterator                          val_const_it_t;
+    typedef vector<string>::iterator                                val_it_t;
+
+private:
+    map<string, vector<string> >                m_config_map;
+    lua_State                                   *m_lua_state;
+};
 
 }
 

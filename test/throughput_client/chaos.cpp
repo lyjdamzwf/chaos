@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../misc_def.h"
+#include "../misc.h"
 #include "test_tpclient.h"
 
 arg_option_t       arg_options[] =

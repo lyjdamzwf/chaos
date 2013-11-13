@@ -9,13 +9,16 @@
 #ifndef _CHAOS_MISC_H_
 #define _CHAOS_MISC_H_
 
+#include <iostream>
 #include <vector>
 
 namespace chaos
 {
 
-namespace utility
-{
+    namespace utility
+    {
+
+        using namespace std;
 
 #define SAFE_DELETE(x) { if (NULL != x) { delete(x); (x) = NULL; } }
 #define SAFE_DELETE_ARR(x) { if (NULL != x) { delete [] (x); (x) = NULL; } }
@@ -32,22 +35,31 @@ namespace utility
 
 #define STRERR                      strerror(errno)
 
-#define EXCEPTION_BEGIN \
-try \
-{
+#define EXCEPTION_BEGIN                         \
+        try                                     \
+        {
 
-#define EXCEPTION_END(module, ext)   \
-} \
-catch (std::exception& e) \
-{ \
-    LOGWARN((module, "%s, %s, exception:[%s]", __PRETTY_FUNCTION__, ext, e.what())); \
-} \
-catch (...) \
-{ \
-    LOGWARN((module, "%s, %s, unknown exception", __PRETTY_FUNCTION__, ext)); \
-}
+#define EXCEPTION_END(module, ext)                                      \
+        }                                                               \
+            catch (std::exception& e)                                   \
+            {                                                           \
+                LOGWARN((module, "%s, %s, exception:[%s]", __PRETTY_FUNCTION__, ext, e.what())); \
+            }                                                           \
+            catch (...)                                                 \
+            {                                                           \
+                LOGWARN((module, "%s, %s, unknown exception", __PRETTY_FUNCTION__, ext)); \
+            }
 
-}
+        template<typename type_t>
+        void loop_2_printf(vector<type_t>& vector_)
+        {
+            for (typename vector<type_t>::iterator it = vector_.begin(); it != vector_.end(); it++)
+            {
+                std::cout << *it << std::endl;
+            }
+        }
+
+    }
 
 }
 

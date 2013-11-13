@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../misc_def.h"
+#include "../misc.h"
 #include "test_log.h"
 
 EXTERN_SERVICE_DECL

@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../misc_def.h"
+#include "../misc.h"
 #include "server_config.h"
 #include "test_tcp_server.h"
 
@@ -57,7 +57,7 @@ int main(int argc_, char* argv_[])
 
     parse_cmdarg(argc_, argv_);
     init_config(network_config, hb_param);
-    
+
     //! yunjie: 对于先创建的所有线程阻塞所有信号
     application_tool_t::block_all_signal();
     log_tool_t::start_log_service(
@@ -148,7 +148,7 @@ void parse_cmdarg(int argc_, char* argv_[])
 
             case 3:
                 {
-                    g_lua_config.init(pair_arr[i].arg_val);
+                    g_lua_config.init(pair_arr[i].arg_val, "echo_server_config");
                     lua_config_to_server_config(g_lua_config, g_server_config);
                     printf("%s",g_server_config.dump().c_str());
                 }

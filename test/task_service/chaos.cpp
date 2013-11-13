@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../misc_def.h"
+#include "../misc.h"
 #include "test_task_service.h"
 
 int main(int argc_, char* argv_[])
