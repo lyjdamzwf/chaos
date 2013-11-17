@@ -26,11 +26,15 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#include <string>
+
 namespace chaos
 {
 
 namespace network
 {
+
+using namespace std;
 
 class network_tool_t
 {

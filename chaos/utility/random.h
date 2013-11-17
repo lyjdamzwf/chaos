@@ -25,13 +25,14 @@
 #include <stdlib.h>
 
 #include <iostream>
-using namespace std;
 
 namespace chaos
 {
 
 namespace utility
 {
+
+using namespace std;
 
 //! yunjie: it's safe in mutil thread environment.
 class rand_gen_t

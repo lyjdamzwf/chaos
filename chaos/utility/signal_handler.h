@@ -24,13 +24,14 @@
 #include <stddef.h>
 
 #include <map>
-using namespace std;
 
 namespace chaos
 {
 
 namespace utility
 {
+
+using namespace std;
 
 class signal_handler_t
 {

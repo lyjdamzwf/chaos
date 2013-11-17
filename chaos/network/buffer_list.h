@@ -21,7 +21,7 @@
  */
 
 #include <list>
-using namespace std;
+
 
 #include <chaos/network/msg_buffer.h>
 
@@ -34,6 +34,8 @@ namespace chaos
 
 namespace network
 {
+
+using namespace std;
 
 #define DEFAULT_MAX_MOVE_BYTES      (16*1024)
 

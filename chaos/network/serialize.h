@@ -24,7 +24,6 @@
 #include <stdio.h>
 
 #include <string>
-using namespace std;
 
 #include <chaos/utility/utility_inc.h>
 
@@ -35,6 +34,8 @@ namespace chaos
 
 namespace network
 {
+
+using namespace std;
 
 using namespace chaos::utility;
 
