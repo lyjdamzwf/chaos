@@ -1,3 +1,5 @@
+#include <chaos/utility/utility_inc.h>
+
 #include <chaos/script/script.h>
 
 #include <inttypes.h>
@@ -7,6 +9,8 @@ namespace chaos
 
 namespace script
 {
+
+using namespace chaos::utility;
 
 script::script()
 {
@@ -66,6 +70,8 @@ void script::register_lua_interface()
     lua_tinker::def(_L, "loginfo", &script::loginfo);
     lua_tinker::def(_L, "logtrace", &script::logtrace);
     lua_tinker::def(_L, "logdebug", &script::logdebug);
+
+    lua_tinker::def(_L, "get_rand", &rand_gen_t::get_rand);
 }
 
 void script::add_package_path(const string& path_)

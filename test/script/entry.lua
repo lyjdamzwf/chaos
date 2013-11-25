@@ -17,4 +17,9 @@ function callback(p)
    loginfo("TEST_MODULE", "info log!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
    logtrace("TEST_MODULE", "trace log!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
    logdebug("TEST_MODULE", "debug log!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+   for i = 0, 10 do
+      local rand_val = get_rand(0, 3)
+      print("rand_val:" .. rand_val)
+   end
 end
