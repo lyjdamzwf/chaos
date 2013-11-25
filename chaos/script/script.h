@@ -25,15 +25,18 @@
 #include <map>
 
 #include <chaos/utility/noncopyable.h>
+#include <chaos/log/log_inc.h>
 #include <chaos/deps/lua_tinker/lua_tinker.h>
 
 namespace chaos
 {
 
-namespace utility
+namespace script
 {
 
 using namespace std;
+
+using namespace chaos::log;
 
 class script : private noncopyable_t
 {
@@ -96,6 +99,36 @@ public:
 
 	template<typename T, typename BASE, typename VAR>
 	void class_mem(const char* name, VAR BASE::*val);
+
+    static void logfatal(const char *module_, const char *data_)
+    {
+        LOGFATAL((module_, data_));
+    }
+
+    static void logerror(const char *module_, const char *data_)
+    {
+        LOGERROR((module_, data_));
+    }
+
+    static void logwarn(const char *module_, const char *data_)
+    {
+        LOGWARN((module_, data_));
+    }
+
+    static void loginfo(const char *module_, const char *data_)
+    {
+        LOGINFO((module_, data_));
+    }
+
+    static void logtrace(const char *module_, const char *data_)
+    {
+        LOGTRACE((module_, data_));
+    }
+
+    static void logdebug(const char *module_, const char *data_)
+    {
+        LOGDEBUG((module_, data_));
+    }
 };
 
 template<typename T>

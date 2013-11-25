@@ -1,11 +1,11 @@
-#include <chaos/utility/script.h>
+#include <chaos/script/script.h>
 
 #include <inttypes.h>
 
 namespace chaos
 {
 
-namespace utility
+namespace script
 {
 
 script::script()
@@ -60,7 +60,12 @@ void script::reload()
 
 void script::register_lua_interface()
 {
-
+    lua_tinker::def(_L, "logfatal", &script::logfatal);
+    lua_tinker::def(_L, "logerror", &script::logerror);
+    lua_tinker::def(_L, "logwarn", &script::logwarn);
+    lua_tinker::def(_L, "loginfo", &script::loginfo);
+    lua_tinker::def(_L, "logtrace", &script::logtrace);
+    lua_tinker::def(_L, "logdebug", &script::logdebug);
 }
 
 void script::add_package_path(const string& path_)

@@ -1,6 +1,4 @@
-#include <chaos/utility/script.h>
-
-using namespace chaos::utility;
+#include "../misc.h"
 
 class a_t
 {
@@ -11,11 +9,13 @@ class a_t
     }
 };
 
-class script2_t : public chaos::utility::script
+class script2_t : public chaos::script::script
 {
   public:
     void register_lua_interface()
     {
+        chaos::script::script::register_lua_interface();
+
 #define CLASS_DEF(klass,member)                                     \
         lua_tinker::class_def<klass>(_L, #member, &klass::member)
 #define CLASS_ADD(klass)                            \
@@ -30,6 +30,10 @@ class script2_t : public chaos::utility::script
 
 int main(int argc_, char *argv_[])
 {
+    NEW_SERVICE();
+
+    log_tool_t::start_log_service("script.log", 6, 1, 1);
+
     script2_t s;
     s.add_package_path("./lua_package");
     s.register_lua_interface();
@@ -40,6 +44,10 @@ int main(int argc_, char *argv_[])
 
     sleep(10);
     s.reload();
+
+    log_tool_t::stop_log_service();
+
+    DEL_SERVICE();
 
     return 0;
 }

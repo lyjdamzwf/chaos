@@ -48,6 +48,7 @@ AC_CONFIG_FILES([Makefile
 		chaos/log/Makefile
 		chaos/network/Makefile
 		chaos/statistic/Makefile
+		chaos/script/Makefile
         test/Makefile
 		test/arg_helper/Makefile
 		test/async_method/Makefile

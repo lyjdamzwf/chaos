@@ -1,4 +1,4 @@
-SUBDIRS= thread utility task_service log network statistic
+SUBDIRS= thread utility task_service log network statistic script
 
 lib_LIBRARIES = libchaos.a
 
@@ -18,6 +18,7 @@ statisticdir=$(includedir)/statistic
 task_servicedir=$(includedir)/task_service
 threaddir=$(includedir)/thread
 utilitydir=$(includedir)/utility
+scriptdir=$(includedir)/script
 
 # deps
 jemallocdir=$(includedir)/deps/jemalloc
@@ -34,6 +35,7 @@ statistic_HEADERS=statistic/*.h
 task_service_HEADERS=task_service/*.h
 thread_HEADERS=thread/*.h
 utility_HEADERS=utility/*.h
+script_HEADERS=script/*.h
 
 # deps
 jemalloc_HEADERS=deps/jemalloc/include/jemalloc/*.h
@@ -66,7 +68,7 @@ libchaos_a_SOURCES = \
 					 utility/processor_helper.cpp \
 					 utility/random.cpp \
 					 utility/signal_handler.cpp \
-                     utility/script.cpp \
+                     script/script.cpp \
 					 deps/lua-5.1.4/src/ldo.c \
 					 deps/lua-5.1.4/src/lcode.c \
 					 deps/lua-5.1.4/src/lauxlib.c \

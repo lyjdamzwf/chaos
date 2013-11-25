@@ -21,6 +21,5 @@
 #include <chaos/utility/arg_helper.h>
 #include <chaos/utility/memory.h>
 #include <chaos/utility/shared_ptr.h>
-#include <chaos/utility/script.h>
 
 #endif //! _CHAOS_UTILITY_INC_H_

@@ -19,6 +19,7 @@
 #include <chaos/statistic/statistic_inc.h>
 #include <chaos/heart_beat/heart_beat_inc.h>
 #include <chaos/network/network_inc.h>
+#include <chaos/script/script_inc.h>
 
 using namespace chaos::utility;
 using namespace chaos::async_method;
@@ -28,6 +29,7 @@ using namespace chaos::task_service;
 using namespace chaos::statistic;
 using namespace chaos::heart_beat;
 using namespace chaos::network;
+using namespace chaos::script;
 
 
 //! yunjie: 日志模块定义
