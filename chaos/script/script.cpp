@@ -12,45 +12,45 @@ namespace script
 
 using namespace chaos::utility;
 
-script::script()
+script_t::script_t()
 {
 	_L = lua_open();
 	luaL_openlibs(_L);
     add_package_path("./");
 }
 
-script::~script()
+script_t::~script_t()
 {
     lua_close(_L);
 }
 
-void script::do_file(const char * fn)
+void script_t::do_file(const char * fn)
 {
 	lua_tinker::dofile(_L, fn);
 	_scriptName = fn;
 }
 
-void script::run_script(const char * str)
+void script_t::run_script(const char * str)
 {
 	lua_tinker::dostring(_L, str);
 }
 
-lua_tinker::table script::get_table()
+lua_tinker::table script_t::get_table()
 {
 	return lua_tinker::table(_L);
 }
 
-lua_tinker::table script::get_table( int index )
+lua_tinker::table script_t::get_table( int index )
 {
 	return lua_tinker::table(_L, index);
 }
 
-lua_tinker::table script::get_table( const char * name )
+lua_tinker::table script_t::get_table( const char * name )
 {
 	return lua_tinker::table(_L, name);
 }
 
-void script::reload()
+void script_t::reload()
 {
 	lua_close(_L);
 	_L = lua_open();
@@ -62,19 +62,19 @@ void script::reload()
         do_file(_scriptName.c_str());
 }
 
-void script::register_lua_interface()
+void script_t::register_lua_interface()
 {
-    lua_tinker::def(_L, "logfatal", &script::logfatal);
-    lua_tinker::def(_L, "logerror", &script::logerror);
-    lua_tinker::def(_L, "logwarn", &script::logwarn);
-    lua_tinker::def(_L, "loginfo", &script::loginfo);
-    lua_tinker::def(_L, "logtrace", &script::logtrace);
-    lua_tinker::def(_L, "logdebug", &script::logdebug);
+    lua_tinker::def(_L, "logfatal", &script_t::logfatal);
+    lua_tinker::def(_L, "logerror", &script_t::logerror);
+    lua_tinker::def(_L, "logwarn", &script_t::logwarn);
+    lua_tinker::def(_L, "loginfo", &script_t::loginfo);
+    lua_tinker::def(_L, "logtrace", &script_t::logtrace);
+    lua_tinker::def(_L, "logdebug", &script_t::logdebug);
 
     lua_tinker::def(_L, "get_rand", &rand_gen_t::get_rand);
 }
 
-void script::add_package_path(const string& path_)
+void script_t::add_package_path(const string& path_)
 {
 	if(!path_.empty())
 	{

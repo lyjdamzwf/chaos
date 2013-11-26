@@ -9,12 +9,12 @@ class a_t
     }
 };
 
-class script2_t : public chaos::script::script
+class script2_t : public chaos::script::script_t
 {
   public:
     void register_lua_interface()
     {
-        chaos::script::script::register_lua_interface();
+        chaos::script::script_t::register_lua_interface();
 
 #define CLASS_DEF(klass,member)                                     \
         lua_tinker::class_def<klass>(_L, #member, &klass::member)

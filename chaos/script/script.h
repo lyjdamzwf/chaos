@@ -38,11 +38,11 @@ using namespace std;
 
 using namespace chaos::log;
 
-class script : private noncopyable_t
+class script_t : private noncopyable_t
 {
 public:
-	script();
-    virtual ~script();
+	script_t();
+    virtual ~script_t();
     void add_package_path(const string& path_);
 	void run_script(const char *);
 	void do_file(const char *);
@@ -132,91 +132,91 @@ public:
 };
 
 template<typename T>
-T script::get( const char* name )
+T script_t::get( const char* name )
 {
 	return lua_tinker::get<T>(_L, name);
 }
 
 template<typename T>
-void script::set( const char* name, T object )
+void script_t::set( const char* name, T object )
 {
 	lua_tinker::set(_L, name, object);
 }
 
 template<typename RVal>
-RVal script::call( const char* name )
+RVal script_t::call( const char* name )
 {
 	return lua_tinker::call<RVal>(_L, name);
 }
 
 template<typename RVal, typename T1>
-RVal script::call(const char* name, T1 arg1)
+RVal script_t::call(const char* name, T1 arg1)
 {
 	return lua_tinker::call<RVal>(_L, name, arg1);
 }
 
 template<typename RVal, typename T1, typename T2>
-RVal script::call(const char* name, T1 arg1, T2 arg2)
+RVal script_t::call(const char* name, T1 arg1, T2 arg2)
 {
 	return lua_tinker::call<RVal>(_L, name, arg1, arg2);
 }
 
 template<typename RVal, typename T1, typename T2, typename T3>
-RVal script::call(const char* name, T1 arg1, T2 arg2, T3 arg3)
+RVal script_t::call(const char* name, T1 arg1, T2 arg2, T3 arg3)
 {
 	return lua_tinker::call<RVal>(_L, name, arg1, arg2, arg3);
 }
 
 template<typename RVal, typename T1, typename T2, typename T3, typename T4>
-RVal script::call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+RVal script_t::call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 {
 	return lua_tinker::call<RVal>(_L, name, arg1, arg2, arg3, arg4);
 }
 
 template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5>
-RVal script::call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+RVal script_t::call(const char* name, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 {
 	return lua_tinker::call<RVal>(_L, name, arg1, arg2, arg3, arg4, arg5);
 }
 
 template<typename T>
-void script::decl( const char* name, T object )
+void script_t::decl( const char* name, T object )
 {
 	return lua_tinker::decl(_L, name, object);
 }
 
 template<typename F>
-void script::def( const char * name, F func )
+void script_t::def( const char * name, F func )
 {
 	lua_tinker::def(_L, name, func);
 }
 
 template<typename T, typename F>
-void script::class_def( const char * name, F func )
+void script_t::class_def( const char * name, F func )
 {
 	lua_tinker::class_def<T>(_L, name, func);
 }
 
 template<typename T, typename F>
-void script::class_con( F func )
+void script_t::class_con( F func )
 {
 	lua_tinker::class_con<T>(_L, func);
 }
 
 template<typename T, typename P>
-void script::class_inh()
+void script_t::class_inh()
 {
 	lua_tinker::class_inh<T, P>(_L);
 }
 
 template<typename T>
-void script::class_add( const char * name )
+void script_t::class_add( const char * name )
 {
 	lua_tinker::class_add<T>(_L, name);
 }
 
 template<typename T, typename BASE, typename VAR>
-void script::class_mem( const char* name, VAR BASE::*val )
+void script_t::class_mem( const char* name, VAR BASE::*val )
 {
 	lua_tinker::class_mem<T>(_L, name, val);
 }
