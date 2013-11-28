@@ -48,11 +48,30 @@ enum
     LF_INFO,
     LF_TRACE,
     LF_DEBUG,
-    ALL_LOG_LEVEL
 };
 
-//! 将`日志级别'或者`日志模块'序号转换成位图
-#define LOG_FLAG(x)            (1 << (x))
+struct module_t
+{
+    module_t()
+    :
+        log_level(LF_DEBUG)
+    {}
+
+    module_t(const string& n_, int l_)
+    :
+        name(n_),
+        log_level(l_)
+    {}
+
+
+    bool operator<(const module_t& rhs_) const
+    {
+        return name < rhs_.name;
+    }
+
+    string      name;
+    int         log_level;
+};
 
 class log_t
 {
@@ -76,14 +95,8 @@ public:
     //! 设置单个日志文件最大文件大小
     int set_maxsize(int maxsize);
 
-    //! 设置日志级别
-    int enable_log_level(unsigned int log_level_flags, bool enable_flag);
-
     //! 设置日志模块
-    int enable_log_module(const char* module, bool enable_flag);
-
-    //! 设置日志级别
-    int set_log_level(const char *level);
+    int enable_log_module(const char* module_, bool enable_flag_, int log_level_ = LF_DEBUG);
 
     //! 设置是否写屏
     int enable_print_screen(bool enable_flag);
@@ -109,10 +122,8 @@ public:
     void handle_print_file(const std::string& text);
 
 private:
-    int check_module(const char* module);
+    int check_module(const char* module, int log_level_);
 
-    //! 检查日志级别
-    int check_log_level(int log_level);
     const char* get_color_head_by_level(int log_level_);
 
     int format_log_head(char *log_head, const char* module, int level, struct tm *tmp);
@@ -120,10 +131,6 @@ private:
     //! 记录一行日志
     int log(const char* module, int level, const char* fmt, va_list ap);
 
-
-private:
-    std::ofstream                                       ofstream_;
-    std::set<std::string>                               enable_modules_;
 
 private:
     //! 每行日志最大长度
@@ -142,22 +149,19 @@ private:
     //! 单个日志文件最大文件大小
     int                     m_maxsize;
 
-    //! 日志级别
-    unsigned int            m_log_level_flags;
-
     //! 是否写屏
     bool                    m_print_screen_flag;
 
     //! 是否写文件
     bool                    m_print_file_flag;
 
-    //! 当天日志文件序号
-    int                     m_cur_sn;
-
     //! 但前日期
     int                     m_cur_year;
     int                     m_cur_mon;
     int                     m_cur_mday;
+
+    //! 当天日志文件序号
+    int                     m_cur_sn;
 
     //! 当前日志行数
     int                     m_cur_line;
@@ -171,6 +175,10 @@ private:
     //! yunjie: 最终输出日志操作的回调, 可由外部决定投递到哪个线程进行写日志
     print_screen_callback_t m_print_screen_callback;
     print_file_callback_t   m_print_file_callback;
+
+
+    std::ofstream                                       m_ofstream;
+    std::set<module_t>                                  m_modules;
 };
 
 }

@@ -148,8 +148,12 @@ void parse_cmdarg(int argc_, char* argv_[])
 
             case 3:
                 {
-                    g_lua_config.init(pair_arr[i].arg_val, "echo_server_config");
-                    lua_config_to_server_config(g_lua_config, g_server_config);
+                    vector<string> tables;
+                    tables.push_back(CONFIG_ECHO_SERVER_TABLE);
+                    tables.push_back(CONFIG_LOG_MODULES_TABLE);
+
+                    g_lua_config.init(pair_arr[i].arg_val, tables);
+                    process_lua_config(g_lua_config, g_server_config);
                     printf("%s",g_server_config.dump().c_str());
                 }
                 break;

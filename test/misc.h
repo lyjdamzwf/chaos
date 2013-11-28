@@ -92,32 +92,45 @@ public:
         }
     }
 
+    static void enable_log_module(const string& module_, int log_level_)
+    {
+        singleton_t<log_t>::instance().enable_log_module(module_.c_str(), true, log_level_);
+    }
+
+    static void enable_log_module(const string& module_)
+    {
+        singleton_t<log_t>::instance().enable_log_module(module_.c_str(), true);
+    }
+
     static int start_log_service(const char* log_path_, int log_level_, int file_, int screen_)
     {
-        string log_path = log_path_;
-        string log_name = "log";
-        vector<string> modules;
-        modules.push_back(TEST_MODULE);
-        //! modules.push_back(THREAD_MODULE);
-        modules.push_back(TASK_SERVICE_MODULE);
-        modules.push_back(TIMER_MANAGER_MODULE);
-        modules.push_back(IO_MULTIPLEX_MODULE);
-        modules.push_back(WORK_SERVICE_MODULE);
-        modules.push_back(ACCEPTOR_SERVICE_MODULE);
-        modules.push_back(CONNECTION_MODULE);
-        modules.push_back(HEART_BEAT_MOUDLE);
-        modules.push_back(STATISTIC_MOUDLE);
-        modules.push_back(CONNECTOR_SERVICE);
+        singleton_t<log_t>::instance().set_path(log_path_);
+        singleton_t<log_t>::instance().set_filename("log");
+        singleton_t<log_t>::instance().set_maxline(100000);
+        singleton_t<log_t>::instance().set_maxsize(5000000);
 
-        init_log(log_path,
-                 log_name,
-                 file_,                              //! yunjie: 是否打印到文件
-                 screen_,                            //! yunjie: 是否输出到屏幕
-                 log_level_,                         //! yunjie: log level
-                 modules,
-                 print_screen_callback,
-                 print_file_callback
-            );
+        if(file_)
+            singleton_t<log_t>::instance().enable_print_file(true);
+
+        if(screen_)
+            singleton_t<log_t>::instance().enable_print_screen(true);
+
+        singleton_t<log_t>::instance().set_print_screen_callback(print_screen_callback);
+        singleton_t<log_t>::instance().set_print_file_callback(print_file_callback);
+
+        singleton_t<log_t>::instance().enable_log_module(THREAD_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(TASK_SERVICE_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(TIMER_MANAGER_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(IO_MULTIPLEX_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(ACCEPTOR_SERVICE_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(WORK_SERVICE_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(TCP_SERVICE_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(CONNECTION_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(HEART_BEAT_MOUDLE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(STATISTIC_MOUDLE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(CONNECTION_MODULE, true, log_level_);
+
+        singleton_t<log_t>::instance().open();
 
         LOGS().start(1);
         is_started = true;

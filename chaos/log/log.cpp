@@ -55,8 +55,6 @@ log_t::log_t()
     m_maxline = 50000;      //! yunjie: 单文件最大50000行
     m_maxsize = 1024000;    //! yunjie: 单文件最大100M
 
-    m_log_level_flags = 0;
-
     m_print_screen_flag = false;
     m_print_file_flag = false;
 
@@ -109,40 +107,17 @@ int log_t::set_maxsize(int maxsize)
 }
 
 //! 设置日志模块
-int log_t::enable_log_module(const char* module, bool enable_flag)
+int log_t::enable_log_module(const char* module_, bool enable_flag_, int log_level_)
 {
-    if (enable_flag)
+    module_t m(module_, log_level_);
+
+    if (enable_flag_)
     {
-        enable_modules_.insert(module);
+        m_modules.insert(m);
     }
     else
     {
-        enable_modules_.erase(module);
-    }
-
-    return 0;
-}
-
-int log_t::enable_log_level(unsigned int log_level_flags, bool enable_flag)
-{
-    if (true == enable_flag)
-    {
-        if (LOG_FLAG(ALL_LOG_LEVEL) == log_level_flags)
-        {
-            unsigned int z = 0;
-            m_log_level_flags = ~z;
-        }
-
-        m_log_level_flags = m_log_level_flags | log_level_flags;
-    }
-    else
-    {
-        if (LOG_FLAG(ALL_LOG_LEVEL) == log_level_flags)
-        {
-            m_log_level_flags = 0;
-        }
-
-        m_log_level_flags = m_log_level_flags & (~log_level_flags);
+        m_modules.erase(m);
     }
 
     return 0;
@@ -227,7 +202,7 @@ int log_t::open()
         break;
     }
 
-    ofstream_.open(file);
+    m_ofstream.open(file);
 
     m_opened = true;
 
@@ -241,7 +216,7 @@ int log_t::close()
         return 0;
     }
 
-    enable_modules_.clear();
+    m_modules.clear();
 
     return 0;
 }
@@ -322,11 +297,8 @@ int log_t::_logdebug(const char* module, const char* fmt, ...)
 int log_t::log(const char* module, int level, const char* fmt, va_list ap)
 {
     int rc;
-    rc = check_module(module);
+    rc = check_module(module, level);
     if(rc) return rc;
-
-    rc = check_log_level(level);
-    if (0 != rc) return rc;
 
     time_t timep = time(NULL);
     struct tm *tmp = localtime(&timep);
@@ -370,25 +342,17 @@ int log_t::log(const char* module, int level, const char* fmt, va_list ap)
     return 0;
 }
 
-int log_t::check_module(const char* module)
+int log_t::check_module(const char* module_, int log_level_)
 {
-    if (enable_modules_.find(module) != enable_modules_.end())
-    {
-        return 0;
-    }
-    return -1;
-}
-
-int log_t::check_log_level(int log_level)
-{
-    if (0 != (m_log_level_flags & LOG_FLAG(log_level)))
+    module_t m(module_, log_level_);
+    set<module_t>::iterator it = m_modules.find(m);
+    if (it != m_modules.end() && (*it).log_level >= log_level_)
     {
         return 0;
     }
 
     return -1;
 }
-
 
 const char* log_t::get_color_head_by_level(int log_level_)
 {
@@ -442,8 +406,8 @@ void log_t::handle_print_file(const std::string& mesg)
     // yunjie: 日期变化, 建立新的日期目录
     if ((m_cur_year != tmp->tm_year) || (m_cur_mon != tmp->tm_mon) || (m_cur_mday != tmp->tm_mday))
     {
-        ofstream_.close();
-        ofstream_.clear();
+        m_ofstream.close();
+        m_ofstream.clear();
 
         m_cur_year = tmp->tm_year;
         m_cur_mon = tmp->tm_mon;
@@ -458,17 +422,17 @@ void log_t::handle_print_file(const std::string& mesg)
         mkdir(file, 0777);
 
         sprintf(file, "%s/%d-%d-%d/%s.%d", m_path, m_cur_year + 1900, m_cur_mon + 1, m_cur_mday, m_filename, m_cur_sn);
-        ofstream_.open(file);
+        m_ofstream.open(file);
     }
 
-    ofstream_ << mesg;
-    ofstream_.flush();
+    m_ofstream << mesg;
+    m_ofstream.flush();
 
     // yunjie: 文件行数或者大小达到限制, 建立新文件
     if ((m_cur_line >= m_maxline) || (m_cur_size > m_maxsize))
     {
-        ofstream_.close();
-        ofstream_.clear();
+        m_ofstream.close();
+        m_ofstream.clear();
 
         m_cur_sn++;
         m_cur_line = 0;
@@ -476,7 +440,7 @@ void log_t::handle_print_file(const std::string& mesg)
 
         char file[1024];
         sprintf(file, "%s/%d-%d-%d/%s.%d", m_path, m_cur_year + 1900, m_cur_mon + 1, m_cur_mday, m_filename, m_cur_sn);
-        ofstream_.open(file);
+        m_ofstream.open(file);
     }
 
     m_cur_line += 1;

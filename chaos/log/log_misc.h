@@ -133,17 +133,6 @@ using namespace chaos::utility;
 #endif
 
 
-int init_log(const std::string& path,
-			 const std::string& file,
-			 const int	flag_print_file,
-			 const int	flag_print_screen,
-			 const int  flag_log_level,
-			 const std::vector<std::string>& modules,
-             log_t::print_screen_callback_t screen_callback_ = NULL,
-             log_t::print_file_callback_t file_callback = NULL,
-			 const int  max_line = 100000,
-			 const int  maz_size = 5000000);
-
 }
 
 }

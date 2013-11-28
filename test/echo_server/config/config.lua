@@ -20,3 +20,21 @@ echo_server_config =
     work_thread_num         = 2,
 }
 
+-- yunjie: 日志相关
+log_modules =
+{
+    THREAD_MODULE           = 3,
+    TASK_SERVICE_MODULE     = 3,
+    TIMER_MANAGER_MODULE    = 3,
+    IO_MULTIPLEX_MODULE     = 3,
+    ACCEPTOR_SERVICE_MODULE = 3,
+    WORK_SERVICE_MODULE     = 3,
+    TCP_SERVICE_MODULE      = 3,
+    CONNECTION_MODULE       = 3,
+    HEART_BEAT_MOUDLE       = 3,
+    STATISTIC_MOUDLE        = 3,
+    CONNECTOR_SERVICE       = 3,
+
+    TEST_MODULE             = 5,
+}
+

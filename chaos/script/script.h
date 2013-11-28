@@ -225,10 +225,18 @@ void script_t::class_mem( const char* name, VAR BASE::*val )
 class lua_config_t : private noncopyable_t
 {
 public:
+    typedef vector<string>                                          vct_val_t;
+    typedef map<string, vct_val_t>                                  map_attr_t;
+    typedef map<string, map_attr_t>                                 map_table_t;
+
+    typedef void (*process_table_attr) (const string& key_, const string& val_);
+
+public:
     lua_config_t();
     ~lua_config_t();
 
     int init(const string& lua_path_, const string& table_);
+    int init(const string& lua_path_, const vector<string>& tables_);
 
     const string& operator[](const string& key_) const
     {
@@ -236,17 +244,14 @@ public:
     }
 
     const string& get(const string& key_) const;
+    const string& get(const string& table_, const string& key_) const;
     const vector<string>& get_multi(const string& key_) const;
+    const vector<string>& get_multi(const string& table_, const string& key_) const;
+    int enumerate(const string& table_, process_table_attr func_) const;
 
 private:
-    typedef map<string, vector<string> >::const_iterator            map_const_it_t;
-    typedef map<string, vector<string> >::iterator                  map_it_t;
-    typedef vector<string>::const_iterator                          val_const_it_t;
-    typedef vector<string>::iterator                                val_it_t;
-
-private:
-    map<string, vector<string> >                m_config_map;
-    lua_State                                   *m_lua_state;
+    map_table_t                                                 m_map_table;
+    lua_State                                                  *m_lua_state;
 };
 
 }

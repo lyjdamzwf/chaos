@@ -1,6 +1,9 @@
 #ifndef _CHAOS_SERVER_CONFIG_H_
 #define _CHAOS_SERVER_CONFIG_H_
 
+#include "../misc.h"
+
+#define CONFIG_ECHO_SERVER_TABLE            "echo_server_config"
 #define CONFIG_OPTION_DAEMON                "daemon"
 #define CONFIG_OPTION_LOG_LEVEL             "log_level"
 #define CONFIG_OPTION_LOG_PRINT_TO_FILE     "log_print_to_file"
@@ -14,6 +17,8 @@
 #define CONFIG_OPTION_PORT                  "port"
 #define CONFIG_OPTION_CONN_TIMEOUT          "conn_timeout"
 #define CONFIG_OPTION_WORK_THREAD_NUM       "work_thread_num"
+
+#define CONFIG_LOG_MODULES_TABLE            "log_modules"
 
 struct server_config_t
 {
@@ -90,27 +95,38 @@ struct server_config_t
     }
 };
 
-#define LUA_CFG_ASSIGN_SER_CFG_INT(ser_mem, lua_key) \
-server_config_.ser_mem = atoi(lua_config_[lua_key].c_str());
+#define CFG_ASSIGN_INT(ser_mem, lua_key) \
+    server_config_.ser_mem = atoi(lua_config_.get(CONFIG_ECHO_SERVER_TABLE, lua_key).c_str());
 
-#define LUA_CFG_ASSIGN_SER_CFG_STR(ser_mem, lua_key) \
-server_config_.ser_mem = lua_config_[lua_key];
+#define CFG_ASSIGN_STR(ser_mem, lua_key) \
+    server_config_.ser_mem = lua_config_.get(CONFIG_ECHO_SERVER_TABLE, lua_key).c_str();
 
-static void lua_config_to_server_config(const lua_config_t& lua_config_, server_config_t& server_config_)
+
+void process_table_attr(const string& key_, const string& val_)
 {
-    LUA_CFG_ASSIGN_SER_CFG_INT(daemon, CONFIG_OPTION_DAEMON);
-    LUA_CFG_ASSIGN_SER_CFG_INT(log_level, CONFIG_OPTION_LOG_LEVEL);
-    LUA_CFG_ASSIGN_SER_CFG_INT(log_print_to_file, CONFIG_OPTION_LOG_PRINT_TO_FILE);
-    LUA_CFG_ASSIGN_SER_CFG_INT(log_print_to_screen, CONFIG_OPTION_LOG_PRINT_TO_SCREEN);
-    LUA_CFG_ASSIGN_SER_CFG_INT(tcp_sndbuf_size, CONFIG_OPTION_TCP_SNDBUF_SIZE);
-    LUA_CFG_ASSIGN_SER_CFG_INT(tcp_rcvbuf_size, CONFIG_OPTION_TCP_RCVBUF_SIZE);
-    LUA_CFG_ASSIGN_SER_CFG_INT(max_send_buffer_size, CONFIG_OPTION_MAX_SEND_BUFFER_SIZE);
-    LUA_CFG_ASSIGN_SER_CFG_INT(max_recv_buffer_size, CONFIG_OPTION_MAX_RECV_BUFFER_SIZE);
-    LUA_CFG_ASSIGN_SER_CFG_INT(tcp_nodelay, CONFIG_OPTION_TCP_NODELAY);
-    LUA_CFG_ASSIGN_SER_CFG_STR(address, CONFIG_OPTION_ADDRESS);
-    LUA_CFG_ASSIGN_SER_CFG_INT(port, CONFIG_OPTION_PORT);
-    LUA_CFG_ASSIGN_SER_CFG_INT(conn_timeout, CONFIG_OPTION_CONN_TIMEOUT);
-    LUA_CFG_ASSIGN_SER_CFG_INT(work_thread_num, CONFIG_OPTION_WORK_THREAD_NUM);
+    if (val_.empty())
+        log_tool_t::enable_log_module(key_);
+    else
+        log_tool_t::enable_log_module(key_, atoi(val_.c_str()));
+}
+
+static void process_lua_config(const lua_config_t& lua_config_, server_config_t& server_config_)
+{
+    CFG_ASSIGN_INT(daemon, CONFIG_OPTION_DAEMON);
+    CFG_ASSIGN_INT(log_level, CONFIG_OPTION_LOG_LEVEL);
+    CFG_ASSIGN_INT(log_print_to_file, CONFIG_OPTION_LOG_PRINT_TO_FILE);
+    CFG_ASSIGN_INT(log_print_to_screen, CONFIG_OPTION_LOG_PRINT_TO_SCREEN);
+    CFG_ASSIGN_INT(tcp_sndbuf_size, CONFIG_OPTION_TCP_SNDBUF_SIZE);
+    CFG_ASSIGN_INT(tcp_rcvbuf_size, CONFIG_OPTION_TCP_RCVBUF_SIZE);
+    CFG_ASSIGN_INT(max_send_buffer_size, CONFIG_OPTION_MAX_SEND_BUFFER_SIZE);
+    CFG_ASSIGN_INT(max_recv_buffer_size, CONFIG_OPTION_MAX_RECV_BUFFER_SIZE);
+    CFG_ASSIGN_INT(tcp_nodelay, CONFIG_OPTION_TCP_NODELAY);
+    CFG_ASSIGN_STR(address, CONFIG_OPTION_ADDRESS);
+    CFG_ASSIGN_INT(port, CONFIG_OPTION_PORT);
+    CFG_ASSIGN_INT(conn_timeout, CONFIG_OPTION_CONN_TIMEOUT);
+    CFG_ASSIGN_INT(work_thread_num, CONFIG_OPTION_WORK_THREAD_NUM);
+
+    lua_config_.enumerate(CONFIG_LOG_MODULES_TABLE, &process_table_attr);
 }
 
 
