@@ -102,6 +102,14 @@ public:
         singleton_t<log_t>::instance().enable_log_module(module_.c_str(), true);
     }
 
+    static void enable_log_module(const string& key_, const string& val_)
+    {
+        if (val_.empty())
+            enable_log_module(key_);
+        else
+            enable_log_module(key_, atoi(val_.c_str()));
+    }
+
     static int start_log_service(const char* log_path_, int log_level_, int file_, int screen_)
     {
         singleton_t<log_t>::instance().set_path(log_path_);
@@ -129,6 +137,7 @@ public:
         singleton_t<log_t>::instance().enable_log_module(HEART_BEAT_MOUDLE, true, log_level_);
         singleton_t<log_t>::instance().enable_log_module(STATISTIC_MOUDLE, true, log_level_);
         singleton_t<log_t>::instance().enable_log_module(CONNECTION_MODULE, true, log_level_);
+        singleton_t<log_t>::instance().enable_log_module(TEST_MODULE, true, log_level_);
 
         singleton_t<log_t>::instance().open();
 

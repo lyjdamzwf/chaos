@@ -102,14 +102,6 @@ struct server_config_t
     server_config_.ser_mem = lua_config_.get(CONFIG_ECHO_SERVER_TABLE, lua_key).c_str();
 
 
-void process_table_attr(const string& key_, const string& val_)
-{
-    if (val_.empty())
-        log_tool_t::enable_log_module(key_);
-    else
-        log_tool_t::enable_log_module(key_, atoi(val_.c_str()));
-}
-
 static void process_lua_config(const lua_config_t& lua_config_, server_config_t& server_config_)
 {
     CFG_ASSIGN_INT(daemon, CONFIG_OPTION_DAEMON);
@@ -126,7 +118,7 @@ static void process_lua_config(const lua_config_t& lua_config_, server_config_t&
     CFG_ASSIGN_INT(conn_timeout, CONFIG_OPTION_CONN_TIMEOUT);
     CFG_ASSIGN_INT(work_thread_num, CONFIG_OPTION_WORK_THREAD_NUM);
 
-    lua_config_.enumerate(CONFIG_LOG_MODULES_TABLE, &process_table_attr);
+    lua_config_.enumerate(CONFIG_LOG_MODULES_TABLE, (void (*) (const string&, const string&))&log_tool_t::enable_log_module);
 }
 
 
