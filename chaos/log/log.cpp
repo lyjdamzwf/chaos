@@ -25,7 +25,9 @@
 #include <sys/syscall.h>
 
 #include <chaos/utility/utility_inc.h>
+#include <chaos/task_service/task_service.h>
 using namespace chaos::utility;
+using namespace chaos::task_service;
 
 #include <chaos/log/log.h>
 
@@ -65,9 +67,6 @@ log_t::log_t()
     m_cur_sn = 0;
     m_cur_line = 0;
     m_cur_size = 0;
-
-    m_print_screen_callback = NULL;
-    m_print_file_callback = NULL;
 }
 
 log_t::~log_t()
@@ -135,20 +134,6 @@ int log_t::enable_print_file(bool enable_flag)
     return 0;
 }
 
-int log_t::set_print_screen_callback(print_screen_callback_t callback_)
-{
-    m_print_screen_callback = callback_;
-
-    return 0;
-}
-
-int log_t::set_print_file_callback(print_file_callback_t callback_)
-{
-    m_print_file_callback = callback_;
-
-    return 0;
-}
-
 int log_t::open()
 {
     if(m_opened) return 0;
@@ -202,6 +187,13 @@ int log_t::open()
         break;
     }
 
+    if (!m_task_service)
+    {
+        m_task_service = new task_service_t("log_service");
+    }
+
+    m_task_service->start();
+
     m_ofstream.open(file);
 
     m_opened = true;
@@ -217,6 +209,11 @@ int log_t::close()
     }
 
     m_modules.clear();
+
+    m_task_service->stop();
+    SAFE_DELETE(m_task_service);
+
+    m_opened = false;
 
     return 0;
 }
@@ -318,27 +315,14 @@ int log_t::log(const char* module, int level, const char* fmt, va_list ap)
 
     if (m_print_screen_flag)
     {
-        if (NULL != m_print_screen_callback)
-        {
-            (*m_print_screen_callback)(os.str());
-        }
-        else
-        {
-            handle_print_screen(os.str());
-        }
+        m_task_service->post(bindfunc(this, &log_t::handle_print_screen, os.str()));
     }
 
     if (m_print_file_flag)
     {
-        if (NULL != m_print_file_callback)
-        {
-            (*m_print_file_callback)(os.str());
-        }
-        else
-        {
-            handle_print_file(os.str());
-        }
+        m_task_service->post(bindfunc(this, &log_t::handle_print_file, os.str()));
     }
+
     return 0;
 }
 

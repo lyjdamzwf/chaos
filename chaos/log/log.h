@@ -32,6 +32,15 @@
 #include <sstream>
 #include <iostream>
 
+
+namespace chaos
+{
+namespace task_service
+{
+    class task_service_t;
+}
+}
+
 namespace chaos
 {
 
@@ -76,10 +85,6 @@ struct module_t
 class log_t
 {
 public:
-    typedef void (*print_screen_callback_t)(const std::string& msg_);
-    typedef void (*print_file_callback_t)(const std::string& msg_);
-
-public:
     log_t();
     ~log_t();
 
@@ -103,9 +108,6 @@ public:
 
     //! 设置是否打印到文件
     int enable_print_file(bool enable_flag);
-
-    int set_print_screen_callback(print_screen_callback_t callback_);
-    int set_print_file_callback(print_file_callback_t callback_);
 
     int open();
 
@@ -172,11 +174,7 @@ private:
     //! 日志级别描述
     static const char*      m_log_level_desp[];
 
-    //! yunjie: 最终输出日志操作的回调, 可由外部决定投递到哪个线程进行写日志
-    print_screen_callback_t m_print_screen_callback;
-    print_file_callback_t   m_print_file_callback;
-
-
+    chaos::task_service::task_service_t                *m_task_service;
     std::ofstream                                       m_ofstream;
     std::set<module_t>                                  m_modules;
 };

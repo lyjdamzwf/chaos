@@ -47,26 +47,22 @@ using namespace chaos::script;
     extern task_service_t*             task_service_1104;       \
     extern work_service_t*             work_service_1104;       \
     extern work_service_group_t*       work_service_group_1104; \
-    extern task_service_t*             log_service_1104;        \
     extern statistic_service_t*        stat_service_1104;       \
 
 #define NEW_SERVICE()                                               \
     task_service_1104 = new task_service_t("global task service");  \
     work_service_1104 = new work_service_t("global work service");  \
     work_service_group_1104 = new work_service_group_t();           \
-    log_service_1104 = new task_service_t("log service");           \
     stat_service_1104 = new statistic_service_t();                  \
 
 #define DEL_SERVICE()                           \
     SAFE_DELETE(task_service_1104);             \
     SAFE_DELETE(work_service_1104);             \
     SAFE_DELETE(work_service_group_1104);       \
-    SAFE_DELETE(log_service_1104);              \
     SAFE_DELETE(stat_service_1104);             \
 
 #define TS()    (*task_service_1104)
 #define WS()    (*work_service_1104)
-#define LOGS()  (*log_service_1104)
 #define WSG()   (*work_service_group_1104)
 #define SS()    (*stat_service_1104)
 
@@ -76,22 +72,6 @@ EXTERN_SERVICE_DECL
 class log_tool_t
 {
 public:
-    static void print_screen_callback(const std::string& msg_)
-    {
-        if (is_started)
-        {
-            LOGS().post(bindfunc(&singleton_t<log_t>::instance(), &log_t::handle_print_screen, msg_));
-        }
-    }
-
-    static void print_file_callback(const std::string& msg_)
-    {
-        if (is_started)
-        {
-            LOGS().post(bindfunc(&singleton_t<log_t>::instance(), &log_t::handle_print_file, msg_));
-        }
-    }
-
     static void enable_log_module(const string& module_, int log_level_)
     {
         singleton_t<log_t>::instance().enable_log_module(module_.c_str(), true, log_level_);
@@ -123,9 +103,6 @@ public:
         if(screen_)
             singleton_t<log_t>::instance().enable_print_screen(true);
 
-        singleton_t<log_t>::instance().set_print_screen_callback(print_screen_callback);
-        singleton_t<log_t>::instance().set_print_file_callback(print_file_callback);
-
         singleton_t<log_t>::instance().enable_log_module(THREAD_MODULE, true, log_level_);
         singleton_t<log_t>::instance().enable_log_module(TASK_SERVICE_MODULE, true, log_level_);
         singleton_t<log_t>::instance().enable_log_module(TIMER_MANAGER_MODULE, true, log_level_);
@@ -141,22 +118,15 @@ public:
 
         singleton_t<log_t>::instance().open();
 
-        LOGS().start(1);
-        is_started = true;
-
         return 0;
     }
 
     static int stop_log_service()
     {
-        LOGS().stop();
-        is_started = false;
+        singleton_t<log_t>::instance().close();
 
         return 0;
     }
-
-private:
-    volatile static bool             is_started;
 };
 
 class application_tool_t
