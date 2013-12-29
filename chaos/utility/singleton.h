@@ -21,6 +21,7 @@
  */
 
 #include <stdlib.h>
+#include <pthread.h>
 
 namespace chaos
 {
@@ -37,17 +38,20 @@ namespace utility
     public:
         static Type& instance() // Unique point of access
         {
-            if (s_instance == 0)
-            {
-                s_instance = new(Type)();
-                atexit(destroy);
-            }
+            pthread_once(&s_pthread_once, &singleton_t::init);
             return *s_instance;
         }
-    protected:
+
+    private:
         singleton_t() {}
         virtual ~singleton_t() {}
-    private:
+
+        static void init()
+        {
+            s_instance = new(Type)();
+            atexit(destroy);
+        }
+
         static void destroy() // Destroy the only instance
         {
             if (s_instance != 0)
@@ -56,13 +60,17 @@ namespace utility
                 s_instance = 0;
             }
         }
-        static Type* volatile s_instance; // The one and oly instance
+
+    private:
+        static pthread_once_t       s_pthread_once;
+        static Type*                s_instance; // The one and oly instance
     };
 
     template <typename Type>
-    Type* volatile singleton_t<Type >::s_instance = 0;
+    pthread_once_t singleton_t<Type >::s_pthread_once = PTHREAD_ONCE_INIT;
 
-
+    template <typename Type>
+    Type* singleton_t<Type >::s_instance = 0;
 }
 
 }
