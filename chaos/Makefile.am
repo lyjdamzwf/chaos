@@ -69,6 +69,7 @@ libchaos_a_SOURCES = \
 					 utility/random.cpp \
 					 utility/signal_handler.cpp \
                      script/script.cpp \
+					 script/lua_config.cpp \
 					 deps/lua-5.1.4/src/ldo.c \
 					 deps/lua-5.1.4/src/lcode.c \
 					 deps/lua-5.1.4/src/lauxlib.c \

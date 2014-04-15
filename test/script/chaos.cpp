@@ -25,8 +25,19 @@ class script2_t : public chaos::script::script_t
 
         CLASS_ADD(a_t);
         CLASS_DEF(a_t, func1);
+
+        lua_tinker::def(_L, "cpp_callback", &script2_t::callback);
+    }
+
+    static void callback(lua_tinker::table t_)
+    {
+        extern script2_t s;
+        printf("callback!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        s.call<void>("user_t:func1", t_);
     }
 };
+
+script2_t s;
 
 int main(int argc_, char *argv_[])
 {
@@ -34,7 +45,7 @@ int main(int argc_, char *argv_[])
 
     log_tool_t::start_log_service("script.log", 6, 1, 1);
 
-    script2_t s;
+
     s.add_package_path("./lua_package");
     s.register_lua_interface();
     s.do_file("./entry.lua");

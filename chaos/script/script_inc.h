@@ -10,6 +10,7 @@
 #define _CHAOS_SCRIPT_INC_H_
 
 #include <chaos/script/script.h>
+#include <chaos/script/lua_config.h>
 
 #endif //! _CHAOS_SCRIPT_INC_H_
 

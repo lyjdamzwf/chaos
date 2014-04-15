@@ -23,3 +23,23 @@ function callback(p)
       print("rand_val:" .. rand_val)
    end
 end
+
+user_t = {}
+user_t.__index = user_t
+
+function user_t:new()
+
+   local ret = {}
+   setmetatable(ret, self)
+   return ret
+
+end
+
+function user_t:func1()
+   print("func1!!!!!!!!!!!!!!!!!!!!!!!!")
+end
+
+g_u = user_t:new()
+
+cpp_callback(g_u)
+

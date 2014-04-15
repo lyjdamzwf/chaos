@@ -9,4 +9,5 @@ libchaos_script_a_LIBFLAGS =
 libchaos_script_a_LIBADD =
 
 libchaos_script_a_SOURCES = \
-						script.cpp
+						script.cpp \
+						lua_config.cpp

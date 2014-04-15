@@ -24,9 +24,10 @@
 #include <vector>
 #include <map>
 
-#include <chaos/utility/noncopyable.h>
-#include <chaos/log/log_inc.h>
 #include <chaos/deps/lua_tinker/lua_tinker.h>
+#include <chaos/utility/utility_inc.h>
+#include <chaos/task_service/task_service_inc.h>
+#include <chaos/log/log_inc.h>
 
 namespace chaos
 {
@@ -37,6 +38,7 @@ namespace script
 using namespace std;
 
 using namespace chaos::log;
+using namespace chaos::task_service;
 
 class script_t : private noncopyable_t
 {
@@ -221,37 +223,16 @@ void script_t::class_mem( const char* name, VAR BASE::*val )
 	lua_tinker::class_mem<T>(_L, name, val);
 }
 
-
-class lua_config_t : private noncopyable_t
+class service_script_t : public script_t
 {
 public:
-    typedef vector<string>                                          vct_val_t;
-    typedef map<string, vct_val_t>                                  map_attr_t;
-    typedef map<string, map_attr_t>                                 map_table_t;
+    service_script_t(task_service_t *service_);
+    virtual ~service_script_t();
 
-    typedef void (*process_table_attr) (const string& key_, const string& val_);
-
-public:
-    lua_config_t();
-    ~lua_config_t();
-
-    int init(const string& lua_path_, const string& table_);
-    int init(const string& lua_path_, const vector<string>& tables_);
-
-    const string& operator[](const string& key_) const
-    {
-        return get(key_);
-    }
-
-    const string& get(const string& key_) const;
-    const string& get(const string& table_, const string& key_) const;
-    const vector<string>& get_multi(const string& key_) const;
-    const vector<string>& get_multi(const string& table_, const string& key_) const;
-    int enumerate(const string& table_, process_table_attr func_) const;
+    void register_timer();
 
 private:
-    map_table_t                                                 m_map_table;
-    lua_State                                                  *m_lua_state;
+    task_service_t                  *m_service;
 };
 
 }
