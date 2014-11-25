@@ -9,6 +9,7 @@ AC_SUBST(chaos_ver)
 
 # Checks for programs.
 AC_PROG_RANLIB
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
