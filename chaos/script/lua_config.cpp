@@ -53,7 +53,7 @@ int lua_config_t::init(const string& lua_path_, const vector<string>& tables_)
         {
             if(lua_isnumber(m_lua_state,-2))
             {
-                sprintf(key_buf, "%" PRId64, lua_tonumber(m_lua_state,-2));
+                sprintf(key_buf, "%f", lua_tonumber(m_lua_state,-2));
                 key = key_buf;
             }
             else if(lua_isstring(m_lua_state,-2))
@@ -62,7 +62,7 @@ int lua_config_t::init(const string& lua_path_, const vector<string>& tables_)
             }
             if(lua_isnumber(m_lua_state,-1))
             {
-                sprintf(val_buf, "%" PRId64, lua_tonumber(m_lua_state,-1));
+                sprintf(val_buf, "%f", lua_tonumber(m_lua_state,-1));
                 val = val_buf;
             }
             else if(lua_isstring(m_lua_state,-1))
