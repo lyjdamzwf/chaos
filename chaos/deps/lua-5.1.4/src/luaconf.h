@@ -10,8 +10,6 @@
 
 #include <limits.h>
 #include <stddef.h>
-//! added by FM
-#include <stdlib.h>
 
 
 /*
@@ -142,10 +140,7 @@
 ** CHANGE that if ptrdiff_t is not adequate on your machine. (On most
 ** machines, ptrdiff_t gives a good choice between int or long.)
 */
-
-//! #define LUA_INTEGER	ptrdiff_t
-//! modified by FM
-#define LUA_INTEGER	long
+#define LUA_INTEGER	ptrdiff_t
 
 
 /*
@@ -506,19 +501,14 @@
 ** ===================================================================
 */
 
-//! #define LUA_NUMBER_DOUBLE
-//! #define LUA_NUMBER	double
-//! modified by FM
-#define LUA_NUMBER_LONG
-#define LUA_NUMBER	long
+#define LUA_NUMBER_DOUBLE
+#define LUA_NUMBER	double
 
 /*
 @@ LUAI_UACNUMBER is the result of an 'usual argument conversion'
 @* over a number.
 */
-//! #define LUAI_UACNUMBER	double
-//! modified by FM
-#define LUAI_UACNUMBER	long
+#define LUAI_UACNUMBER	double
 
 
 /*
@@ -528,16 +518,11 @@
 @@ LUAI_MAXNUMBER2STR is maximum size of previous conversion.
 @@ lua_str2number converts a string to a number.
 */
-//! #define LUA_NUMBER_SCAN		"%lf"
-//! #define LUA_NUMBER_FMT		"%.14g"
-//! #define lua_number2str(s,n)	sprintf((s), LUA_NUMBER_FMT, (n))
-//! #define LUAI_MAXNUMBER2STR	32 /* 16 digits, sign, point, and \0 */
-//! #define lua_str2number(s,p)	strtod((s), (p))
-#define LUA_NUMBER_SCAN		"%ld"
-#define LUA_NUMBER_FMT		"%ld"
+#define LUA_NUMBER_SCAN		"%lf"
+#define LUA_NUMBER_FMT		"%.14g"
 #define lua_number2str(s,n)	sprintf((s), LUA_NUMBER_FMT, (n))
 #define LUAI_MAXNUMBER2STR	32 /* 16 digits, sign, point, and \0 */
-#define lua_str2number(s,p)	strtol((s), (p), 10)
+#define lua_str2number(s,p)	strtod((s), (p))
 
 
 /*
